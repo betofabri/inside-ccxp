@@ -8,6 +8,7 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "workers_dev": true,
   "routes": [
     {
       "pattern": "betofabri.com/lab/inside-ccxp*",
