@@ -1772,13 +1772,32 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
   line-height: 1.2;
 }
 
-.perfil-host .corp-on {
+.perfil-host .perfil-sub {
   display: block;
   font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+
+.perfil-host .corp-on {
   font-weight: 700;
-  letter-spacing: 0.05em;
   color: var(--st-resgatado);
 }
+
+/* variante compacta da topbar */
+.perfil-topo > summary {
+  padding: 6px 12px 6px 7px;
+  border-radius: var(--radius-pill);
+}
+
+.perfil-topo .avatar {
+  width: 30px;
+  height: 30px;
+  font-size: 13.5px;
+}
+
+.perfil-topo .perfil-nome { font-size: 13.5px; white-space: nowrap; }
 
 .perfil-host .chevron {
   width: 8px;

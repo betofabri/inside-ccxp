@@ -5,7 +5,6 @@ import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, fmtData } from "@/l
 import NovoConvite from "./novo-convite";
 import AcoesConvite from "./acoes-convite";
 import ImportarBotao from "./importar-botao";
-import PerfilHost from "./perfil-host";
 import { expirarVencidos } from "@/lib/convites";
 
 export const dynamic = "force-dynamic";
@@ -47,24 +46,12 @@ export default async function PaginaFuncionario() {
     corpDisp: contar(corpDisponivel, tipo),
   }));
 
-  const saldoPessoalTotal = tipos.reduce((acc, t) => acc + t.pessoalDisp, 0);
 
   return (
     <div className="pagina">
-      <div className="cab-pagina">
-        <div>
-          <h1>Novo convite</h1>
-          <div style={{ marginTop: 14 }}>
-            <ImportarBotao pool="pessoal" eventoEsperado="CCXP26" />
-          </div>
-        </div>
-        <PerfilHost
-          nome={host.nome}
-          email={host.email}
-          nivel={host.nivel}
-          podeCorporativo={host.podeCorporativo}
-          saldoPessoal={saldoPessoalTotal}
-        />
+      <h1>Novo convite</h1>
+      <div style={{ marginTop: 14 }}>
+        <ImportarBotao pool="pessoal" eventoEsperado="CCXP26" />
       </div>
 
       <div className="estoque">

@@ -3,8 +3,9 @@ import { Archivo, Marcellus, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { getPersona } from "@/lib/persona";
-import { sairPersona } from "@/lib/actions";
+import { NIVEL_LABEL, fmtData } from "@/lib/labels";
 import { db } from "@/lib/db";
+import PerfilTopo from "@/components/perfil-topo";
 
 const display = Marcellus({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
@@ -21,18 +22,56 @@ const PAPEL_LABEL: Record<string, string> = {
   convidado: "Convidado",
 };
 
-async function nomePersona(role: string, id: number): Promise<string | null> {
+type Perfil = {
+  nome: string;
+  papel: string;
+  corpOn: boolean;
+  detalhes: { rotulo: string; valor: React.ReactNode }[];
+};
+
+async function carregarPerfil(role: string, id: number): Promise<Perfil | null> {
   if (role === "convidado") {
     const c = await db.convidado.findUnique({ where: { id } });
-    return c?.nome ?? null;
+    if (!c) return null;
+    return {
+      nome: c.nome,
+      papel: PAPEL_LABEL[role],
+      corpOn: false,
+      detalhes: [
+        { rotulo: "Contato", valor: <span className="mono">{c.email ?? c.telefone ?? "—"}</span> },
+        ...(c.empresa ? [{ rotulo: "Empresa", valor: c.empresa }] : []),
+        {
+          rotulo: "LGPD",
+          valor: c.consentimentoEm ? `aceita em ${fmtData(c.consentimentoEm)}` : "pendente",
+        },
+      ],
+    };
   }
+
   const f = await db.funcionario.findUnique({ where: { id } });
-  return f?.nome ?? null;
+  if (!f) return null;
+  const saldoPessoal = await db.codigo.count({
+    where: { pool: "pessoal", donoId: f.id, status: "disponivel" },
+  });
+  return {
+    nome: f.nome,
+    papel: PAPEL_LABEL[role],
+    corpOn: f.podeCorporativo,
+    detalhes: [
+      { rotulo: "Email", valor: <span className="mono">{f.email}</span> },
+      { rotulo: "Nível", valor: NIVEL_LABEL[f.nivel] },
+      {
+        rotulo: "Convite corporativo",
+        valor: f.podeCorporativo ? <span className="badge resgatado">Ativo</span> : <span className="dim">—</span>,
+      },
+      { rotulo: "Cota pessoal disponível", valor: <b>{saldoPessoal} código(s)</b> },
+    ],
+  };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const persona = await getPersona();
-  const nome = persona ? await nomePersona(persona.role, persona.id) : null;
+  const perfil = persona ? await carregarPerfil(persona.role, persona.id) : null;
 
   return (
     <html lang="pt-BR">
@@ -52,14 +91,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </button>
           </nav>
           <span className="spacer" />
-          {persona && nome && (
-            <div className="persona-chip">
-              <span className="papel">{PAPEL_LABEL[persona.role]}</span>
-              <span className="quem">{nome}</span>
-              <form action={sairPersona}>
-                <button type="submit">Trocar</button>
-              </form>
-            </div>
+          {perfil && (
+            <PerfilTopo
+              nome={perfil.nome}
+              papel={perfil.papel}
+              corpOn={perfil.corpOn}
+              detalhes={perfil.detalhes}
+            />
           )}
         </header>
         <main>{children}</main>
