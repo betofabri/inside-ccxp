@@ -1,0 +1,118 @@
+// Sistema RSVP / CRM de convidados VIP · CCXP26
+// Modelo do §11 do plano. SQLite não tem enum no Prisma — campos String com valores documentados.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// nivel: vp_socio | diretoria | geral
+model Funcionario {
+  id              Int       @id @default(autoincrement())
+  nome            String
+  email           String    @unique
+  nivel           String
+  podeCorporativo Boolean   @default(false)
+  isAdmin         Boolean   @default(false)
+  codigos         Codigo[]
+  convites        Convite[]
+}
+
+// tipo:   quinta | sexta | sabado | domingo | todos_os_dias
+// pool:   pessoal | corporativo
+// status: disponivel | reservado | entregue | resgatado
+model Codigo {
+  id                  Int          @id @default(autoincrement())
+  valor               String       @unique
+  tipo                String
+  pool                String
+  donoId              Int?
+  dono                Funcionario? @relation(fields: [donoId], references: [id])
+  status              String       @default("disponivel")
+  conviteId           Int?
+  convite             Convite?     @relation(fields: [conviteId], references: [id])
+  resgateConfirmadoEm DateTime?
+  presenteEm          DateTime?
+}
+
+// canais: csv simples "email" | "whatsapp" | "email,whatsapp"
+// status: pendente | cadastrado | expirado | cancelado
+model Convite {
+  id           Int              @id @default(autoincrement())
+  hostId       Int
+  host         Funcionario      @relation(fields: [hostId], references: [id])
+  convidadoId  Int
+  convidado    Convidado        @relation(fields: [convidadoId], references: [id])
+  canais       String
+  status       String           @default("pendente")
+  expiraEm     DateTime
+  vipOmelete   Boolean          @default(false)
+  criadoEm     DateTime         @default(now())
+  magicToken   String           @unique
+  parcelas     ConviteParcela[]
+  codigos      Codigo[]
+}
+
+model ConviteParcela {
+  id        Int     @id @default(autoincrement())
+  conviteId Int
+  convite   Convite @relation(fields: [conviteId], references: [id])
+  pool      String
+  tipo      String
+  qtd       Int
+}
+
+model Convidado {
+  id               Int             @id @default(autoincrement())
+  nome             String
+  email            String?         @unique
+  telefone         String?
+  consentimentoEm  DateTime?
+  optoutRegua      Boolean         @default(false)
+  resgateDeclarado Boolean         @default(false)
+  convites         Convite[]
+  comunicacoes     ComunicacaoLog[]
+}
+
+// categoria: transacional | regua
+model ComunicacaoLog {
+  id          Int       @id @default(autoincrement())
+  convidadoId Int
+  convidado   Convidado @relation(fields: [convidadoId], references: [id])
+  categoria   String
+  passo       String
+  canal       String
+  status      String
+  data        DateTime  @default(now())
+}
+
+model AgendaItem {
+  id        Int    @id @default(autoincrement())
+  dia       String
+  horario   String
+  titulo    String
+  descricao String
+}
+
+model DominioBloqueado {
+  id      Int    @id @default(autoincrement())
+  dominio String @unique
+}
+
+model AuditLog {
+  id      Int      @id @default(autoincrement())
+  atorId  Int?
+  acao    String
+  alvo    String
+  detalhe String
+  data    DateTime @default(now())
+}
+
+model Config {
+  chave String @id
+  valor String
+}

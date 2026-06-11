@@ -1,0 +1,247 @@
+import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { getPersona } from "@/lib/persona";
+import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
+
+export const dynamic = "force-dynamic";
+
+export default async function PaginaAdmin() {
+  const persona = await getPersona();
+  if (!persona || persona.role !== "admin") redirect("/");
+
+  const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
+  if (!admin?.isAdmin) redirect("/");
+
+  // ── Funil ──
+  const totalConvidados = await db.convidado.count();
+  const cadastrados = await db.convidado.count({ where: { consentimentoEm: { not: null } } });
+  const entregues = await db.convidado.count({
+    where: { convites: { some: { codigos: { some: { status: { in: ["entregue", "resgatado"] } } } } } },
+  });
+  const declarados = await db.convidado.count({ where: { resgateDeclarado: true } });
+  const confirmados = await db.convidado.count({
+    where: { convites: { some: { codigos: { some: { status: "resgatado" } } } } },
+  });
+  const presentes = await db.convidado.count({
+    where: { convites: { some: { codigos: { some: { presenteEm: { not: null } } } } } },
+  });
+
+  // ── Pool corporativo ──
+  const corpDisponivel = await db.codigo.groupBy({
+    by: ["tipo"],
+    where: { pool: "corporativo", status: "disponivel" },
+    _count: true,
+  });
+  const corpTotal = await db.codigo.groupBy({
+    by: ["tipo"],
+    where: { pool: "corporativo" },
+    _count: true,
+  });
+
+  // ── Ranking de hosts ──
+  const hosts = await db.funcionario.findMany({
+    include: { convites: { include: { codigos: true } } },
+  });
+  const ranking = hosts
+    .map((h) => ({
+      nome: h.nome,
+      convites: h.convites.length,
+      resgatados: h.convites.reduce(
+        (acc, cv) => acc + cv.codigos.filter((c) => c.status === "resgatado").length,
+        0,
+      ),
+    }))
+    .sort((a, b) => b.convites - a.convites);
+
+  // ── Convidados ──
+  const convidados = await db.convidado.findMany({
+    include: { convites: { include: { host: true, codigos: true } } },
+    orderBy: { id: "asc" },
+  });
+
+  const auditoria = await db.auditLog.findMany({ orderBy: { data: "desc" }, take: 10 });
+  const atores = new Map(hosts.map((h) => [h.id, h.nome]));
+  const configs = await db.config.findMany();
+
+  const contar = (grupos: { tipo: string; _count: number }[], tipo: string) =>
+    grupos.find((g) => g.tipo === tipo)?._count ?? 0;
+
+  return (
+    <div className="pagina">
+      <h1>Painel admin</h1>
+      <div className="sub">
+        <span className="badge vip">MASTER</span>
+        <span>{admin.nome} · visão completa do sistema</span>
+      </div>
+
+      <section className="secao">
+        <h2>
+          Funil <span className="nota">convidados → cadastrados → entregues → resgatados → presentes</span>
+        </h2>
+        <div className="stats">
+          <div className="stat">
+            <div className="valor">{totalConvidados}</div>
+            <div className="rotulo">Convidados</div>
+          </div>
+          <div className="stat">
+            <div className="valor">{cadastrados}</div>
+            <div className="rotulo">Cadastrados</div>
+          </div>
+          <div className="stat">
+            <div className="valor">{entregues}</div>
+            <div className="rotulo">Entregues</div>
+          </div>
+          <div className="stat">
+            <div className="valor acento">{declarados}</div>
+            <div className="rotulo">Resgate declarado</div>
+          </div>
+          <div className="stat">
+            <div className="valor acento">{confirmados}</div>
+            <div className="rotulo">Resgate confirmado</div>
+          </div>
+          <div className="stat">
+            <div className="valor">{presentes}</div>
+            <div className="rotulo">Presentes</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="secao">
+        <h2>
+          Pool corporativo <span className="nota">disponíveis / total por tipo</span>
+        </h2>
+        <div className="saldos">
+          {TIPOS.map((tipo) => {
+            const disp = contar(corpDisponivel, tipo);
+            return (
+              <div className="saldo" key={tipo}>
+                <div className="tipo">{TIPO_LABEL[tipo]}</div>
+                <div className={`qtd ${disp === 0 ? "zerado" : ""}`}>{disp}</div>
+                <div className="de">de {contar(corpTotal, tipo)}</div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="secao">
+        <h2>
+          Ranking de hosts <span className="nota">quem convidou quantos · resgates confirmados</span>
+        </h2>
+        <div className="tabela-wrap">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Host</th>
+                <th>Convites</th>
+                <th>Códigos resgatados</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ranking.map((r, i) => (
+                <tr key={r.nome}>
+                  <td className="mono dim">{i + 1}</td>
+                  <td><b>{r.nome}</b></td>
+                  <td className="mono">{r.convites}</td>
+                  <td className="mono">{r.resgatados}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="secao">
+        <h2>
+          Convidados <span className="nota">filtro VIP, busca e exports chegam na F5</span>
+        </h2>
+        <div className="tabela-wrap">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Origem</th>
+                <th>Códigos</th>
+                <th>Status</th>
+                <th>VIP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {convidados.map((c) => {
+                const vip = c.convites.some((cv) => cv.vipOmelete);
+                const codigos = c.convites.flatMap((cv) => cv.codigos);
+                return (
+                  <tr key={c.id}>
+                    <td><b>{c.nome}</b></td>
+                    <td className="mono dim">{c.email ?? c.telefone ?? "—"}</td>
+                    <td className="dim">
+                      {[...new Set(c.convites.map((cv) => cv.host.nome))].join(" + ") || "—"}
+                    </td>
+                    <td className="mono dim">{codigos.length}</td>
+                    <td style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {[...new Set(c.convites.map((cv) => cv.status))].map((s) => (
+                        <span key={s} className={`badge ${s}`}>{STATUS_CONVITE_LABEL[s]}</span>
+                      ))}
+                      {c.resgateDeclarado && <span className="badge declarado">Declarou resgate</span>}
+                    </td>
+                    <td>{vip ? <span className="badge vip">VIP</span> : <span className="dim">—</span>}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="secao">
+        <h2>
+          Audit log <span className="nota">últimas 10 operações</span>
+        </h2>
+        <div className="tabela-wrap">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Ator</th>
+                <th>Ação</th>
+                <th>Alvo</th>
+                <th>Detalhe</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditoria.map((a) => (
+                <tr key={a.id}>
+                  <td className="mono dim">{fmtData(a.data)}</td>
+                  <td>{a.atorId ? atores.get(a.atorId) ?? a.atorId : "sistema"}</td>
+                  <td className="mono">{a.acao}</td>
+                  <td className="mono dim">{a.alvo}</td>
+                  <td className="dim">{a.detalhe}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="secao">
+        <h2>
+          Configuração <span className="nota">edição chega na F5</span>
+        </h2>
+        <div className="tabela-wrap">
+          <table className="tabela">
+            <tbody>
+              {configs.map((c) => (
+                <tr key={c.chave}>
+                  <td className="mono dim">{c.chave}</td>
+                  <td className="mono">{c.valor}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
