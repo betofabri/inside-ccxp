@@ -4,7 +4,7 @@ import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
 import AdminTabs from "./admin-tabs";
 import ImportarPlanilha from "../funcionario/importar-planilha";
-import { FunilBarras, DonutResgates } from "./graficos";
+import { FunilEvento, PizzaResgates } from "./graficos-cliente";
 
 export const dynamic = "force-dynamic";
 
@@ -105,13 +105,13 @@ export default async function PaginaAdmin() {
         <summary><h2>
           Funil <span className="nota">passe o mouse pra ver a conversão de cada etapa</span>
         </h2></summary>
-        <FunilBarras
+        <FunilEvento
           etapas={[
             { nome: "Convidados", valor: totalConvidados },
             { nome: "Cadastrados", valor: cadastrados },
             { nome: "Entregues", valor: entregues },
-            { nome: "Resgate declarado", valor: declarados },
-            { nome: "Resgate confirmado", valor: confirmados },
+            { nome: "Declarados", valor: declarados },
+            { nome: "Confirmados", valor: confirmados },
             { nome: "Presentes", valor: presentes },
           ]}
         />
@@ -121,7 +121,7 @@ export default async function PaginaAdmin() {
         <summary><h2>
           Resgates Corporativos <span className="nota">consumo do lote por tipo · passe o mouse nas fatias</span>
         </h2></summary>
-        <DonutResgates
+        <PizzaResgates
           fatias={TIPOS.map((tipo) => {
             const total = contar(corpTotal, tipo);
             return { tipo, total, usados: total - contar(corpDisponivel, tipo) };
