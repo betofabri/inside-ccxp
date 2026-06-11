@@ -45,3 +45,7 @@ prisma/dev.db
 
 # prisma generated client
 src/generated/
+
+# cloudflare
+.open-next/
+.wrangler/
