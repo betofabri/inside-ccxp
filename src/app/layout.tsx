@@ -11,8 +11,8 @@ const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
 const mono = IBM_Plex_Mono({ weight: ["400", "500", "700"], subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "CCXP26 · RSVP · Convidados VIP",
-  description: "Sistema RSVP / CRM de convidados VIP da CCXP26, de 03 a 06 de dezembro no São Paulo Expo.",
+  title: "CCXP INSIDER · Convidados VIP",
+  description: "CCXP INSIDER, a plataforma de convidados VIP da CCXP26, de 03 a 06 de dezembro no São Paulo Expo.",
 };
 
 const PAPEL_LABEL: Record<string, string> = {
@@ -40,9 +40,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="topbar">
           <Link href="/" aria-label="Início">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-logo.png`} alt="CCXP" className="logo" />
+            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-insider.svg`} alt="CCXP Insider" className="logo" />
           </Link>
-          <span className="sistema">RSVP · Convidados VIP</span>
+          <span className="sistema">Convidados VIP</span>
           <nav className="topo-nav">
             <Link href="/apoio" className="topo-link">Material de apoio</Link>
             <button className="topo-link breve" type="button" disabled title="Fotos do dia: em breve">

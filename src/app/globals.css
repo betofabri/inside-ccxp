@@ -78,11 +78,10 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 .topbar .logo {
-  height: 22px;
+  height: 44px;
   width: auto;
-  filter: invert(1);
   display: block;
-  opacity: 0.96;
+  margin: -6px 0; /* o desenho tem respiro interno; compensa sem engordar a barra */
 }
 
 .topbar .sistema {
@@ -137,10 +136,10 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 .hero .logo-hero {
-  height: clamp(54px, 8vw, 92px);
+  height: clamp(120px, 18vw, 200px);
   width: auto;
-  filter: invert(1);
   display: block;
+  margin: -16px 0 -10px -10px; /* compensa o respiro interno do SVG */
 }
 
 .hero h1 {

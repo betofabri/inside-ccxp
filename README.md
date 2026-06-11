@@ -1,6 +1,6 @@
-# Inside CCXP — RSVP / CRM de convidados VIP
+# CCXP INSIDER — plataforma de convidados VIP
 
-Protótipo navegável do sistema de convites VIP da CCXP26 (03 a 06/dez/2026, São Paulo Expo).
+Protótipo navegável do RSVP/CRM de convites VIP da CCXP26 (03 a 06/dez/2026, São Paulo Expo).
 
 **Produção**: https://betofabri.com/lab/inside-ccxp (Cloudflare Access · Google @omeletecompany)
 
