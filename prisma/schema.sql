@@ -76,6 +76,21 @@ CREATE TABLE "ComunicacaoLog" (
 );
 
 -- CreateTable
+CREATE TABLE "ReguaPasso" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "categoria" TEXT NOT NULL,
+    "ordem" INTEGER NOT NULL,
+    "rotulo" TEXT NOT NULL,
+    "timing" TEXT NOT NULL,
+    "dataRef" TEXT,
+    "canal" TEXT NOT NULL,
+    "condicao" TEXT,
+    "assunto" TEXT NOT NULL,
+    "corpo" TEXT NOT NULL,
+    "ativo" BOOLEAN NOT NULL DEFAULT true
+);
+
+-- CreateTable
 CREATE TABLE "AgendaItem" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "dia" TEXT NOT NULL,

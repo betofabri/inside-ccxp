@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
+import AdminTabs from "./admin-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -96,11 +97,12 @@ export default async function PaginaAdmin() {
         <span className="badge vip">Master</span>
         <span>{admin.nome} · visão completa do sistema</span>
       </div>
+      <AdminTabs ativa="dashboard" />
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Funil <span className="nota">convidados → cadastrados → entregues → resgatados → presentes</span>
-        </h2>
+        </h2></summary>
         <div className="stats">
           <div className="stat">
             <div className="valor">{totalConvidados}</div>
@@ -127,12 +129,12 @@ export default async function PaginaAdmin() {
             <div className="rotulo">Presentes</div>
           </div>
         </div>
-      </section>
+      </details>
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Pool corporativo <span className="nota">disponíveis / total por tipo</span>
-        </h2>
+        </h2></summary>
         <div className="saldos">
           {TIPOS.map((tipo) => {
             const disp = contar(corpDisponivel, tipo);
@@ -145,12 +147,12 @@ export default async function PaginaAdmin() {
             );
           })}
         </div>
-      </section>
+      </details>
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Ranking de hosts <span className="nota">quem convidou quantos · resgates confirmados</span>
-        </h2>
+        </h2></summary>
         <div className="tabela-wrap">
           <table className="tabela">
             <thead>
@@ -173,12 +175,12 @@ export default async function PaginaAdmin() {
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Empresas convidadas <span className="nota">derivado do domínio do email</span>
-        </h2>
+        </h2></summary>
         <div className="tabela-wrap">
           <table className="tabela">
             <thead>
@@ -210,12 +212,12 @@ export default async function PaginaAdmin() {
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Convidados <span className="nota">filtro VIP, busca e exports chegam na F5</span>
-        </h2>
+        </h2></summary>
         <div className="tabela-wrap">
           <table className="tabela">
             <thead>
@@ -253,12 +255,12 @@ export default async function PaginaAdmin() {
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Audit log <span className="nota">últimas 10 operações</span>
-        </h2>
+        </h2></summary>
         <div className="tabela-wrap">
           <table className="tabela">
             <thead>
@@ -283,12 +285,12 @@ export default async function PaginaAdmin() {
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section className="secao">
-        <h2>
+      <details className="secao" open>
+        <summary><h2>
           Configuração <span className="nota">edição chega na F5</span>
-        </h2>
+        </h2></summary>
         <div className="tabela-wrap">
           <table className="tabela">
             <tbody>
@@ -301,7 +303,7 @@ export default async function PaginaAdmin() {
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
     </div>
   );
 }

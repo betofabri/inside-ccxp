@@ -1,7 +1,7 @@
 // Seed F0 — 3 funcionários (1 admin, 1 com flag, 1 sem), lote corporativo,
 // convidados em estados variados: pendente, cadastrado, expirado, cancelado,
 // resgate declarado, resgatado, VIP e não-VIP. Carteira consolidada (Luís).
-import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient } from "./generated/client-node/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 const adapter = new PrismaBetterSqlite3({ url: "file:./prisma/dev.db" });
@@ -262,6 +262,38 @@ async function main() {
   await log(carla.id, "transacional", "aviso_expiracao", "email", dias(-3));
   await log(elisa.id, "regua", "d-7_falta_uma_semana", "email", dias(-1));
   await log(luis.id, "transacional", "convite", "email", dias(-3));
+
+  // ── Régua de comunicação padrão (§7 do plano) ──────────────────
+  await db.reguaPasso.createMany({
+    data: [
+      // transacionais — todos os convidados, sem opt-out, relativos ao convite
+      { categoria: "transacional", ordem: 1, rotulo: "Convite", timing: "imediato", canal: "email,whatsapp",
+        assunto: "Você foi convidado pra CCXP26",
+        corpo: "Olá, {{nome}}! {{host}} convidou você pra CCXP26 (03 a 06/dez, São Paulo Expo) com {{qtd}} ingresso(s): {{tipos}}. Complete seu cadastro pra receber os códigos: {{link}}" },
+      { categoria: "transacional", ordem: 2, rotulo: "Lembrete de cadastro", timing: "D+3", canal: "email,whatsapp", condicao: "pular_se_cadastrado",
+        assunto: "Seus ingressos da CCXP26 esperam por você",
+        corpo: "{{nome}}, seus {{qtd}} ingresso(s) seguem reservados, mas o cadastro ainda não foi concluído. Leva 1 minuto: {{link}}" },
+      { categoria: "transacional", ordem: 3, rotulo: "Aviso de expiração", timing: "D+6", canal: "email,whatsapp", condicao: "pular_se_cadastrado",
+        assunto: "Último dia: seu convite expira amanhã",
+        corpo: "{{nome}}, seu convite pra CCXP26 expira amanhã e os ingressos voltam ao pool. Garanta os seus: {{link}}" },
+      { categoria: "transacional", ordem: 4, rotulo: "Instrução de resgate", timing: "após cadastro", canal: "email",
+        assunto: "Como resgatar seus ingressos na Mundo Ticket",
+        corpo: "{{nome}}, seus códigos estão na sua carteira. Resgate na Mundo Ticket com o passo a passo: {{link}}. Qualquer dúvida, fale com {{host}}." },
+      // régua de relacionamento — só corporativo, com opt-out, ancorada no evento
+      { categoria: "regua", ordem: 1, rotulo: "Falta uma semana", timing: "D-7", dataRef: "2026-11-26", canal: "email",
+        assunto: "Falta uma semana pra CCXP26",
+        corpo: "{{nome}}, em 7 dias a CCXP26 abre os portões no São Paulo Expo. Como chegar, por onde entrar e o que levar: tudo neste guia. Seus ingressos: {{tipos}}." },
+      { categoria: "regua", ordem: 2, rotulo: "Lembrete de resgate", timing: "D-3", dataRef: "2026-11-30", canal: "email,whatsapp", condicao: "pular_se_resgatado",
+        assunto: "Já resgatou seus ingressos?",
+        corpo: "{{nome}}, faltam 3 dias e seus códigos ainda não foram resgatados na Mundo Ticket. Resolve agora em 2 minutos: {{link}}. Mapa do evento em anexo." },
+      { categoria: "regua", ordem: 3, rotulo: "Véspera: agenda do dia", timing: "D-1", dataRef: "2026-12-02", canal: "email",
+        assunto: "Amanhã tem CCXP26: sua agenda",
+        corpo: "{{nome}}, amanhã começa! Agenda do dia, dicas práticas e o lounge VIP Omelete te esperando. Credenciamento VIP abre 1h antes dos portões." },
+      { categoria: "regua", ordem: 4, rotulo: "É hoje", timing: "Dia 1", dataRef: "2026-12-03", canal: "whatsapp",
+        assunto: "É hoje! CCXP26 abre às 12h",
+        corpo: "{{nome}}, chegou o dia. Destaques de hoje no Palco Thunder, entrada VIP pela entrada Sul. Bom evento!" },
+    ],
+  });
 
   // ── Agenda geral (única) ───────────────────────────────────────
   await db.agendaItem.createMany({

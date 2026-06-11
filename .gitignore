@@ -49,3 +49,4 @@ src/generated/
 # cloudflare
 .open-next/
 .wrangler/
+prisma/generated/

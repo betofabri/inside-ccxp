@@ -275,7 +275,158 @@ h1, h2, h3 { text-wrap: balance; }
 
 .secao { margin-top: 52px; }
 
-.secao > h2 {
+/* seções colapsáveis (admin) */
+details.secao { margin-top: 36px; }
+
+details.secao summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+details.secao summary::-webkit-details-marker { display: none; }
+
+details.secao summary h2 { padding-right: 30px; position: relative; }
+
+details.secao summary h2::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  top: 8px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform var(--dur) var(--ease);
+}
+
+details.secao:not([open]) summary h2::after { transform: rotate(-45deg); }
+
+details.secao summary:hover h2::after { border-color: var(--champagne); }
+
+/* ── Tabs do admin ── */
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 14px;
+}
+
+.admin-tab {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 8px 18px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.admin-tab:hover { color: var(--ink); border-color: var(--champagne); }
+
+.admin-tab.ativa {
+  background: var(--champagne);
+  border-color: var(--champagne);
+  color: var(--ink-on-accent);
+}
+
+/* ── Régua de comunicação ── */
+.regua-lista {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.passo-regua {
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  border-radius: var(--radius-m);
+  padding: 16px 18px;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.passo-regua.pausado { opacity: 0.55; }
+
+.passo-cab {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.quando-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  padding: 7px 10px;
+  border-radius: var(--radius-s);
+  background: var(--champagne-soft);
+  color: var(--champagne);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.quando-chip small {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.passo-titulo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+
+.passo-titulo .canais { display: flex; gap: 6px; }
+
+.toggle-passo {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+}
+
+.toggle-passo.on {
+  background: var(--st-resgatado);
+  border-color: var(--st-resgatado);
+  color: var(--ink-on-accent);
+}
+
+.toggle-passo:hover { filter: brightness(1.1); }
+
+.passo-corpo { margin-top: 12px; padding-left: 90px; }
+
+.passo-corpo .assunto {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.passo-corpo .mensagem {
+  margin: 6px 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 68ch;
+}
+
+.secao > h2,
+.secao summary h2 {
   font-family: var(--font-display), serif;
   font-weight: 400;
   font-size: 21px;
@@ -288,7 +439,8 @@ h1, h2, h3 { text-wrap: balance; }
   flex-wrap: wrap;
 }
 
-.secao > h2 .nota {
+.secao > h2 .nota,
+.secao summary h2 .nota {
   font-family: var(--font-corpo), sans-serif;
   font-size: 12.5px;
   color: var(--faint);
@@ -1370,6 +1522,10 @@ a.topo-link:hover { color: var(--ink); border-color: var(--champagne); }
   .persona-chip { margin-left: auto; }
 
   .cartao-convite { padding: 24px 18px 26px; }
+
+  .passo-corpo { padding-left: 0; }
+  .admin-tabs { overflow-x: auto; padding-bottom: 12px; }
+  .admin-tab { white-space: nowrap; }
 
   .passos { padding: 16px 18px 0; flex-wrap: wrap; }
   .passo + .passo::before { display: none; }

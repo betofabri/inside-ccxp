@@ -14,7 +14,7 @@ Estado em 11/jun/2026. Fases do plano original em `~/Downloads/plano_rsvp_ccxp_f
 - **F1 — Ingestão**: parser Excel Modo A/B (SheetJS) com hardening de privilégio, lote corporativo, validações + relatório de rejeição.
 - **F2 restante**: import de resgate do host (CSV Mundo Ticket restrito aos códigos dele), notificação in-app quando convidado se cadastra.
 - **F3 restante**: botão "já resgatei" funcional, transacionais mockados visíveis (lembrete D+3, aviso D+6).
-- **F4 — Régua + agenda**: motor com condições e opt-out, templates com variáveis, datas reais (26/11 a 03/12), restrito ao corporativo.
+- **F4 — Régua + agenda** (painel pronto, motor pendente): o admin já tem o painel "Régua de comunicação" com a régua RSVP padrão (4 transacionais + 4 de relacionamento, modelo `ReguaPasso` no banco, toggle ativo/pausado com audit log). Falta: motor de disparo com condições e opt-out, edição de timing/template/canal pelo painel, agenda editável.
 - **F5 — Admin**: imports centrais (resgate corporativo + presença), exports CSV, configs editáveis, audit log completo, filtro VIP + busca na tabela de convidados.
 - **F6 — Produção**: Google SSO, Postgres com lock, email real (Resend/SendGrid), WhatsApp Business API, domínio, LGPD operacional.
 

@@ -7,6 +7,12 @@ generator client {
   runtime  = "workerd"
 }
 
+// client Node só pro seed script (tsx); o app usa o de cima
+generator clientNode {
+  provider = "prisma-client"
+  output   = "./generated/client-node"
+}
+
 datasource db {
   provider = "sqlite"
 }
@@ -93,6 +99,23 @@ model ComunicacaoLog {
   canal       String
   status      String
   data        DateTime  @default(now())
+}
+
+// categoria: transacional | regua
+// timing: "imediato" | "D+3" | "D-7" | ... · dataRef: data prevista (régua ancorada no evento)
+// canal: email | whatsapp | email,whatsapp · condicao: ex "pular_se_resgatado"
+model ReguaPasso {
+  id        Int     @id @default(autoincrement())
+  categoria String
+  ordem     Int
+  rotulo    String
+  timing    String
+  dataRef   String?
+  canal     String
+  condicao  String?
+  assunto   String
+  corpo     String
+  ativo     Boolean @default(true)
 }
 
 model AgendaItem {
