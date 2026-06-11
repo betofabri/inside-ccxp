@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Inside CCXP — RSVP / CRM de convidados VIP
 
-## Getting Started
+Protótipo navegável do sistema de convites VIP da CCXP26 (03 a 06/dez/2026, São Paulo Expo).
 
-First, run the development server:
+**Produção**: https://betofabri.com/lab/inside-ccxp (Cloudflare Access · Google @omeletecompany)
+
+## Stack
+
+- Next.js 16 (App Router, TS) + CSS custom — identidade CCXP escuro premium
+- Prisma 7 + **Cloudflare D1** (`@prisma/adapter-d1`) em produção e no dev (miniflare)
+- Deploy: `@opennextjs/cloudflare` → Worker `inside-ccxp`, rota `betofabri.com/lab/inside-ccxp*`
+- CI/CD: Workers Builds conectado a este repo (push na `main` = deploy)
+
+## Rodar local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run db:d1:local   # aplica schema + seed no D1 local (primeira vez)
+npm run dev           # http://localhost:3000/lab/inside-ccxp
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts úteis
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| script | faz |
+|---|---|
+| `npm run deploy` | build OpenNext + deploy manual no Worker |
+| `npm run db:sql` | regenera `prisma/schema.sql` a partir do schema Prisma |
+| `npm run db:seed` | popula o `prisma/dev.db` local (fonte pro dump do seed.sql) |
+| `npm run db:d1:local` / `db:d1:remote` | aplica schema+seed no D1 local / produção |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentos
 
-## Learn More
+- `ROADMAP.md` — status das fases (F0–F6) e melhorias futuras
+- `PRODUCT.md` / `DESIGN.md` — princípios de produto e sistema visual
+- Plano completo: `plano_rsvp_ccxp_final.md` (fora do repo)
 
-To learn more about Next.js, take a look at the following resources:
+## Papéis do protótipo
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Login mockado por switcher na landing: **Admin** (Beto), **Hosts** (Camila com flag corporativa, Diego sem) e **Convidados** em todos os estados do funil. O ciclo convite → link mágico → cadastro → carteira funciona ponta a ponta com reserva atômica de códigos no D1.
