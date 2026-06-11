@@ -93,7 +93,7 @@ const textoWhatsApp = (c: Card) =>
 export default function PaginaApoio() {
   return (
     <div className="pagina">
-      <h1>Material de apoio</h1>
+      <h1>Assets</h1>
       <div className="sub">
         <span>Cards prontos pra encaminhar no WhatsApp pros seus convidados.</span>
       </div>

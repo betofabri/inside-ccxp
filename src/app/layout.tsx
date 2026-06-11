@@ -86,9 +86,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <b>CCXP INSIDER.</b> O Backstage do Backstage.
           </span>
           <nav className="topo-nav">
-            <Link href="/apoio" className="topo-link">Material de apoio</Link>
-            <button className="topo-link breve" type="button" disabled title="Fotos do dia: em breve">
-              Fotos do dia <span className="selo-breve">em breve</span>
+            <Link href="/apoio" className="topo-link">Assets</Link>
+            <button className="topo-link breve" type="button" disabled title="Fotos: em breve">
+              Fotos <span className="selo-breve">em breve</span>
             </button>
           </nav>
           <span className="spacer" />

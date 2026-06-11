@@ -102,7 +102,7 @@ export default async function PaginaConvidado() {
             que você já copiou ficam marcados aqui na carteira.
           </div>
           <div className="aviso">
-            <b>Dica:</b> na aba <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/apoio`} style={{ textDecoration: "underline" }}>Materiais de Apoio</a>{" "}
+            <b>Dica:</b> na aba <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/apoio`} style={{ textDecoration: "underline" }}>Assets</a>{" "}
             tem mapa do evento, horários, por onde entrar, como chegar e o que levar.
           </div>
         </section>

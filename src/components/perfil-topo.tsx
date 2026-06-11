@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { sairPersona } from "@/lib/actions";
 
 type Detalhe = { rotulo: string; valor: React.ReactNode };
@@ -40,6 +41,13 @@ export default function PerfilTopo({ nome, papel, corpOn, detalhes, acoes }: Pro
             </div>
           ))}
         </dl>
+        {/* navegação que sai da topbar no mobile */}
+        <nav className="perfil-nav">
+          <Link href="/apoio" className="perfil-nav-item">Assets</Link>
+          <span className="perfil-nav-item desabilitado">
+            Fotos <span className="selo-breve">em breve</span>
+          </span>
+        </nav>
         {acoes && <div className="perfil-acoes">{acoes}</div>}
         <form action={sairPersona}>
           <button className="acao" type="submit">Trocar papel</button>

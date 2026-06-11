@@ -118,10 +118,12 @@ export default async function PaginaFuncionario() {
         }))}
       />
 
-      <section className="secao">
-        <h2>
-          Meus convites <span className="nota">reenvio, cancelamento e import de resgate chegam na F2</span>
-        </h2>
+      <details className="secao">
+        <summary>
+          <h2>
+            Convites enviados <span className="nota">reenvio, cancelamento e import de resgate chegam na F2</span>
+          </h2>
+        </summary>
         <div className="tabela-wrap">
           <table className="tabela">
             <thead>
@@ -166,7 +168,7 @@ export default async function PaginaFuncionario() {
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
     </div>
   );
