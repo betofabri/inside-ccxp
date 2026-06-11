@@ -7,7 +7,7 @@ export default function AdminTabs({ ativa }: { ativa: "dashboard" | "regua" }) {
         Dashboard
       </Link>
       <Link href="/admin/regua" className={`admin-tab ${ativa === "regua" ? "ativa" : ""}`}>
-        Régua de comunicação
+        Follow up
       </Link>
     </nav>
   );

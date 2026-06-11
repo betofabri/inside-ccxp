@@ -1,7 +1,13 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { alternarPassoRegua } from "@/lib/regua";
+import {
+  alternarPassoRegua,
+  salvarPassoRegua,
+  criarPassoRegua,
+  excluirPassoRegua,
+  enviarMensagemAdHoc,
+} from "@/lib/regua";
 import AdminTabs from "../admin-tabs";
 
 export const dynamic = "force-dynamic";
@@ -14,15 +20,101 @@ const CONDICAO_LABEL: Record<string, string> = {
 const fmtDataRef = (iso: string) =>
   new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" });
 
-export default async function PaginaRegua() {
+type Passo = {
+  id: number;
+  categoria: string;
+  rotulo: string;
+  timing: string;
+  dataRef: string | null;
+  canal: string;
+  condicao: string | null;
+  assunto: string;
+  corpo: string;
+  ativo: boolean;
+};
+
+function CamposPasso({ passo }: { passo?: Passo }) {
+  return (
+    <>
+      <div className="campo-dupla">
+        <div className="campo">
+          <label>Nome da etapa</label>
+          <input type="text" name="rotulo" defaultValue={passo?.rotulo} placeholder="Ex: Lembrete de resgate" required />
+        </div>
+        <div className="campo">
+          <label>Timing</label>
+          <input type="text" name="timing" defaultValue={passo?.timing} placeholder="Ex: D-3, imediato" required />
+        </div>
+      </div>
+      <div className="campo-dupla">
+        <div className="campo">
+          <label>Data de disparo <span className="opcional">(se ancorada no calendário)</span></label>
+          <input type="date" name="dataRef" defaultValue={passo?.dataRef ?? ""} />
+        </div>
+        <div className="campo">
+          <label>Canal</label>
+          <select name="canal" defaultValue={passo?.canal ?? "email"}>
+            <option value="email">Email</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="email,whatsapp">Email + WhatsApp</option>
+          </select>
+        </div>
+      </div>
+      <div className="campo">
+        <label>Condição</label>
+        <select name="condicao" defaultValue={passo?.condicao ?? ""}>
+          <option value="">Sempre envia</option>
+          <option value="pular_se_cadastrado">Pular se já cadastrou</option>
+          <option value="pular_se_resgatado">Pular se já resgatou</option>
+        </select>
+      </div>
+      <div className="campo">
+        <label>Assunto</label>
+        <input type="text" name="assunto" defaultValue={passo?.assunto} required />
+      </div>
+      <div className="campo">
+        <label>Mensagem</label>
+        <textarea name="corpo" rows={4} defaultValue={passo?.corpo} required />
+        <div className="dica">
+          Variáveis: {"{{nome}}"} · {"{{host}}"} · {"{{qtd}}"} · {"{{tipos}}"} · {"{{link}}"}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default async function PaginaFollowUp({
+  searchParams,
+}: {
+  searchParams: Promise<{ erro?: string; adhoc?: string }>;
+}) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
+  const { erro, adhoc } = await searchParams;
 
-  const passos = await db.reguaPasso.findMany({ orderBy: [{ categoria: "desc" }, { ordem: "asc" }] });
-  const transacionais = passos.filter((p) => p.categoria === "transacional");
-  const relacionamento = passos.filter((p) => p.categoria === "regua");
+  const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
+  const grupos = [
+    {
+      chave: "transacional",
+      titulo: "Transacionais",
+      nota: "todos os convidados · sem opt-out · relativos ao convite",
+      passos: passos.filter((p) => p.categoria === "transacional"),
+    },
+    {
+      chave: "regua",
+      titulo: "Régua de relacionamento",
+      nota: "só convidados corporativos · com opt-out (LGPD) · ancorada no evento",
+      passos: passos.filter((p) => p.categoria === "regua"),
+    },
+    {
+      chave: "pos_evento",
+      titulo: "Pós-evento",
+      nota: "agradecimento, pesquisa e números · fecha o relacionamento",
+      passos: passos.filter((p) => p.categoria === "pos_evento"),
+    },
+  ];
 
-  const Passo = ({ passo }: { passo: (typeof passos)[number] }) => (
+  const CardPasso = ({ passo }: { passo: Passo }) => (
     <article className={`passo-regua ${passo.ativo ? "" : "pausado"}`}>
       <div className="passo-cab">
         <span className="quando-chip">
@@ -50,50 +142,106 @@ export default async function PaginaRegua() {
         {passo.condicao && (
           <span className="badge declarado">Condição: {CONDICAO_LABEL[passo.condicao] ?? passo.condicao}</span>
         )}
+        <div className="passo-acoes">
+          <details className="editor-passo">
+            <summary className="acao">Editar</summary>
+            <form action={salvarPassoRegua} className="form-passo">
+              <input type="hidden" name="passoId" value={passo.id} />
+              <CamposPasso passo={passo} />
+              <div className="form-acoes">
+                <button className="cta" type="submit">Salvar etapa</button>
+              </div>
+            </form>
+          </details>
+          <form action={excluirPassoRegua}>
+            <input type="hidden" name="passoId" value={passo.id} />
+            <button className="acao perigo" type="submit" title="Remove a etapa da régua">
+              Excluir
+            </button>
+          </form>
+        </div>
       </div>
     </article>
   );
 
   return (
     <div className="pagina">
-      <h1>Régua de comunicação</h1>
+      <h1>Follow up</h1>
       <div className="sub">
-        <span>Disparos mockados no protótipo; o motor real chega na F4.</span>
+        <span>Régua de comunicação, pós-evento e mensagens avulsas. Disparos mockados; o motor real chega na F4.</span>
       </div>
       <AdminTabs ativa="regua" />
 
-      <div className="aviso">
-        Variáveis disponíveis nos templates: <b>{"{{nome}}"}</b>, <b>{"{{host}}"}</b>, <b>{"{{qtd}}"}</b>,{" "}
-        <b>{"{{tipos}}"}</b>, <b>{"{{link}}"}</b>. Quem cadastra depois de um passo já disparado não recebe
-        retroativo; entra no próximo.
-      </div>
+      {erro === "campos" && <div className="aviso erro">Preencha nome, assunto e mensagem da etapa.</div>}
+      {adhoc && (
+        <div className="aviso ok">
+          <b>Mensagem enviada ✓</b> (mock) pra {adhoc} convidado(s). Registrada no log de comunicação de cada um.
+        </div>
+      )}
 
-      <details className="secao" open>
+      <details className="secao">
         <summary>
           <h2>
-            Transacionais <span className="nota">todos os convidados · sem opt-out · relativos ao convite</span>
+            Mensagem avulsa <span className="nota">disparo sob demanda · fora da régua</span>
           </h2>
         </summary>
-        <div className="regua-lista">
-          {transacionais.map((p) => (
-            <Passo passo={p} key={p.id} />
-          ))}
-        </div>
+        <form action={enviarMensagemAdHoc} className="form-passo adhoc">
+          <div className="campo-dupla">
+            <div className="campo">
+              <label>Destinatários</label>
+              <select name="audiencia" defaultValue="vips">
+                <option value="vips">Convidados VIP (convites ativos)</option>
+                <option value="todos">Todos os convidados (convites ativos)</option>
+              </select>
+            </div>
+            <div className="campo">
+              <label>Canal</label>
+              <select name="canal" defaultValue="email">
+                <option value="email">Email</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="email,whatsapp">Email + WhatsApp</option>
+              </select>
+            </div>
+          </div>
+          <div className="campo">
+            <label>Assunto</label>
+            <input type="text" name="assunto" placeholder="Ex: Mudança no horário do credenciamento" required />
+          </div>
+          <div className="campo">
+            <label>Mensagem</label>
+            <textarea name="corpo" rows={3} placeholder="Texto do disparo. Aceita {{nome}}." required />
+          </div>
+          <div className="form-acoes">
+            <button className="cta" type="submit">Enviar agora</button>
+          </div>
+        </form>
       </details>
 
-      <details className="secao" open>
-        <summary>
-          <h2>
-            Régua de relacionamento{" "}
-            <span className="nota">só convidados corporativos · com opt-out (LGPD) · ancorada no evento</span>
-          </h2>
-        </summary>
-        <div className="regua-lista">
-          {relacionamento.map((p) => (
-            <Passo passo={p} key={p.id} />
-          ))}
-        </div>
-      </details>
+      {grupos.map((g) => (
+        <details className="secao" open key={g.chave}>
+          <summary>
+            <h2>
+              {g.titulo} <span className="nota">{g.nota}</span>
+            </h2>
+          </summary>
+          <div className="regua-lista">
+            {g.passos.map((p) => (
+              <CardPasso passo={p} key={p.id} />
+            ))}
+            {g.passos.length === 0 && <p className="dica">Nenhuma etapa; adicione a primeira abaixo.</p>}
+            <details className="editor-passo nova-etapa">
+              <summary className="acao">+ Adicionar etapa</summary>
+              <form action={criarPassoRegua} className="form-passo">
+                <input type="hidden" name="categoria" value={g.chave} />
+                <CamposPasso />
+                <div className="form-acoes">
+                  <button className="cta" type="submit">Criar etapa</button>
+                </div>
+              </form>
+            </details>
+          </div>
+        </details>
+      ))}
     </div>
   );
 }

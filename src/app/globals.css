@@ -425,6 +425,46 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
   max-width: 68ch;
 }
 
+/* edição / criação de etapas */
+.passo-acoes {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 12px;
+}
+
+.editor-passo > summary {
+  list-style: none;
+  display: inline-block;
+}
+
+.editor-passo > summary::-webkit-details-marker { display: none; }
+
+.form-passo {
+  margin-top: 14px;
+  padding: 18px;
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-m);
+  max-width: 640px;
+}
+
+.form-passo.adhoc { margin-top: 18px; background: var(--surface); }
+
+.form-acoes { display: flex; gap: 10px; }
+
+.editor-passo.nova-etapa { margin-top: 4px; }
+
+.editor-passo.nova-etapa > summary {
+  border-style: dashed;
+  color: var(--champagne);
+}
+
+.aviso.erro { border-color: color-mix(in oklab, var(--st-cancelado) 45%, transparent); color: var(--st-cancelado); }
+
+.aviso.ok { border-color: color-mix(in oklab, var(--st-resgatado) 45%, transparent); }
+.aviso.ok b { color: var(--st-resgatado); }
+
 .secao > h2,
 .secao summary h2 {
   font-family: var(--font-display), serif;
@@ -820,7 +860,9 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 .campo input[type="text"],
 .campo input[type="email"],
 .campo input[type="tel"],
-.campo input[type="date"] {
+.campo input[type="date"],
+.campo select,
+.campo textarea {
   width: 100%;
   font-family: inherit;
   font-size: 14px;
@@ -831,6 +873,18 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
   padding: 10px 12px;
   transition: border-color var(--dur) var(--ease);
 }
+
+.campo textarea { resize: vertical; line-height: 1.5; }
+
+.campo select { cursor: pointer; }
+
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--champagne);
+}
+
+.campo label .opcional { color: var(--faint); font-weight: 400; }
 
 .campo input::placeholder { color: var(--faint); }
 

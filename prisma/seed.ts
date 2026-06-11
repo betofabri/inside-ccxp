@@ -292,6 +292,16 @@ async function main() {
       { categoria: "regua", ordem: 4, rotulo: "É hoje", timing: "Dia 1", dataRef: "2026-12-03", canal: "whatsapp",
         assunto: "É hoje! CCXP26 abre às 12h",
         corpo: "{{nome}}, chegou o dia. Destaques de hoje no Palco Thunder, entrada VIP pela entrada Sul. Bom evento!" },
+      // pós-evento — fechamento do relacionamento
+      { categoria: "pos_evento", ordem: 1, rotulo: "Agradecimento + fotos", timing: "D+1", dataRef: "2026-12-07", canal: "email",
+        assunto: "Obrigado por viver a CCXP26 com a gente",
+        corpo: "{{nome}}, foi incrível ter você na CCXP26. As fotos do lounge VIP Omelete já estão disponíveis na sua conta: {{link}}" },
+      { categoria: "pos_evento", ordem: 2, rotulo: "Pesquisa de satisfação", timing: "D+3", dataRef: "2026-12-09", canal: "email",
+        assunto: "2 minutos: como foi sua CCXP26?",
+        corpo: "{{nome}}, sua opinião define a próxima edição. Responda a pesquisa rápida (NPS + 3 perguntas): {{link}}" },
+      { categoria: "pos_evento", ordem: 3, rotulo: "Números + after movie", timing: "D+7", dataRef: "2026-12-13", canal: "email",
+        assunto: "CCXP26 em números (e o after movie)",
+        corpo: "{{nome}}, a CCXP26 em números: público, palcos e os melhores momentos no after movie. Assista e compartilhe: {{link}}" },
     ],
   });
 

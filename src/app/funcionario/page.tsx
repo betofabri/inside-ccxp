@@ -52,11 +52,7 @@ export default async function PaginaFuncionario() {
         <span>
           Olá, <b>{host.nome.split(" ")[0]}</b> · {NIVEL_LABEL[host.nivel]}
         </span>
-        {host.podeCorporativo ? (
-          <span className="badge declarado">Corp Invitation On</span>
-        ) : (
-          <span className="badge expirado">Cota pessoal apenas</span>
-        )}
+        {host.podeCorporativo && <span className="badge declarado">Corp Invitation On</span>}
       </div>
 
       <div className="estoque">
@@ -94,7 +90,17 @@ export default async function PaginaFuncionario() {
         </div>
       </div>
 
-      <NovoConvite podeCorporativo={host.podeCorporativo} tipos={tipos} />
+      <NovoConvite
+        podeCorporativo={host.podeCorporativo}
+        tipos={tipos}
+        empresas={[
+          ...new Set(
+            (await db.convidado.findMany({ where: { empresa: { not: null } }, select: { empresa: true } }))
+              .map((c) => c.empresa as string)
+              .sort(),
+          ),
+        ]}
+      />
 
       <section className="secao">
         <h2>

@@ -14,6 +14,7 @@ type TipoInfo = {
 type Props = {
   podeCorporativo: boolean;
   tipos: TipoInfo[];
+  empresas: string[];
 };
 
 type Fluxo = "pessoal" | "corporativo";
@@ -41,7 +42,7 @@ const DOMINIOS_GENERICOS = [
   "gmx.com", "mail.com", "yandex.com",
 ];
 
-export default function NovoConvite({ podeCorporativo, tipos }: Props) {
+export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props) {
   const [fluxo, setFluxo] = useState<Fluxo>("pessoal");
   const [passo, setPasso] = useState(0);
   const [nome, setNome] = useState("");
@@ -185,33 +186,34 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
 
   return (
     <div className="composer wizard">
-      <div className="fluxos" role="tablist" aria-label="Tipo de convite">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={fluxo === "pessoal"}
-          className={`fluxo-tab ${fluxo === "pessoal" ? "ativo" : ""}`}
-          onClick={() => trocarFluxo("pessoal")}
-        >
-          Convite pessoal
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={fluxo === "corporativo"}
-          className={`fluxo-tab ${fluxo === "corporativo" ? "ativo" : ""}`}
-          onClick={() => trocarFluxo("corporativo")}
-          disabled={!podeCorporativo}
-          title={podeCorporativo ? undefined : "A flag corporativa é atribuída pelo admin"}
-        >
-          Convite corporativo
-        </button>
-        <span className="fluxo-dica">
-          {fluxo === "pessoal"
-            ? "Usa a sua cota da planilha; contato por email ou WhatsApp."
-            : "Usa o lote compartilhado; empresa e email corporativo obrigatórios."}
-        </span>
-      </div>
+      {/* sem flag corporativa, a aba nem aparece (decisão: ocultar sinalização) */}
+      {podeCorporativo && (
+        <div className="fluxos" role="tablist" aria-label="Tipo de convite">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={fluxo === "pessoal"}
+            className={`fluxo-tab ${fluxo === "pessoal" ? "ativo" : ""}`}
+            onClick={() => trocarFluxo("pessoal")}
+          >
+            Convite pessoal
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={fluxo === "corporativo"}
+            className={`fluxo-tab ${fluxo === "corporativo" ? "ativo" : ""}`}
+            onClick={() => trocarFluxo("corporativo")}
+          >
+            Convite corporativo
+          </button>
+          <span className="fluxo-dica">
+            {fluxo === "pessoal"
+              ? "Usa a sua cota da planilha; contato por email ou WhatsApp."
+              : "Usa o lote compartilhado; empresa e email corporativo obrigatórios."}
+          </span>
+        </div>
+      )}
 
       <ol className="passos">
         {PASSOS.map((rotulo, i) => (
@@ -261,7 +263,13 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                 placeholder="Nome da empresa"
                 value={empresa}
                 onChange={(e) => setEmpresa(e.target.value)}
+                list="empresas-conhecidas"
               />
+              <datalist id="empresas-conhecidas">
+                {empresas.map((e) => (
+                  <option value={e} key={e} />
+                ))}
+              </datalist>
               <div className="dica">Obrigatório no convite corporativo; entra no ranking de empresas.</div>
             </div>
           )}
