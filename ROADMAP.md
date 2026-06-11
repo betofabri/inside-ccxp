@@ -26,6 +26,8 @@ Estado em 11/jun/2026. Fases do plano original em `~/Downloads/plano_rsvp_ccxp_f
 
 ## Melhorias futuras (pedidos do Beto)
 
+- **👣 Footprint (admin)** — aba já existe no admin, desabilitada com selo "em breve" atrás da flag `FOOTPRINT_ENABLED` (`src/lib/flags.ts`). Ficha do convidado (nome, empresa, categoria do ingresso) + trajeto via bipagens da credencial: chegada/saída, compras, palcos visitados. Contrato de dados assumido (tipado em `src/lib/footprint.ts`) — cada bipagem é um evento `{ credentialId, type: 'entry'|'exit'|'stage'|'purchase', location, timestamp, payload }`; a ficha é a agregação por credentialId. Aguarda fonte de dados do controle de acesso.
+
 - **📸 Fotos do dia** — galeria pessoal do convidado VIP: fotos tiradas no lounge VIP Omelete, filtradas só pra pessoa (reconhecimento facial ou marcação manual no upload). Botão já está no topo, desabilitado com selo "em breve" pra gerar hype. Decisões pendentes: fornecedor de captura, pipeline de upload, matching, LGPD de biometria.
 - **📋 Pesquisa de satisfação** — disparo pós-evento (D+1) na régua de relacionamento, com NPS + perguntas abertas; resultados agregados no dashboard admin. Aproveitar opt-out da régua.
 - **🎨 Polish final de UI** — ajustes de contraste e estados de botão (hover/focus/active/disabled) em toda a aplicação; revisão de acessibilidade AA; **botão de navegação do hub mais marcado**; **microinterações** (fades e transições entre telas e estados).

@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { TIPO_LABEL, STATUS_CODIGO_LABEL, fmtData } from "@/lib/labels";
+import { TIPO_LABEL, fmtData } from "@/lib/labels";
+import Ticket from "./ticket";
 
 export const dynamic = "force-dynamic";
 
@@ -80,30 +81,25 @@ export default async function PaginaConvidado() {
           </h2>
           <div className="carteira">
             {tickets.map(({ cod, host }) => (
-              <div className={`ticket t-${cod.tipo}`} key={cod.id}>
-                <div className="corpo">
-                  <div className="tipo">{TIPO_LABEL[cod.tipo]}</div>
-                  <div className="codigo">{cod.valor}</div>
-                  <div className="origem">Convite de {host}</div>
-                  <div className="rodape">
-                    <span className={`badge ${cod.status}`}>{STATUS_CODIGO_LABEL[cod.status]}</span>
-                  </div>
-                </div>
-              </div>
+              <Ticket
+                key={cod.id}
+                codigoId={cod.id}
+                valor={cod.valor}
+                tipo={cod.tipo}
+                tipoLabel={TIPO_LABEL[cod.tipo]}
+                host={host}
+              />
             ))}
           </div>
 
-          <div style={{ marginTop: 28, display: "flex", gap: 14, flexWrap: "wrap" }}>
+          <div style={{ marginTop: 28 }}>
             <a className="cta" href={linkMundoTicket} target="_blank" rel="noreferrer">
               Resgatar na Mundo Ticket ↗
             </a>
-            <button className="cta fantasma" type="button" title="Self-report: funcional na F3">
-              Já resgatei ✓
-            </button>
           </div>
           <div className="aviso">
-            O resgate é feito <b>manualmente no site da Mundo Ticket</b>, com os códigos acima. Depois de{" "}
-            resgatar, toque em &ldquo;Já resgatei&rdquo; pra avisar a organização.
+            <b>Toque num código pra copiar</b> e resgate manualmente no site da Mundo Ticket. Os códigos
+            que você já copiou ficam marcados aqui na carteira.
           </div>
           <div className="aviso">
             <b>Dica:</b> na aba <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/apoio`} style={{ textDecoration: "underline" }}>Materiais de Apoio</a>{" "}

@@ -339,6 +339,16 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
   color: var(--ink-on-accent);
 }
 
+.admin-tab.breve {
+  font-family: inherit;
+  background: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
 /* ── Régua de comunicação ── */
 .regua-lista {
   margin-top: 18px;
@@ -1323,6 +1333,44 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-s);
   padding: 9px 12px;
+}
+
+.ticket .codigo.clicavel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.ticket .codigo.clicavel:hover {
+  border-color: var(--champagne);
+  background: var(--surface-2);
+}
+
+.ticket .icone-copiar {
+  font-size: 15px;
+  color: var(--champagne);
+  flex-shrink: 0;
+}
+
+/* código já copiado: rebaixado, como se resgatado */
+.ticket.copiado {
+  --tipo-cor: oklch(62% 0.008 75);
+  opacity: 0.62;
+}
+
+.ticket.copiado .codigo.clicavel { color: var(--muted); }
+
+.ticket.copiado .icone-copiar { color: var(--faint); }
+
+.badge.copiado-badge {
+  color: var(--muted);
+  background: var(--surface-2);
 }
 
 .ticket .origem {
