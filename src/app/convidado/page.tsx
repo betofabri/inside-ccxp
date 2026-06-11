@@ -56,7 +56,7 @@ export default async function PaginaConvidado() {
       {tickets.length > 0 && (
         <section className="secao">
           <h2>
-            Seus ingressos <span className="nota">{tickets.length} código(s) — consolidados de todos os convites</span>
+            Seus ingressos <span className="nota">{tickets.length} código(s), consolidados de todos os convites</span>
           </h2>
           <div className="carteira">
             {tickets.map(({ cod, host }) => (
@@ -77,12 +77,12 @@ export default async function PaginaConvidado() {
             <a className="cta" href={linkMundoTicket} target="_blank" rel="noreferrer">
               Resgatar na Mundo Ticket ↗
             </a>
-            <button className="cta fantasma" type="button" title="Self-report — funcional na F3">
+            <button className="cta fantasma" type="button" title="Self-report: funcional na F3">
               Já resgatei ✓
             </button>
           </div>
           <div className="aviso">
-            O resgate é feito <b>manualmente no site da Mundo Ticket</b> com os códigos acima. Depois de
+            O resgate é feito <b>manualmente no site da Mundo Ticket</b>, com os códigos acima. Depois de{" "}
             resgatar, toque em &ldquo;Já resgatei&rdquo; pra avisar a organização.
           </div>
         </section>
@@ -98,7 +98,7 @@ export default async function PaginaConvidado() {
       {agenda.length > 0 && (
         <section className="secao">
           <h2>
-            Agenda do evento <span className="nota">geral única — perfil corporativo</span>
+            Agenda do evento <span className="nota">geral única · perfil corporativo</span>
           </h2>
           <div className="agenda">
             {agenda.map((item) => (

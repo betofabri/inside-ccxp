@@ -250,9 +250,9 @@ async function main() {
   await db.agendaItem.createMany({
     data: [
       { dia: "2026-12-03", horario: "11:00", titulo: "Abertura dos portões", descricao: "Credenciamento VIP na entrada Sul do São Paulo Expo." },
-      { dia: "2026-12-03", horario: "14:00", titulo: "Painel de abertura — Palco Thunder", descricao: "Apresentação oficial da CCXP26." },
-      { dia: "2026-12-05", horario: "16:00", titulo: "Painel principal — Palco Thunder", descricao: "Convidado internacional surpresa." },
-      { dia: "2026-12-06", horario: "18:00", titulo: "Encerramento", descricao: "Último dia — recap e agradecimentos." },
+      { dia: "2026-12-03", horario: "14:00", titulo: "Painel de abertura · Palco Thunder", descricao: "Apresentação oficial da CCXP26." },
+      { dia: "2026-12-05", horario: "16:00", titulo: "Painel principal · Palco Thunder", descricao: "Convidado internacional surpresa." },
+      { dia: "2026-12-06", horario: "18:00", titulo: "Encerramento", descricao: "Último dia: recap e agradecimentos." },
     ],
   });
 

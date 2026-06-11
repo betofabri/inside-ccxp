@@ -20,20 +20,20 @@ export default async function Home() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/ccxp-logo.png" alt="CCXP" className="logo-hero" />
         <h1>
-          Sistema RSVP de <em>convidados VIP</em>
+          Convidados VIP, <em>do convite à presença</em>
         </h1>
         <div className="evento">
           <span><b>CCXP26</b></span>
-          <span>03 — 06 dez 2026</span>
+          <span>03 a 06 de dezembro de 2026</span>
           <span>São Paulo Expo</span>
-          <span style={{ color: "var(--amarelo)" }}>Protótipo F0 — escolha um papel pra navegar</span>
+          <span>Protótipo navegável · escolha um papel pra entrar</span>
         </div>
       </section>
 
       <section className="personas">
         <div className="persona-col">
           <header>
-            Admin <span className="num">MASTER</span>
+            Admin <span className="num">master</span>
           </header>
           <p className="desc">
             Vê tudo: funil, pool corporativo, convidados, audit log e configurações. Também convida (tem as duas cotas).
@@ -57,10 +57,10 @@ export default async function Home() {
 
         <div className="persona-col">
           <header>
-            Funcionário <span className="num">HOST</span>
+            Funcionário <span className="num">host</span>
           </header>
           <p className="desc">
-            Vê saldos por tipo e pool, convida e gerencia os próprios convites. A flag corporativa libera o lote compartilhado.
+            Convida direto da tela inicial e acompanha os próprios convites. A flag corporativa libera o lote compartilhado.
           </p>
           <ul>
             {hosts.map((f) => (
@@ -83,7 +83,7 @@ export default async function Home() {
 
         <div className="persona-col">
           <header>
-            Convidado <span className="num">VIP</span>
+            Convidado <span className="num">vip</span>
           </header>
           <p className="desc">
             Carteira de códigos consolidada, link da Mundo Ticket e agenda do evento (perfil corporativo).

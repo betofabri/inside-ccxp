@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Archivo, Archivo_Black, IBM_Plex_Mono } from "next/font/google";
+import { Archivo, Marcellus, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { getPersona } from "@/lib/persona";
 import { sairPersona } from "@/lib/actions";
 import { db } from "@/lib/db";
 
-const display = Archivo_Black({ weight: "400", subsets: ["latin"], variable: "--font-display" });
+const display = Marcellus({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
 const mono = IBM_Plex_Mono({ weight: ["400", "500", "700"], subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "CCXP26 · RSVP — Convidados VIP",
-  description: "Sistema RSVP / CRM de convidados VIP da CCXP26 — 03 a 06 de dezembro, São Paulo Expo.",
+  title: "CCXP26 · RSVP · Convidados VIP",
+  description: "Sistema RSVP / CRM de convidados VIP da CCXP26, de 03 a 06 de dezembro no São Paulo Expo.",
 };
 
 const PAPEL_LABEL: Record<string, string> = {
@@ -37,7 +37,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="pt-BR">
       <body className={`${display.variable} ${corpo.variable} ${mono.variable}`}>
-        <div className="faixa" />
         <header className="topbar">
           <Link href="/" aria-label="Início">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -57,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </header>
         <main>{children}</main>
         <footer className="rodape-app">
-          <span>CCXP26 — 03 a 06 dez 2026 · São Paulo Expo</span>
+          <span>CCXP26 · 03 a 06 dez 2026 · São Paulo Expo</span>
           <span>Protótipo F0 · envio mockado · dados de exemplo</span>
         </footer>
       </body>

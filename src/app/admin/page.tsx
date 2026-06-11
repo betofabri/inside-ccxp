@@ -70,7 +70,7 @@ export default async function PaginaAdmin() {
     <div className="pagina">
       <h1>Painel admin</h1>
       <div className="sub">
-        <span className="badge vip">MASTER</span>
+        <span className="badge vip">Master</span>
         <span>{admin.nome} · visão completa do sistema</span>
       </div>
 
