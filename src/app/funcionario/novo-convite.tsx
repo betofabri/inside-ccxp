@@ -243,17 +243,20 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                     {t.label}
                     <small>{t.data}</small>
                   </div>
-                  {fluxo === "corporativo" && (
-                    <label className={`vip-addon ${qtd[t.tipo] === 0 ? "off" : ""} ${vipTipo[t.tipo] ? "on" : ""}`}>
-                      <input
-                        type="checkbox"
-                        checked={vipTipo[t.tipo]}
-                        disabled={qtd[t.tipo] === 0}
-                        onChange={(e) => setVipTipo((vt) => ({ ...vt, [t.tipo]: e.target.checked }))}
-                      />
-                      + VIP
-                    </label>
-                  )}
+                  {fluxo === "corporativo" &&
+                    (t.tipo === "todos_os_dias" ? (
+                      <span className="vip-addon incluso">VIP incluso</span>
+                    ) : (
+                      <label className={`vip-addon ${qtd[t.tipo] === 0 ? "off" : ""} ${vipTipo[t.tipo] ? "on" : ""}`}>
+                        <input
+                          type="checkbox"
+                          checked={vipTipo[t.tipo]}
+                          disabled={qtd[t.tipo] === 0}
+                          onChange={(e) => setVipTipo((vt) => ({ ...vt, [t.tipo]: e.target.checked }))}
+                        />
+                        + VIP
+                      </label>
+                    ))}
                   <div className="pool-campo">
                     <span className="rotulo">
                       <b>{fluxo === "pessoal" ? "Disponíveis" : "Restam no lote"}</b>

@@ -840,6 +840,12 @@ h1, h2, h3 { text-wrap: balance; }
   cursor: not-allowed;
 }
 
+.vip-addon.incluso {
+  cursor: default;
+  color: var(--champagne);
+  border-color: color-mix(in oklab, var(--champagne) 35%, transparent);
+}
+
 .composer .rodape {
   display: flex;
   align-items: center;
