@@ -49,7 +49,7 @@ export default async function PaginaFuncionario() {
           Olá, <b>{host.nome.split(" ")[0]}</b> · {NIVEL_LABEL[host.nivel]}
         </span>
         {host.podeCorporativo ? (
-          <span className="badge declarado">Flag corporativa ativa</span>
+          <span className="badge declarado">Corp Invitation On</span>
         ) : (
           <span className="badge expirado">Cota pessoal apenas</span>
         )}
