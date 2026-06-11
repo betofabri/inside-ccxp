@@ -299,7 +299,12 @@ function RotuloSegmento({
   const display = stage.displayValue ?? formatValue(stage.value);
 
   const valueEl = showValues && <span className="fc-valor">{display}</span>;
-  const pctEl = showPercentage && <span className="fc-pct">{formatPercentage(pct)}</span>;
+  // pill central carrega absoluto + percentual
+  const pctEl = showPercentage && (
+    <span className="fc-pct">
+      {display} <small>· {formatPercentage(pct)}</small>
+    </span>
+  );
   const labelEl = showLabels && <span className="fc-label">{stage.label}</span>;
 
   const linha = (children: React.ReactNode, extra: CSSProperties) => (

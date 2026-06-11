@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "stagesub-admin",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /Users/betofabri/Claude/StageSub/admin && npx wrangler dev --port 8799"],
+      "port": 8799
     }
   ]
 }

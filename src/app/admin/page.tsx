@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
+import { TIPOS } from "@/lib/labels";
 import AdminTabs from "./admin-tabs";
 import ImportarPlanilha from "../funcionario/importar-planilha";
-import { FunilEvento, PizzaResgates } from "./graficos-cliente";
+import { FunilEvento, BarrasResgates } from "./graficos-cliente";
 
 export const dynamic = "force-dynamic";
 
@@ -81,8 +81,6 @@ export default async function PaginaAdmin() {
     (a, b) => b.codigos - a.codigos || b.convidados - a.convidados,
   );
 
-  const auditoria = await db.auditLog.findMany({ orderBy: { data: "desc" }, take: 10 });
-  const atores = new Map(hosts.map((h) => [h.id, h.nome]));
   const configs = await db.config.findMany();
 
   const contar = (grupos: { tipo: string; _count: number }[], tipo: string) =>
@@ -113,9 +111,9 @@ export default async function PaginaAdmin() {
 
       <details className="secao" open>
         <summary><h2>
-          Resgates Corporativos <span className="nota">consumo do lote por tipo · passe o mouse nas fatias</span>
+          Resgates Corporativos <span className="nota">consumo do lote por tipo de ingresso</span>
         </h2></summary>
-        <PizzaResgates
+        <BarrasResgates
           fatias={TIPOS.map((tipo) => {
             const total = contar(corpTotal, tipo);
             return { tipo, total, usados: total - contar(corpDisponivel, tipo) };
@@ -188,48 +186,7 @@ export default async function PaginaAdmin() {
         </div>
       </details>
 
-      <details className="secao">
-        <summary><h2>
-          Convidados <span className="nota">filtro VIP, busca e exports chegam na F5</span>
-        </h2></summary>
-        <div className="tabela-wrap">
-          <table className="tabela">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Contato</th>
-                <th>Origem</th>
-                <th>Códigos</th>
-                <th>Status</th>
-                <th>VIP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {convidados.map((c) => {
-                const vip = c.convites.some((cv) => cv.vipOmelete);
-                const codigos = c.convites.flatMap((cv) => cv.codigos);
-                return (
-                  <tr key={c.id}>
-                    <td><b>{c.nome}</b></td>
-                    <td className="mono dim">{c.email ?? c.telefone ?? "—"}</td>
-                    <td className="dim">
-                      {[...new Set(c.convites.map((cv) => cv.host.nome))].join(" + ") || "—"}
-                    </td>
-                    <td className="mono dim">{codigos.length}</td>
-                    <td style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      {[...new Set(c.convites.map((cv) => cv.status))].map((s) => (
-                        <span key={s} className={`badge ${s}`}>{STATUS_CONVITE_LABEL[s]}</span>
-                      ))}
-                      {c.resgateDeclarado && <span className="badge declarado">Declarou resgate</span>}
-                    </td>
-                    <td>{vip ? <span className="badge vip">VIP</span> : <span className="dim">—</span>}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </details>
+      
 
       <details className="secao">
         <summary><h2>
@@ -238,35 +195,7 @@ export default async function PaginaAdmin() {
         <ImportarPlanilha pool="corporativo" eventoEsperado="CCXP26" />
       </details>
 
-      <details className="secao">
-        <summary><h2>
-          Audit log <span className="nota">últimas 10 operações</span>
-        </h2></summary>
-        <div className="tabela-wrap">
-          <table className="tabela">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Ator</th>
-                <th>Ação</th>
-                <th>Alvo</th>
-                <th>Detalhe</th>
-              </tr>
-            </thead>
-            <tbody>
-              {auditoria.map((a) => (
-                <tr key={a.id}>
-                  <td className="mono dim">{fmtData(a.data)}</td>
-                  <td>{a.atorId ? atores.get(a.atorId) ?? a.atorId : "sistema"}</td>
-                  <td className="mono">{a.acao}</td>
-                  <td className="mono dim">{a.alvo}</td>
-                  <td className="dim">{a.detalhe}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
+      
 
       <details className="secao">
         <summary><h2>

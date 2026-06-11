@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pie, PieChart, Cell, Tooltip, LabelList } from "recharts";
 import { FunnelChart } from "@/components/ui/funnel-chart";
 import { TIPO_LABEL } from "@/lib/labels";
 
@@ -42,108 +41,54 @@ export function FunilEvento({ etapas }: { etapas: { nome: string; valor: number 
       }))}
       orientation={vertical ? "vertical" : "horizontal"}
       layers={3}
-      style={{ marginTop: 18, maxWidth: 860 }}
+      showValues={false}
+      style={{ marginTop: 18 }}
     />
   );
 }
 
-// ─── Pizza de Resgates Corporativos (raio crescente por fatia) ──────────────
-
-const TIPO_COR: Record<string, string> = {
-  spoiler_night: "oklch(79% 0.115 305)",
-  quinta: "oklch(78% 0.1 235)",
-  sexta: "oklch(80% 0.1 190)",
-  sabado: "oklch(80% 0.125 150)",
-  domingo: "oklch(80% 0.115 60)",
-  todos_os_dias: "oklch(84% 0.088 85)",
-};
+// ─── Resgates Corporativos em barras (largura total) ────────────────────────
 
 type Fatia = { tipo: string; usados: number; total: number };
 
-function TipFatia({ active, payload }: { active?: boolean; payload?: { payload: Fatia & { nome: string; fill: string } }[] }) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
-  return (
-    <div className="tip-grafico">
-      <span className="ponto" style={{ backgroundColor: d.fill }} aria-hidden />
-      {d.nome}: <b>{d.usados}</b> de {d.total} usados
-    </div>
-  );
-}
-
-const BASE_RADIUS = 74;
-const SIZE_INCREMENT = 11;
-const INNER_RADIUS = 42;
-
-export function PizzaResgates({ fatias }: { fatias: Fatia[] }) {
+export function BarrasResgates({ fatias }: { fatias: Fatia[] }) {
   const totalPool = fatias.reduce((acc, f) => acc + f.total, 0);
-  // menor → maior, como no padrão do componente (raio cresce com a fatia)
-  const dados = fatias
-    .filter((f) => f.usados > 0)
-    .sort((a, b) => a.usados - b.usados)
-    .map((f) => ({ ...f, nome: TIPO_LABEL[f.tipo], fill: TIPO_COR[f.tipo] }));
-  const totalUsados = dados.reduce((acc, f) => acc + f.usados, 0);
+  const totalUsados = fatias.reduce((acc, f) => acc + f.usados, 0);
+  const comDados = fatias.filter((f) => f.total > 0);
 
-  if (totalUsados === 0) {
-    return (
-      <div className="aviso">
-        Nenhum código corporativo usado ainda; o lote está intacto ({totalPool} disponíveis).
-      </div>
-    );
+  if (totalPool === 0) {
+    return <div className="aviso">Nenhum código corporativo importado ainda.</div>;
   }
 
-  const acumuladoAte = (i: number) =>
-    (dados.slice(0, i).reduce((s, d) => s + d.usados, 0) / totalUsados) * 360;
-
-  const lado = 2 * (BASE_RADIUS + (dados.length - 1) * SIZE_INCREMENT) + 28;
-
   return (
-    <div className="pizza-wrap">
-      <div className="pizza-area" style={{ width: lado, height: lado }}>
-        <PieChart width={lado} height={lado}>
-          <Tooltip content={<TipFatia />} />
-          {dados.map((entrada, i) => (
-            <Pie
-              key={entrada.tipo}
-              data={[entrada]}
-              dataKey="usados"
-              innerRadius={INNER_RADIUS}
-              outerRadius={BASE_RADIUS + i * SIZE_INCREMENT}
-              cornerRadius={4}
-              startAngle={acumuladoAte(i)}
-              endAngle={acumuladoAte(i + 1)}
-              stroke="none"
-              isAnimationActive
-            >
-              <Cell fill={entrada.fill} />
-              <LabelList
-                dataKey="usados"
-                stroke="none"
-                fontSize={12}
-                fontWeight={650}
-                fill="oklch(21% 0.025 80)"
+    <div className="barras-resgates">
+      <p className="br-resumo">
+        <b>{totalUsados}</b> de <b>{totalPool}</b> códigos do lote em uso (
+        {Math.round((totalUsados / totalPool) * 100)}%)
+      </p>
+      {comDados.map((f, i) => {
+        const pct = Math.round((f.usados / f.total) * 100);
+        return (
+          <div
+            className={`br-linha t-${f.tipo}`}
+            key={f.tipo}
+            title={`${TIPO_LABEL[f.tipo]}: ${f.usados} de ${f.total} usados (${pct}%)`}
+          >
+            <span className="br-label">{TIPO_LABEL[f.tipo]}</span>
+            <div className="br-trilho">
+              <div
+                className="br-fill"
+                style={{ width: `${Math.max(pct, f.usados > 0 ? 2 : 0)}%`, animationDelay: `${i * 70}ms` }}
               />
-            </Pie>
-          ))}
-        </PieChart>
-        <div className="pizza-centro" aria-hidden>
-          <b>{totalUsados}</b>
-          <span>de {totalPool}</span>
-        </div>
-      </div>
-      <ul className="donut-itens">
-        {dados
-          .slice()
-          .reverse()
-          .map((d) => (
-            <li key={d.tipo} title={`${d.usados} de ${d.total} usados`}>
-              <span className="ponto" style={{ backgroundColor: d.fill }} aria-hidden />
-              <span className="nome">{d.nome}</span>
-              <b>{d.usados}</b>
-              <span className="dim">/ {d.total}</span>
-            </li>
-          ))}
-      </ul>
+            </div>
+            <span className="br-numeros">
+              <b>{f.usados}</b>
+              <span className="de">/ {f.total}</span>
+              <span className="pct">{pct}%</span>
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

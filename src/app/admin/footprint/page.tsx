@@ -20,7 +20,19 @@ const ROTULO: Record<string, string> = {
   purchase: "Compra",
 };
 
-// trajeto fake determinístico por convidado + dia (até a fonte real de bipagem chegar)
+// ── Insights gerais agregados (mock — até a fonte real de bipagem) ──────────
+
+const INSIGHTS_GERAIS = [
+  { numero: "90%", texto: "dos convidados passaram mais de 5h no evento" },
+  { numero: "65%", texto: "foram a 2 dias ou mais" },
+  { numero: "10h–11h", texto: "pico de chegada: a maioria começa pela manhã e vai direto pros painéis" },
+  { numero: "78%", texto: "tiveram o Palco Thunder na jornada, o palco mais visitado pelos VIPs" },
+  { numero: "R$ 480", texto: "ticket médio de compras dentro do evento" },
+  { numero: "42%", texto: "ficaram até o último painel do dia (saída após 19h)" },
+];
+
+// ── Trajeto fake determinístico por convidado ───────────────────────────────
+
 function bipagensFake(convidadoId: number, credentialId: string, tipos: string[]): BipagemEvento[] {
   const DIA_DATA: Record<string, string> = {
     spoiler_night: "2026-12-02",
@@ -53,6 +65,36 @@ function bipagensFake(convidadoId: number, credentialId: string, tipos: string[]
     ev("exit", `19:${String(30 + rnd(d + 10, 29)).padStart(2, "0")}`, "Entrada Sul");
   });
   return eventos.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+}
+
+// ── Insights individuais (AI · mock determinístico) ─────────────────────────
+
+function insightsIndividuais(convidadoId: number, nome: string, dias: number) {
+  const rnd = (n: number, mod: number) => ((convidadoId * 37 + n * 13) % mod);
+  const horas = 5 + rnd(1, 4);
+  const gasto = 320 + rnd(2, 37) * 10;
+  const paineisTerror = 2 + rnd(3, 3);
+  const primeiro = nome.split(" ")[0];
+  return {
+    badges: ["Terror Master", "Shopper", "CCXP Fan"],
+    cards: [
+      {
+        titulo: "Jornada",
+        badge: "CCXP Fan",
+        texto: `${primeiro} chega no pico da manhã e fica em média ${horas}h por dia; esteve presente em ${dias} dia(s) e saiu depois das 19h em quase todos.`,
+      },
+      {
+        titulo: "Interesses",
+        badge: "Terror Master",
+        texto: `Forte afinidade com terror: ${paineisTerror} painéis do gênero na jornada e passagem demorada pelo corredor temático.`,
+      },
+      {
+        titulo: "Consumo",
+        badge: "Shopper",
+        texto: `R$ ${gasto},00 em compras dentro do evento, concentradas na loja oficial, acima do ticket médio dos VIPs.`,
+      },
+    ],
+  };
 }
 
 const fmtHora = (iso: string) =>
@@ -91,11 +133,14 @@ export default async function PaginaFootprint({
         const codigos = selecionado.convites.flatMap((cv) => cv.codigos);
         const tipos = [...new Set(codigos.map((c) => c.tipo))];
         const credentialId = `CRD-${String(selecionado.id).padStart(5, "0")}`;
+        const eventos = bipagensFake(selecionado.id, credentialId, tipos);
+        const diasNoEvento = new Set(eventos.map((e) => e.timestamp.slice(0, 10))).size;
         return {
           credentialId,
           tipos,
           anfitrioes: [...new Set(selecionado.convites.map((cv) => cv.host.nome))],
-          eventos: bipagensFake(selecionado.id, credentialId, tipos),
+          eventos,
+          ai: insightsIndividuais(selecionado.id, selecionado.nome, diasNoEvento),
         };
       })()
     : null;
@@ -104,7 +149,7 @@ export default async function PaginaFootprint({
     <div className="pagina">
       <h1>Footprint</h1>
       <div className="sub">
-        <span>Ficha do convidado e trajeto no evento via bipagens da credencial.</span>
+        <span>O público VIP visto pelas bipagens da credencial.</span>
         <span className="badge declarado">dados de demonstração</span>
       </div>
       <AdminTabs ativa="footprint" />
@@ -113,12 +158,29 @@ export default async function PaginaFootprint({
         <input
           type="text"
           name="q"
-          placeholder="Buscar por nome, email ou empresa"
+          placeholder="Buscar convidado por nome, email ou empresa"
           defaultValue={termo}
           aria-label="Buscar convidado"
         />
         <button className="cta" type="submit">Buscar</button>
       </form>
+
+      {/* visão macro: insights agregados quando ninguém está selecionado */}
+      {!selecionado && !termo && (
+        <section className="secao">
+          <h2>
+            Visão geral do público <span className="nota">agregado de todas as credenciais VIP</span>
+          </h2>
+          <div className="insights-gerais">
+            {INSIGHTS_GERAIS.map((ins) => (
+              <article className="insight-card" key={ins.numero}>
+                <span className="numero">{ins.numero}</span>
+                <p>{ins.texto}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {termo && matches.length === 0 && (
         <div className="aviso">Nenhum convidado com &ldquo;{termo}&rdquo;.</div>
@@ -160,6 +222,29 @@ export default async function PaginaFootprint({
             </div>
           </section>
 
+          <section className="secao box-ai">
+            <div className="box-ai-cab">
+              <h2 style={{ border: "none", paddingBottom: 0 }}>Insights</h2>
+              <span className="selo-ai">AI</span>
+              <span className="spacer" />
+              <div className="badges-perfil">
+                {ficha.ai.badges.map((b) => (
+                  <span className="badge-perfil" key={b}>{b}</span>
+                ))}
+              </div>
+            </div>
+            <div className="ai-cards">
+              {ficha.ai.cards.map((c) => (
+                <article className="ai-card" key={c.titulo}>
+                  <header>
+                    {c.titulo} <span className="badge-perfil mini">{c.badge}</span>
+                  </header>
+                  <p>{c.texto}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <section className="secao">
             <h2>
               Trajeto no evento{" "}
@@ -176,9 +261,7 @@ export default async function PaginaFootprint({
                     <div className="bip-info">
                       <b>{ROTULO[e.type]}</b> · {e.location}
                       {e.payload && (
-                        <span className="bip-payload">
-                          {Object.values(e.payload).join(" · ")}
-                        </span>
+                        <span className="bip-payload">{Object.values(e.payload).join(" · ")}</span>
                       )}
                     </div>
                   </li>
