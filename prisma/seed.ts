@@ -103,7 +103,7 @@ async function main() {
     vip?: boolean;
     criadoEm?: Date;
     token: string;
-    parcelas: { pool: "pessoal" | "corporativo"; tipo: string; qtd: number }[];
+    parcelas: { pool: "pessoal" | "corporativo"; tipo: string; qtd: number; vip?: boolean }[];
     statusCodigos?: string; // reservado | entregue | resgatado
   }) {
     const c = await db.convite.create({
@@ -119,7 +119,7 @@ async function main() {
       },
     });
     for (const p of opts.parcelas) {
-      await db.conviteParcela.create({ data: { conviteId: c.id, pool: p.pool, tipo: p.tipo, qtd: p.qtd } });
+      await db.conviteParcela.create({ data: { conviteId: c.id, pool: p.pool, tipo: p.tipo, qtd: p.qtd, vip: p.vip ?? false } });
       // convites expirados/cancelados devolveram os códigos — não vincula
       if (opts.status === "expirado" || opts.status === "cancelado") continue;
       const codigos =
@@ -144,17 +144,27 @@ async function main() {
 
   // 1. PENDENTE — convidada ontem, ainda não cadastrou
   const ana = await db.convidado.create({
-    data: { nome: "Ana Beltrão", email: "ana.beltrao@warnerbros.com" },
+    data: { nome: "Ana Beltrão", email: "ana.beltrao@warnerbros.com", empresa: "Warner Bros." },
   });
   await convite({
     host: beto, convidadoId: ana.id, canais: "email", status: "pendente",
     expiraEm: dias(6), vip: true, criadoEm: dias(-1), token: "tok-ana",
-    parcelas: [{ pool: "corporativo", tipo: "todos_os_dias", qtd: 2 }],
+    parcelas: [{ pool: "corporativo", tipo: "todos_os_dias", qtd: 2, vip: true }],
+  });
+
+  // 1b. PENDENTE pessoal — só WhatsApp, cadastro simplificado
+  const henrique = await db.convidado.create({
+    data: { nome: "Henrique Sato", telefone: "+5511955554444" },
+  });
+  await convite({
+    host: diego, convidadoId: henrique.id, canais: "whatsapp", status: "pendente",
+    expiraEm: dias(5), criadoEm: dias(-2), token: "tok-henrique",
+    parcelas: [{ pool: "pessoal", tipo: "domingo", qtd: 1 }],
   });
 
   // 2. CADASTRADO + ENTREGUE — viu os códigos, ainda não resgatou
   const bruno = await db.convidado.create({
-    data: { nome: "Bruno Okamoto", email: "bruno.okamoto@netflix.com", consentimentoEm: dias(-3) },
+    data: { nome: "Bruno Okamoto", email: "bruno.okamoto@netflix.com", empresa: "Netflix", cargo: "Diretor de Conteúdo", nascimento: new Date("1988-03-14"), consentimentoEm: dias(-3) },
   });
   await convite({
     host: camila, convidadoId: bruno.id, canais: "email,whatsapp", status: "cadastrado",
@@ -165,7 +175,7 @@ async function main() {
 
   // 3. EXPIRADO — não cadastrou em 7 dias, códigos voltaram ao pool
   const carla = await db.convidado.create({
-    data: { nome: "Carla Mendes", email: "carla.mendes@globo.com" },
+    data: { nome: "Carla Mendes", email: "carla.mendes@globo.com", empresa: "Globo" },
   });
   await convite({
     host: camila, convidadoId: carla.id, canais: "email", status: "expirado",
@@ -187,13 +197,14 @@ async function main() {
   const elisa = await db.convidado.create({
     data: {
       nome: "Elisa Prado", email: "elisa.prado@paramount.com",
+      empresa: "Paramount", cargo: "Head de Distribuição", nascimento: new Date("1985-11-02"),
       consentimentoEm: dias(-6), resgateDeclarado: true,
     },
   });
   await convite({
     host: beto, convidadoId: elisa.id, canais: "email", status: "cadastrado",
     expiraEm: dias(1), vip: true, criadoEm: dias(-6), token: "tok-elisa",
-    parcelas: [{ pool: "corporativo", tipo: "quinta", qtd: 1 }],
+    parcelas: [{ pool: "corporativo", tipo: "quinta", qtd: 1, vip: true }],
     statusCodigos: "entregue",
   });
 
@@ -201,6 +212,7 @@ async function main() {
   const fabio = await db.convidado.create({
     data: {
       nome: "Fábio Quintela", email: "fabio.q@ubisoft.com",
+      empresa: "Ubisoft", cargo: "Brand Manager", nascimento: new Date("1990-07-21"),
       consentimentoEm: dias(-10), resgateDeclarado: true,
     },
   });
@@ -213,7 +225,7 @@ async function main() {
 
   // 7. CARTEIRA CONSOLIDADA — Luís: convite do Beto (pessoal) + da Camila (corporativo)
   const luis = await db.convidado.create({
-    data: { nome: "Luís Hernandez", email: "luis.hernandez@hbo.com", consentimentoEm: dias(-2) },
+    data: { nome: "Luís Hernandez", email: "luis.hernandez@hbo.com", empresa: "HBO", cargo: "VP de Programação", nascimento: new Date("1979-05-30"), consentimentoEm: dias(-2) },
   });
   await convite({
     host: beto, convidadoId: luis.id, canais: "email", status: "cadastrado",
@@ -230,7 +242,7 @@ async function main() {
 
   // 8. Convite só pessoal via WhatsApp (Diego, sem flag corporativa)
   const gabi = await db.convidado.create({
-    data: { nome: "Gabi Torres", telefone: "+5511912345678", consentimentoEm: dias(-1) },
+    data: { nome: "Gabi Torres", telefone: "+5511912345678", nascimento: new Date("1995-09-12"), consentimentoEm: dias(-1) },
   });
   await convite({
     host: diego, convidadoId: gabi.id, canais: "whatsapp", status: "cadastrado",

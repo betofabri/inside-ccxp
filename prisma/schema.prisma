@@ -64,6 +64,7 @@ model ConviteParcela {
   pool      String
   tipo      String
   qtd       Int
+  vip       Boolean @default(false)
 }
 
 model Convidado {
@@ -71,6 +72,9 @@ model Convidado {
   nome             String
   email            String?         @unique
   telefone         String?
+  empresa          String?
+  cargo            String?
+  nascimento       DateTime?
   consentimentoEm  DateTime?
   optoutRegua      Boolean         @default(false)
   resgateDeclarado Boolean         @default(false)

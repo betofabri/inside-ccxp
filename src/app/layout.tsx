@@ -43,6 +43,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <img src="/ccxp-logo.png" alt="CCXP" className="logo" />
           </Link>
           <span className="sistema">RSVP · Convidados VIP</span>
+          <nav className="topo-nav">
+            <Link href="/apoio" className="topo-link">Material de apoio</Link>
+            <button className="topo-link breve" type="button" disabled title="Fotos do dia: em breve">
+              Fotos do dia <span className="selo-breve">em breve</span>
+            </button>
+          </nav>
           <span className="spacer" />
           {persona && nome && (
             <div className="persona-chip">

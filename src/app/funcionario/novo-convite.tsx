@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { criarConvite, type CriarConviteResultado } from "@/lib/convites";
 
 type TipoInfo = {
   tipo: string;
@@ -33,7 +34,7 @@ const DDIS = [
   { codigo: "+82", pais: "KR" },
 ];
 
-// hint visual; a validação real (lista editável pelo admin) chega na F2
+// hint visual; a validação que vale é a do servidor (lista do admin)
 const DOMINIOS_GENERICOS = [
   "gmail.com", "hotmail.com", "outlook.com", "yahoo.com", "icloud.com",
   "live.com", "msn.com", "aol.com", "proton.me", "protonmail.com",
@@ -55,13 +56,27 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
   const [vipTipo, setVipTipo] = useState<Record<string, boolean>>(
     Object.fromEntries(tipos.map((t) => [t.tipo, false])),
   );
+  const [resultado, setResultado] = useState<CriarConviteResultado | null>(null);
+  const [copiado, setCopiado] = useState(false);
+  const [enviando, startEnvio] = useTransition();
+
+  const limpar = () => {
+    setPasso(0);
+    setNome("");
+    setSobrenome("");
+    setEmpresa("");
+    setEmail("");
+    setTelefone("");
+    setQtd(Object.fromEntries(tipos.map((t) => [t.tipo, 0])));
+    setVipTipo(Object.fromEntries(tipos.map((t) => [t.tipo, false])));
+    setResultado(null);
+    setCopiado(false);
+  };
 
   const trocarFluxo = (f: Fluxo) => {
     if (f === fluxo) return;
     setFluxo(f);
-    setPasso(0);
-    setQtd(Object.fromEntries(tipos.map((t) => [t.tipo, 0])));
-    setVipTipo(Object.fromEntries(tipos.map((t) => [t.tipo, false])));
+    limpar();
   };
 
   const disp = (t: TipoInfo) => (fluxo === "pessoal" ? t.pessoalDisp : t.corpDisp);
@@ -93,8 +108,80 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
     .map((t) => ({
       chave: t.tipo,
       texto: `${qtd[t.tipo]}× ${t.label}`,
-      vip: fluxo === "corporativo" && vipTipo[t.tipo],
+      vip: fluxo === "corporativo" && (vipTipo[t.tipo] || t.tipo === "todos_os_dias"),
     }));
+
+  const enviar = () =>
+    startEnvio(async () => {
+      const r = await criarConvite({
+        fluxo,
+        nome,
+        sobrenome,
+        empresa: empresa || undefined,
+        email: email || undefined,
+        ddi,
+        telefone: telefone || undefined,
+        parcelas: tipos
+          .filter((t) => qtd[t.tipo] > 0)
+          .map((t) => ({ tipo: t.tipo, qtd: qtd[t.tipo], vip: vipTipo[t.tipo] })),
+      });
+      setResultado(r);
+    });
+
+  const linkMagico = resultado?.token
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/convite/${resultado.token}`
+    : "";
+
+  const copiarLink = async () => {
+    await navigator.clipboard.writeText(linkMagico);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
+
+  // ── tela de sucesso ──
+  if (resultado?.ok) {
+    return (
+      <div className="composer wizard">
+        <div className="painel sucesso">
+          <div className="selo-sucesso" aria-hidden>✓</div>
+          <h3 className="titulo-sucesso">Convite enviado</h3>
+          <p className="sub-sucesso">
+            {nome.trim()} {sobrenome.trim()} vai receber o link mágico por{" "}
+            {[emailOk && "email", whatsOk && "WhatsApp"].filter(Boolean).join(" e ")}.
+            O envio é mockado no protótipo.
+          </p>
+
+          {resultado.aviso && <div className="aviso">{resultado.aviso}</div>}
+
+          <div className="campo" style={{ marginTop: 20 }}>
+            <label>Link mágico</label>
+            <div className="campo-telefone">
+              <input type="text" readOnly value={linkMagico} onFocus={(e) => e.target.select()} />
+              <button className="cta fantasma" type="button" onClick={copiarLink}>
+                {copiado ? "Copiado ✓" : "Copiar"}
+              </button>
+            </div>
+            <div className="dica">No protótipo, abra o link pra ver o cadastro que o convidado recebe.</div>
+          </div>
+
+          {resultado.preview && (
+            <div className="preview-msg">
+              <span className="rotulo-preview">Preview da mensagem</span>
+              {resultado.preview.replace("{{link}}", linkMagico)}
+            </div>
+          )}
+        </div>
+        <div className="rodape">
+          <span className="nota">Os códigos ficam reservados até o cadastro (expira em 7 dias).</span>
+          <div className="acoes">
+            <button className="cta" type="button" onClick={limpar}>
+              Criar novo convite
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="composer wizard">
@@ -317,7 +404,7 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                   <ul className="resumo-lista">
                     {linhasResumo.map((l) => (
                       <li key={l.chave}>
-                        {l.texto} {l.vip && <span className="badge vip">+ VIP</span>}
+                        {l.texto} {l.vip && <span className="badge vip">VIP</span>}
                       </li>
                     ))}
                   </ul>
@@ -327,13 +414,15 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
               </dd>
             </div>
           </dl>
+
+          {resultado?.erro && <p className="alerta">{resultado.erro}</p>}
         </div>
       )}
 
       <div className="rodape">
         <span className="nota">
           {passo === 2
-            ? `${total} ingresso(s) · reserva atômica e envio chegam na F2`
+            ? `${total} ingresso(s) · reserva atômica no envio`
             : passo === 1
               ? total > 0
                 ? `${total} ingresso(s) selecionado(s)`
@@ -351,8 +440,8 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
               Continuar
             </button>
           ) : (
-            <button className="cta" type="button" disabled title="O envio chega na F2">
-              Enviar convite
+            <button className="cta" type="button" disabled={enviando} onClick={enviar}>
+              {enviando ? "Enviando…" : "Enviar convite"}
             </button>
           )}
         </div>

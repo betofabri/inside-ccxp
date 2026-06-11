@@ -3,12 +3,16 @@ import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, NIVEL_LABEL, fmtData } from "@/lib/labels";
 import NovoConvite from "./novo-convite";
+import AcoesConvite from "./acoes-convite";
+import { expirarVencidos } from "@/lib/convites";
 
 export const dynamic = "force-dynamic";
 
 export default async function PaginaFuncionario() {
   const persona = await getPersona();
   if (!persona || (persona.role !== "funcionario" && persona.role !== "admin")) redirect("/");
+
+  await expirarVencidos();
 
   const host = await db.funcionario.findUnique({ where: { id: persona.id } });
   if (!host) redirect("/");
@@ -72,11 +76,17 @@ export default async function PaginaFuncionario() {
           {tipos.map((t) => (
             <span className={`saldo-chip t-${t.tipo}`} key={t.tipo}>
               <span className="nome-tipo">{t.label}</span>
-              <span className={`n p ${t.pessoalDisp === 0 ? "zerado" : ""}`}>{t.pessoalDisp}</span>
+              <span className="par">
+                <small>pess.</small>
+                <span className={`n p ${t.pessoalDisp === 0 ? "zerado" : ""}`}>{t.pessoalDisp}</span>
+              </span>
               {host.podeCorporativo && (
                 <>
-                  <span className="sep">|</span>
-                  <span className={`n c ${t.corpDisp === 0 ? "zerado" : ""}`}>{t.corpDisp}</span>
+                  <span className="sep" aria-hidden />
+                  <span className="par">
+                    <small>corp.</small>
+                    <span className={`n c ${t.corpDisp === 0 ? "zerado" : ""}`}>{t.corpDisp}</span>
+                  </span>
                 </>
               )}
             </span>
@@ -100,6 +110,7 @@ export default async function PaginaFuncionario() {
                 <th>Status</th>
                 <th>Expira</th>
                 <th>VIP</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -118,11 +129,14 @@ export default async function PaginaFuncionario() {
                   </td>
                   <td className="dim">{fmtData(cv.expiraEm)}</td>
                   <td>{cv.vipOmelete ? <span className="badge vip">VIP</span> : <span className="dim">—</span>}</td>
+                  <td>
+                    <AcoesConvite conviteId={cv.id} token={cv.magicToken} status={cv.status} />
+                  </td>
                 </tr>
               ))}
               {meusConvites.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="dim">
+                  <td colSpan={7} className="dim">
                     Você ainda não convidou ninguém. O formulário acima é o caminho.
                   </td>
                 </tr>

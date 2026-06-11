@@ -59,28 +59,28 @@ export default async function PaginaAdmin() {
     orderBy: { id: "asc" },
   });
 
-  // ── Ranking de empresas (domínio do email do convidado) ──
+  // ── Ranking de empresas (campo empresa; fallback: domínio do email) ──
   const porEmpresa = new Map<
     string,
-    { convidados: number; codigos: number; vips: number }
+    { nome: string; dominio: string; convidados: number; codigos: number; vips: number }
   >();
   for (const c of convidados) {
-    if (!c.email) continue;
-    const dominio = c.email.split("@")[1]?.toLowerCase();
-    if (!dominio) continue;
-    const atual = porEmpresa.get(dominio) ?? { convidados: 0, codigos: 0, vips: 0 };
+    const dominio = c.email?.split("@")[1]?.toLowerCase() ?? "";
+    const nome =
+      c.empresa?.trim() ||
+      (dominio ? dominio.split(".")[0].replace(/^./, (l) => l.toUpperCase()) : "");
+    if (!nome) continue;
+    const chave = nome.toLowerCase();
+    const atual = porEmpresa.get(chave) ?? { nome, dominio, convidados: 0, codigos: 0, vips: 0 };
     atual.convidados += 1;
     atual.codigos += c.convites.reduce((acc, cv) => acc + cv.codigos.length, 0);
     if (c.convites.some((cv) => cv.vipOmelete)) atual.vips += 1;
-    porEmpresa.set(dominio, atual);
+    if (!atual.dominio && dominio) atual.dominio = dominio;
+    porEmpresa.set(chave, atual);
   }
-  const empresas = [...porEmpresa.entries()]
-    .map(([dominio, dados]) => ({
-      dominio,
-      nome: dominio.split(".")[0].replace(/^./, (l) => l.toUpperCase()),
-      ...dados,
-    }))
-    .sort((a, b) => b.codigos - a.codigos || b.convidados - a.convidados);
+  const empresas = [...porEmpresa.values()].sort(
+    (a, b) => b.codigos - a.codigos || b.convidados - a.convidados,
+  );
 
   const auditoria = await db.auditLog.findMany({ orderBy: { data: "desc" }, take: 10 });
   const atores = new Map(hosts.map((h) => [h.id, h.nome]));
@@ -193,10 +193,10 @@ export default async function PaginaAdmin() {
             </thead>
             <tbody>
               {empresas.map((e, i) => (
-                <tr key={e.dominio}>
+                <tr key={e.nome}>
                   <td className="dim">{i + 1}</td>
                   <td><b>{e.nome}</b></td>
-                  <td className="mono dim">{e.dominio}</td>
+                  <td className="mono dim">{e.dominio || "—"}</td>
                   <td>{e.convidados}</td>
                   <td>{e.codigos}</td>
                   <td>{e.vips > 0 ? <span className="badge vip">{e.vips}</span> : <span className="dim">—</span>}</td>
