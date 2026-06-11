@@ -55,7 +55,8 @@ async function main() {
   // OMLT-<dono><tipo><seq> — unicidade global garantida pelo padrão
   // Quantidades variadas por tipo (inclui zerado, pra mostrar o estado)
   const pessoalPorTipo: Record<number, Record<string, number>> = {
-    [beto.id]:   { spoiler_night: 10, quinta: 4, sexta: 4, sabado: 4, domingo: 4, todos_os_dias: 3 },
+    // Beto começa zerado (só os 2 sábados já consumidos pelo convite do Luís) — demo do import da planilha
+    [beto.id]:   { spoiler_night: 0, quinta: 0, sexta: 0, sabado: 2, domingo: 0, todos_os_dias: 0 },
     [camila.id]: { spoiler_night: 4,  quinta: 2, sexta: 3, sabado: 3, domingo: 3, todos_os_dias: 2 },
     [diego.id]:  { spoiler_night: 2,  quinta: 0, sexta: 2, sabado: 2, domingo: 2, todos_os_dias: 1 },
   };

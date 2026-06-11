@@ -4,6 +4,7 @@ import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
 import AdminTabs from "./admin-tabs";
 import ImportarPlanilha from "../funcionario/importar-planilha";
+import { FunilBarras, DonutResgates } from "./graficos";
 
 export const dynamic = "force-dynamic";
 
@@ -102,55 +103,33 @@ export default async function PaginaAdmin() {
 
       <details className="secao" open>
         <summary><h2>
-          Funil <span className="nota">convidados → cadastrados → entregues → resgatados → presentes</span>
+          Funil <span className="nota">passe o mouse pra ver a conversão de cada etapa</span>
         </h2></summary>
-        <div className="stats">
-          <div className="stat">
-            <div className="valor">{totalConvidados}</div>
-            <div className="rotulo">Convidados</div>
-          </div>
-          <div className="stat">
-            <div className="valor">{cadastrados}</div>
-            <div className="rotulo">Cadastrados</div>
-          </div>
-          <div className="stat">
-            <div className="valor">{entregues}</div>
-            <div className="rotulo">Entregues</div>
-          </div>
-          <div className="stat">
-            <div className="valor acento">{declarados}</div>
-            <div className="rotulo">Resgate declarado</div>
-          </div>
-          <div className="stat">
-            <div className="valor acento">{confirmados}</div>
-            <div className="rotulo">Resgate confirmado</div>
-          </div>
-          <div className="stat">
-            <div className="valor">{presentes}</div>
-            <div className="rotulo">Presentes</div>
-          </div>
-        </div>
+        <FunilBarras
+          etapas={[
+            { nome: "Convidados", valor: totalConvidados },
+            { nome: "Cadastrados", valor: cadastrados },
+            { nome: "Entregues", valor: entregues },
+            { nome: "Resgate declarado", valor: declarados },
+            { nome: "Resgate confirmado", valor: confirmados },
+            { nome: "Presentes", valor: presentes },
+          ]}
+        />
       </details>
 
       <details className="secao" open>
         <summary><h2>
-          Pool corporativo <span className="nota">disponíveis / total por tipo</span>
+          Resgates Corporativos <span className="nota">consumo do lote por tipo · passe o mouse nas fatias</span>
         </h2></summary>
-        <div className="saldos">
-          {TIPOS.map((tipo) => {
-            const disp = contar(corpDisponivel, tipo);
-            return (
-              <div className="saldo" key={tipo}>
-                <div className="tipo">{TIPO_LABEL[tipo]}</div>
-                <div className={`qtd ${disp === 0 ? "zerado" : ""}`}>{disp}</div>
-                <div className="de">de {contar(corpTotal, tipo)}</div>
-              </div>
-            );
+        <DonutResgates
+          fatias={TIPOS.map((tipo) => {
+            const total = contar(corpTotal, tipo);
+            return { tipo, total, usados: total - contar(corpDisponivel, tipo) };
           })}
-        </div>
+        />
       </details>
 
-      <details className="secao" open>
+      <details className="secao">
         <summary><h2>
           Ranking de hosts <span className="nota">quem convidou quantos · resgates confirmados</span>
         </h2></summary>
@@ -178,7 +157,7 @@ export default async function PaginaAdmin() {
         </div>
       </details>
 
-      <details className="secao" open>
+      <details className="secao">
         <summary><h2>
           Empresas convidadas <span className="nota">derivado do domínio do email</span>
         </h2></summary>
@@ -215,7 +194,7 @@ export default async function PaginaAdmin() {
         </div>
       </details>
 
-      <details className="secao" open>
+      <details className="secao">
         <summary><h2>
           Convidados <span className="nota">filtro VIP, busca e exports chegam na F5</span>
         </h2></summary>
@@ -265,7 +244,7 @@ export default async function PaginaAdmin() {
         <ImportarPlanilha pool="corporativo" eventoEsperado="CCXP26" />
       </details>
 
-      <details className="secao" open>
+      <details className="secao">
         <summary><h2>
           Audit log <span className="nota">últimas 10 operações</span>
         </h2></summary>
@@ -295,7 +274,7 @@ export default async function PaginaAdmin() {
         </div>
       </details>
 
-      <details className="secao" open>
+      <details className="secao">
         <summary><h2>
           Configuração <span className="nota">edição chega na F5</span>
         </h2></summary>
