@@ -12,6 +12,12 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": ["-c", "cd /Users/betofabri/Claude/StageSub/admin && npx wrangler dev --port 8799"],
       "port": 8799
+    },
+    {
+      "name": "talents-lab",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /Users/betofabri/Downloads/ccxp-talents-lab && npx wrangler dev --port 8798"],
+      "port": 8798
     }
   ]
 }

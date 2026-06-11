@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, NIVEL_LABEL, fmtData } from "@/lib/labels";
+import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
 import NovoConvite from "./novo-convite";
 import AcoesConvite from "./acoes-convite";
-import ImportarPlanilha from "./importar-planilha";
+import ImportarBotao from "./importar-botao";
+import PerfilHost from "./perfil-host";
 import { expirarVencidos } from "@/lib/convites";
 
 export const dynamic = "force-dynamic";
@@ -46,14 +47,24 @@ export default async function PaginaFuncionario() {
     corpDisp: contar(corpDisponivel, tipo),
   }));
 
+  const saldoPessoalTotal = tipos.reduce((acc, t) => acc + t.pessoalDisp, 0);
+
   return (
     <div className="pagina">
-      <h1>Novo convite</h1>
-      <div className="sub">
-        <span>
-          Olá, <b>{host.nome.split(" ")[0]}</b> · {NIVEL_LABEL[host.nivel]}
-        </span>
-        {host.podeCorporativo && <span className="badge declarado">Corp Invitation On</span>}
+      <div className="cab-pagina">
+        <div>
+          <h1>Novo convite</h1>
+          <div style={{ marginTop: 14 }}>
+            <ImportarBotao pool="pessoal" eventoEsperado="CCXP26" />
+          </div>
+        </div>
+        <PerfilHost
+          nome={host.nome}
+          email={host.email}
+          nivel={host.nivel}
+          podeCorporativo={host.podeCorporativo}
+          saldoPessoal={saldoPessoalTotal}
+        />
       </div>
 
       <div className="estoque">
@@ -168,14 +179,6 @@ export default async function PaginaFuncionario() {
         </div>
       </section>
 
-      <details className="secao">
-        <summary>
-          <h2>
-            Importar minha planilha <span className="nota">cortesias pessoais · formato oficial da CCXP</span>
-          </h2>
-        </summary>
-        <ImportarPlanilha pool="pessoal" eventoEsperado="CCXP26" />
-      </details>
     </div>
   );
 }
