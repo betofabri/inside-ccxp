@@ -154,7 +154,7 @@ export default async function PaginaFootprint({
       </div>
       <AdminTabs ativa="footprint" />
 
-      <form className="busca-footprint" action="/admin/footprint" method="get">
+      <form className="busca-footprint" method="get">
         <input
           type="text"
           name="q"
