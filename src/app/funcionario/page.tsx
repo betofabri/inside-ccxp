@@ -4,6 +4,7 @@ import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, NIVEL_LABEL, fmtData } from "@/lib/labels";
 import NovoConvite from "./novo-convite";
 import AcoesConvite from "./acoes-convite";
+import ImportarPlanilha from "./importar-planilha";
 import { expirarVencidos } from "@/lib/convites";
 
 export const dynamic = "force-dynamic";
@@ -167,6 +168,14 @@ export default async function PaginaFuncionario() {
         </div>
       </section>
 
+      <details className="secao">
+        <summary>
+          <h2>
+            Importar minha planilha <span className="nota">cortesias pessoais · formato oficial da CCXP</span>
+          </h2>
+        </summary>
+        <ImportarPlanilha pool="pessoal" eventoEsperado="CCXP26" />
+      </details>
     </div>
   );
 }

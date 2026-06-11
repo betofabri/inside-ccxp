@@ -17,7 +17,7 @@ Estado em 11/jun/2026. Fases do plano original em `~/Downloads/plano_rsvp_ccxp_f
 
 ## Próximas fases
 
-- **F1 — Ingestão**: parser Excel (SheetJS) com hardening de privilégio — planilha individual do host (formato acima) + planilha corporativa central do admin, validações + relatório de rejeição.
+- **F1 — Ingestão ✓ (núcleo feito)**: parser SheetJS client-side com prévia (resumo por tipo, rejeições com linha e motivo, aviso de evento divergente) + revalidação server-side idempotente (código já existente é rejeitado; RESGATADO=SIM entra como resgatado fora do saldo). Host importa a pessoal na própria página; admin importa a corporativa central no dashboard. Falta: histórico de importações por lote.
 - **F2 restante**: import de resgate do host (CSV Mundo Ticket restrito aos códigos dele), notificação in-app quando convidado se cadastra.
 - **F3 restante**: botão "já resgatei" funcional, transacionais mockados visíveis (lembrete D+3, aviso D+6).
 - **F4 — Régua + agenda** (painel pronto, motor pendente): o admin já tem o painel "Régua de comunicação" com a régua RSVP padrão (4 transacionais + 4 de relacionamento, modelo `ReguaPasso` no banco, toggle ativo/pausado com audit log). Falta: motor de disparo com condições e opt-out, edição de timing/template/canal pelo painel, agenda editável.

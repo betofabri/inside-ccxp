@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
 import AdminTabs from "./admin-tabs";
+import ImportarPlanilha from "../funcionario/importar-planilha";
 
 export const dynamic = "force-dynamic";
 
@@ -255,6 +256,13 @@ export default async function PaginaAdmin() {
             </tbody>
           </table>
         </div>
+      </details>
+
+      <details className="secao">
+        <summary><h2>
+          Importar lote corporativo <span className="nota">planilha central · só admin · formato oficial</span>
+        </h2></summary>
+        <ImportarPlanilha pool="corporativo" eventoEsperado="CCXP26" />
       </details>
 
       <details className="secao" open>

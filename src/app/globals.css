@@ -1417,6 +1417,49 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
   margin-top: 2px;
 }
 
+/* ── Importação de planilha ── */
+.import-bloco { margin-top: 18px; }
+
+.zona-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 34px 20px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.zona-upload:hover {
+  border-color: var(--champagne);
+  background: var(--surface-2);
+}
+
+.zona-upload input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.zona-upload .zona-titulo {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--champagne);
+}
+
+.zona-upload .zona-dica {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.import-bloco .saldo-strip { margin-top: 16px; }
+
 /* ── Ações de linha (Meus convites) ── */
 .acoes-linha {
   display: flex;
