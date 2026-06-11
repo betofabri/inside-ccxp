@@ -45,30 +45,37 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
   const [passo, setPasso] = useState(0);
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
+  const [empresa, setEmpresa] = useState("");
   const [email, setEmail] = useState("");
   const [ddi, setDdi] = useState("+55");
   const [telefone, setTelefone] = useState("");
-  const [vip, setVip] = useState(false);
   const [qtd, setQtd] = useState<Record<string, number>>(
     Object.fromEntries(tipos.map((t) => [t.tipo, 0])),
+  );
+  const [vipTipo, setVipTipo] = useState<Record<string, boolean>>(
+    Object.fromEntries(tipos.map((t) => [t.tipo, false])),
   );
 
   const trocarFluxo = (f: Fluxo) => {
     if (f === fluxo) return;
     setFluxo(f);
     setPasso(0);
-    setVip(false);
     setQtd(Object.fromEntries(tipos.map((t) => [t.tipo, 0])));
+    setVipTipo(Object.fromEntries(tipos.map((t) => [t.tipo, false])));
   };
 
   const disp = (t: TipoInfo) => (fluxo === "pessoal" ? t.pessoalDisp : t.corpDisp);
 
-  const setQuantidade = (tipo: string, valor: number, max: number) =>
-    setQtd((q) => ({ ...q, [tipo]: Math.max(0, Math.min(max, valor)) }));
+  const setQuantidade = (tipo: string, valor: number, max: number) => {
+    const v = Math.max(0, Math.min(max, valor));
+    setQtd((q) => ({ ...q, [tipo]: v }));
+    if (v === 0) setVipTipo((vt) => ({ ...vt, [tipo]: false }));
+  };
 
   const total = tipos.reduce((acc, t) => acc + qtd[t.tipo], 0);
 
   const nomeOk = nome.trim().length > 1 && sobrenome.trim().length > 1;
+  const empresaOk = empresa.trim().length > 1;
   const emailOk = email.trim().length > 3 && email.includes("@");
   const whatsOk = telefone.trim().length > 7;
   const dominio = email.trim().toLowerCase().split("@")[1] ?? "";
@@ -76,14 +83,18 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
 
   const contatoOk =
     fluxo === "corporativo"
-      ? nomeOk && emailOk && !dominioGenerico
+      ? nomeOk && empresaOk && emailOk && !dominioGenerico
       : nomeOk && (emailOk || whatsOk);
 
   const podeAvancar = passo === 0 ? contatoOk : passo === 1 ? total > 0 : false;
 
   const linhasResumo = tipos
     .filter((t) => qtd[t.tipo] > 0)
-    .map((t) => ({ chave: t.tipo, texto: `${qtd[t.tipo]}× ${t.label}` }));
+    .map((t) => ({
+      chave: t.tipo,
+      texto: `${qtd[t.tipo]}× ${t.label}`,
+      vip: fluxo === "corporativo" && vipTipo[t.tipo],
+    }));
 
   return (
     <div className="composer wizard">
@@ -111,7 +122,7 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
         <span className="fluxo-dica">
           {fluxo === "pessoal"
             ? "Usa a sua cota da planilha; contato por email ou WhatsApp."
-            : "Usa o lote compartilhado; email corporativo obrigatório."}
+            : "Usa o lote compartilhado; empresa e email corporativo obrigatórios."}
         </span>
       </div>
 
@@ -154,6 +165,19 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
               />
             </div>
           </div>
+          {fluxo === "corporativo" && (
+            <div className="campo">
+              <label htmlFor="empresa">Empresa</label>
+              <input
+                id="empresa"
+                type="text"
+                placeholder="Nome da empresa"
+                value={empresa}
+                onChange={(e) => setEmpresa(e.target.value)}
+              />
+              <div className="dica">Obrigatório no convite corporativo; entra no ranking de empresas.</div>
+            </div>
+          )}
           <div className="campo">
             <label htmlFor="email">
               Email{" "}
@@ -211,6 +235,7 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
           <div className="parcelas">
             {tipos.map((t) => {
               const max = disp(t);
+              const restam = max - qtd[t.tipo];
               return (
                 <div className={`parcela-linha t-${t.tipo}`} key={t.tipo}>
                   <div className="dia">
@@ -218,10 +243,21 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                     {t.label}
                     <small>{t.data}</small>
                   </div>
+                  {fluxo === "corporativo" && (
+                    <label className={`vip-addon ${qtd[t.tipo] === 0 ? "off" : ""} ${vipTipo[t.tipo] ? "on" : ""}`}>
+                      <input
+                        type="checkbox"
+                        checked={vipTipo[t.tipo]}
+                        disabled={qtd[t.tipo] === 0}
+                        onChange={(e) => setVipTipo((vt) => ({ ...vt, [t.tipo]: e.target.checked }))}
+                      />
+                      + VIP
+                    </label>
+                  )}
                   <div className="pool-campo">
                     <span className="rotulo">
                       <b>{fluxo === "pessoal" ? "Disponíveis" : "Restam no lote"}</b>
-                      {max}
+                      <span className={restam === 0 && max > 0 ? "esgotando" : undefined}>{restam}</span>
                     </span>
                     <input
                       type="number"
@@ -254,6 +290,12 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
               <dt>Convidado</dt>
               <dd>{`${nome.trim()} ${sobrenome.trim()}`.trim() || "—"}</dd>
             </div>
+            {fluxo === "corporativo" && (
+              <div>
+                <dt>Empresa</dt>
+                <dd>{empresa.trim() || "—"}</dd>
+              </div>
+            )}
             <div>
               <dt>Canais</dt>
               <dd>
@@ -271,7 +313,9 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                 {linhasResumo.length > 0 ? (
                   <ul className="resumo-lista">
                     {linhasResumo.map((l) => (
-                      <li key={l.chave}>{l.texto}</li>
+                      <li key={l.chave}>
+                        {l.texto} {l.vip && <span className="badge vip">+ VIP</span>}
+                      </li>
                     ))}
                   </ul>
                 ) : (
@@ -280,16 +324,6 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
               </dd>
             </div>
           </dl>
-
-          {fluxo === "corporativo" && (
-            <label className="vip-toggle">
-              <input type="checkbox" checked={vip} onChange={(e) => setVip(e.target.checked)} />
-              <span className="texto">
-                VIP Omelete
-                <small>Marca o convidado pro recorte VIP do evento. O admin pode editar depois.</small>
-              </span>
-            </label>
-          )}
         </div>
       )}
 

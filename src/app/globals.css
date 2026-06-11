@@ -372,19 +372,42 @@ h1, h2, h3 { text-wrap: balance; }
 .t-domingo        { --tipo-cor: oklch(80% 0.115 60); }
 .t-todos_os_dias  { --tipo-cor: var(--champagne); }
 
-/* ── Strip de cotas (primeira info do host) ── */
+/* ── Estoque (primeira info do host) ── */
+.estoque { margin-top: 22px; }
+
+.estoque-cab {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.estoque-cab .titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.estoque-cab .chave {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.estoque-cab .chave .p { color: var(--ink); font-weight: 600; }
+.estoque-cab .chave .c { color: var(--champagne); font-weight: 600; }
+
 .saldo-strip {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 22px;
+  margin-top: 10px;
 }
 
 .saldo-chip {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 9px;
   border: 1px solid color-mix(in oklab, var(--tipo-cor, var(--line-soft)) 32%, transparent);
   background: color-mix(in oklab, var(--tipo-cor, transparent) 7%, var(--surface));
   border-radius: var(--radius-pill);
@@ -400,18 +423,15 @@ h1, h2, h3 { text-wrap: balance; }
 .saldo-chip .n {
   font-size: 16px;
   font-weight: 650;
-  color: var(--tipo-cor, var(--champagne));
 }
 
-.saldo-chip.zerado { opacity: 0.75; }
-.saldo-chip.zerado .n { color: var(--st-cancelado); }
+.saldo-chip .n.p { color: var(--ink); }
+.saldo-chip .n.c { color: var(--tipo-cor, var(--champagne)); }
+.saldo-chip .n.zerado { color: var(--st-cancelado); }
 
-.saldo-strip .legenda {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-right: 4px;
-  min-width: 118px;
+.saldo-chip .sep {
+  color: var(--line);
+  font-size: 14px;
 }
 
 /* bolinha de cor do tipo (wizard) */
@@ -780,6 +800,43 @@ h1, h2, h3 { text-wrap: balance; }
 
 .pool-campo input:disabled {
   opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pool-campo .rotulo .esgotando { color: var(--st-pendente); }
+
+/* add-on VIP por linha (fluxo corporativo) */
+.vip-addon {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.vip-addon input {
+  accent-color: var(--champagne);
+  width: 13px;
+  height: 13px;
+}
+
+.vip-addon:hover:not(.off) { border-color: var(--champagne); color: var(--ink); }
+
+.vip-addon.on {
+  background: var(--champagne);
+  border-color: var(--champagne);
+  color: var(--ink-on-accent);
+}
+
+.vip-addon.off {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 

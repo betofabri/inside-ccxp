@@ -41,27 +41,6 @@ export default async function PaginaFuncionario() {
     corpDisp: contar(corpDisponivel, tipo),
   }));
 
-  // visão geral extra pra VP/Head
-  const ehVp = host.nivel === "vp_socio";
-  const ranking = ehVp
-    ? (
-        await db.funcionario.findMany({
-          include: { convites: { include: { codigos: true } } },
-        })
-      )
-        .map((h) => ({
-          nome: h.nome,
-          nivel: NIVEL_LABEL[h.nivel],
-          convites: h.convites.length,
-          ativos: h.convites.filter((cv) => cv.status === "cadastrado" || cv.status === "pendente").length,
-          resgatados: h.convites.reduce(
-            (acc, cv) => acc + cv.codigos.filter((c) => c.status === "resgatado").length,
-            0,
-          ),
-        }))
-        .sort((a, b) => b.convites - a.convites)
-    : [];
-
   return (
     <div className="pagina">
       <h1>Novo convite</h1>
@@ -76,26 +55,34 @@ export default async function PaginaFuncionario() {
         )}
       </div>
 
-      <div className="saldo-strip" aria-label="Cota pessoal disponível por tipo">
-        <span className="legenda">Cota pessoal</span>
-        {tipos.map((t) => (
-          <span className={`saldo-chip t-${t.tipo} ${t.pessoalDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
-            <span className="nome-tipo">{t.label}</span>
-            <span className="n">{t.pessoalDisp}</span>
+      <div className="estoque">
+        <div className="estoque-cab">
+          <span className="titulo">Ingressos disponíveis</span>
+          <span className="chave">
+            <b className="p">cota pessoal</b>
+            {host.podeCorporativo && (
+              <>
+                {" | "}
+                <b className="c">cota corporativa</b>
+              </>
+            )}
           </span>
-        ))}
-      </div>
-      {host.podeCorporativo && (
-        <div className="saldo-strip" aria-label="Cota corporativa disponível por tipo">
-          <span className="legenda">Cota corporativa</span>
+        </div>
+        <div className="saldo-strip">
           {tipos.map((t) => (
-            <span className={`saldo-chip t-${t.tipo} ${t.corpDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
+            <span className={`saldo-chip t-${t.tipo}`} key={t.tipo}>
               <span className="nome-tipo">{t.label}</span>
-              <span className="n">{t.corpDisp}</span>
+              <span className={`n p ${t.pessoalDisp === 0 ? "zerado" : ""}`}>{t.pessoalDisp}</span>
+              {host.podeCorporativo && (
+                <>
+                  <span className="sep">|</span>
+                  <span className={`n c ${t.corpDisp === 0 ? "zerado" : ""}`}>{t.corpDisp}</span>
+                </>
+              )}
             </span>
           ))}
         </div>
-      )}
+      </div>
 
       <NovoConvite podeCorporativo={host.podeCorporativo} tipos={tipos} />
 
@@ -145,37 +132,6 @@ export default async function PaginaFuncionario() {
         </div>
       </section>
 
-      {ehVp && (
-        <section className="secao">
-          <h2>
-            Visão geral do time <span className="nota">exclusivo do nível VP/Head</span>
-          </h2>
-          <div className="tabela-wrap">
-            <table className="tabela">
-              <thead>
-                <tr>
-                  <th>Host</th>
-                  <th>Nível</th>
-                  <th>Convites</th>
-                  <th>Em andamento</th>
-                  <th>Códigos resgatados</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ranking.map((r) => (
-                  <tr key={r.nome}>
-                    <td><b>{r.nome}</b></td>
-                    <td className="dim">{r.nivel}</td>
-                    <td>{r.convites}</td>
-                    <td>{r.ativos}</td>
-                    <td>{r.resgatados}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
     </div>
   );
 }
