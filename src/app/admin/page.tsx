@@ -15,14 +15,10 @@ export default async function PaginaAdmin() {
   const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
   if (!admin?.isAdmin) redirect("/");
 
-  // ── Funil ──
+  // ── Funil (4 etapas: convidados → cadastrados → resgatados → presentes) ──
   const totalConvidados = await db.convidado.count();
   const cadastrados = await db.convidado.count({ where: { consentimentoEm: { not: null } } });
-  const entregues = await db.convidado.count({
-    where: { convites: { some: { codigos: { some: { status: { in: ["entregue", "resgatado"] } } } } } },
-  });
-  const declarados = await db.convidado.count({ where: { resgateDeclarado: true } });
-  const confirmados = await db.convidado.count({
+  const resgatados = await db.convidado.count({
     where: { convites: { some: { codigos: { some: { status: "resgatado" } } } } },
   });
   const presentes = await db.convidado.count({
@@ -109,9 +105,7 @@ export default async function PaginaAdmin() {
           etapas={[
             { nome: "Convidados", valor: totalConvidados },
             { nome: "Cadastrados", valor: cadastrados },
-            { nome: "Entregues", valor: entregues },
-            { nome: "Declarados", valor: declarados },
-            { nome: "Confirmados", valor: confirmados },
+            { nome: "Resgatados", valor: resgatados },
             { nome: "Presentes", valor: presentes },
           ]}
         />

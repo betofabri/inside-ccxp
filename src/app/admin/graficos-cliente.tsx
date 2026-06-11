@@ -26,14 +26,18 @@ export function FunilEvento({ etapas }: { etapas: { nome: string; valor: number 
     return <div className="aviso">Sem convidados ainda; o funil aparece com o primeiro convite.</div>;
   }
 
+  // distribui o gradiente do logo pela quantidade de etapas que vier
+  const ancora = (i: number) =>
+    PALETA_INSIDER[Math.round((i * (PALETA_INSIDER.length - 1)) / etapas.length)];
+
   return (
     <FunnelChart
       data={etapas.map((e, i) => ({
         label: e.nome,
         value: e.valor,
         gradient: [
-          { offset: 0, color: PALETA_INSIDER[i] ?? PALETA_INSIDER.at(-1)! },
-          { offset: 1, color: PALETA_INSIDER[i + 1] ?? PALETA_INSIDER.at(-1)! },
+          { offset: 0, color: ancora(i) },
+          { offset: 1, color: ancora(i + 1) },
         ],
       }))}
       orientation={vertical ? "vertical" : "horizontal"}
