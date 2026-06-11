@@ -212,8 +212,9 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
             {tipos.map((t) => {
               const max = disp(t);
               return (
-                <div className="parcela-linha" key={t.tipo}>
+                <div className={`parcela-linha t-${t.tipo}`} key={t.tipo}>
                   <div className="dia">
+                    <span className="dot-tipo" aria-hidden />
                     {t.label}
                     <small>{t.data}</small>
                   </div>

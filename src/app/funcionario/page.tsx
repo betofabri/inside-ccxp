@@ -76,20 +76,20 @@ export default async function PaginaFuncionario() {
         )}
       </div>
 
-      <div className="saldo-strip" aria-label="Saldo pessoal disponível por tipo">
-        <span className="legenda">Sua cota:</span>
+      <div className="saldo-strip" aria-label="Cota pessoal disponível por tipo">
+        <span className="legenda">Cota pessoal</span>
         {tipos.map((t) => (
-          <span className={`saldo-chip ${t.pessoalDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
+          <span className={`saldo-chip t-${t.tipo} ${t.pessoalDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
             <span className="nome-tipo">{t.label}</span>
             <span className="n">{t.pessoalDisp}</span>
           </span>
         ))}
       </div>
       {host.podeCorporativo && (
-        <div className="saldo-strip" aria-label="Saldo corporativo disponível por tipo">
-          <span className="legenda">Lote corporativo:</span>
+        <div className="saldo-strip" aria-label="Cota corporativa disponível por tipo">
+          <span className="legenda">Cota corporativa</span>
           {tipos.map((t) => (
-            <span className={`saldo-chip ${t.corpDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
+            <span className={`saldo-chip t-${t.tipo} ${t.corpDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
               <span className="nome-tipo">{t.label}</span>
               <span className="n">{t.corpDisp}</span>
             </span>

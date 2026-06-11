@@ -60,7 +60,7 @@ export default async function PaginaConvidado() {
           </h2>
           <div className="carteira">
             {tickets.map(({ cod, host }) => (
-              <div className="ticket" key={cod.id}>
+              <div className={`ticket t-${cod.tipo}`} key={cod.id}>
                 <div className="corpo">
                   <div className="tipo">{TIPO_LABEL[cod.tipo]}</div>
                   <div className="codigo">{cod.valor}</div>

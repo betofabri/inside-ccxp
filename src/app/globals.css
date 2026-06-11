@@ -364,10 +364,19 @@ h1, h2, h3 { text-wrap: balance; }
   margin-top: 2px;
 }
 
-/* ── Strip de saldo (primeira info do host) ── */
+/* ── Cores por tipo de ingresso ── */
+.t-spoiler_night  { --tipo-cor: oklch(79% 0.115 305); }
+.t-quinta         { --tipo-cor: oklch(78% 0.1 235); }
+.t-sexta          { --tipo-cor: oklch(80% 0.1 190); }
+.t-sabado         { --tipo-cor: oklch(80% 0.125 150); }
+.t-domingo        { --tipo-cor: oklch(80% 0.115 60); }
+.t-todos_os_dias  { --tipo-cor: var(--champagne); }
+
+/* ── Strip de cotas (primeira info do host) ── */
 .saldo-strip {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   margin-top: 22px;
 }
@@ -376,8 +385,8 @@ h1, h2, h3 { text-wrap: balance; }
   display: flex;
   align-items: baseline;
   gap: 8px;
-  border: 1px solid var(--line-soft);
-  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--tipo-cor, var(--line-soft)) 32%, transparent);
+  background: color-mix(in oklab, var(--tipo-cor, transparent) 7%, var(--surface));
   border-radius: var(--radius-pill);
   padding: 8px 16px;
 }
@@ -385,22 +394,35 @@ h1, h2, h3 { text-wrap: balance; }
 .saldo-chip .nome-tipo {
   font-size: 13px;
   font-weight: 500;
-  color: var(--muted);
+  color: color-mix(in oklab, var(--tipo-cor, var(--muted)) 60%, var(--ink));
 }
 
 .saldo-chip .n {
   font-size: 16px;
   font-weight: 650;
-  color: var(--champagne);
+  color: var(--tipo-cor, var(--champagne));
 }
 
+.saldo-chip.zerado { opacity: 0.75; }
 .saldo-chip.zerado .n { color: var(--st-cancelado); }
 
 .saldo-strip .legenda {
-  align-self: center;
   font-size: 12.5px;
-  color: var(--faint);
+  font-weight: 600;
+  color: var(--muted);
   margin-right: 4px;
+  min-width: 118px;
+}
+
+/* bolinha de cor do tipo (wizard) */
+.dot-tipo {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tipo-cor, var(--champagne));
+  margin-right: 8px;
+  vertical-align: 1px;
 }
 
 /* ── Tabelas ── */
@@ -896,7 +918,7 @@ h1, h2, h3 { text-wrap: balance; }
   font-size: 15px;
   font-weight: 650;
   letter-spacing: 0.04em;
-  color: var(--champagne);
+  color: var(--tipo-cor, var(--champagne));
 }
 
 .ticket .codigo {
