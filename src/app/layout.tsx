@@ -11,8 +11,8 @@ const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
 const mono = IBM_Plex_Mono({ weight: ["400", "500", "700"], subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "CCXP INSIDER · Convidados VIP",
-  description: "CCXP INSIDER, a plataforma de convidados VIP da CCXP26, de 03 a 06 de dezembro no São Paulo Expo.",
+  title: "CCXP INSIDER · O Backstage do Backstage",
+  description: "A plataforma de convites e relacionamento corporativo da CCXP. CCXP26: 03 a 06 de dezembro, São Paulo Expo.",
 };
 
 const PAPEL_LABEL: Record<string, string> = {
@@ -42,7 +42,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-insider.svg`} alt="CCXP Insider" className="logo" />
           </Link>
-          <span className="sistema">Convidados VIP</span>
+          <span className="sistema">
+            <b>CCXP INSIDER.</b> O Backstage do Backstage.
+          </span>
           <nav className="topo-nav">
             <Link href="/apoio" className="topo-link">Material de apoio</Link>
             <button className="topo-link breve" type="button" disabled title="Fotos do dia: em breve">
@@ -62,8 +64,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </header>
         <main>{children}</main>
         <footer className="rodape-app">
+          <span className="assinatura">
+            <b>CCXP INSIDER</b> · A plataforma de convites e relacionamento corporativo da CCXP
+          </span>
           <span>CCXP26 · 03 a 06 dez 2026 · São Paulo Expo</span>
-          <span>Protótipo F0 · envio mockado · dados de exemplo</span>
+          <span>Protótipo · envio mockado · dados de exemplo</span>
         </footer>
       </body>
     </html>

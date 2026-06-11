@@ -92,6 +92,12 @@ h1, h2, h3 { text-wrap: balance; }
   letter-spacing: 0.01em;
 }
 
+.topbar .sistema b {
+  color: var(--champagne);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
 .topbar .spacer { flex: 1; }
 
 .persona-chip {
@@ -915,6 +921,7 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 }
 
 .campo-telefone select {
+  width: auto;
   font-family: inherit;
   font-size: 13.5px;
   color: var(--ink);
@@ -1549,10 +1556,21 @@ a.topo-link:hover { color: var(--ink); border-color: var(--champagne); }
   padding: 24px 32px;
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  align-items: baseline;
+  gap: 10px 24px;
   flex-wrap: wrap;
   font-size: 12.5px;
   color: var(--faint);
+}
+
+.rodape-app .assinatura {
+  flex-basis: 100%;
+  color: var(--muted);
+}
+
+.rodape-app .assinatura b {
+  color: var(--champagne);
+  letter-spacing: 0.04em;
 }
 
 @media (max-width: 640px) {
