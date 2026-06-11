@@ -14,6 +14,7 @@ export type ParcelaInput = { tipo: string; qtd: number; vip: boolean };
 
 export type CriarConviteInput = {
   fluxo: "pessoal" | "corporativo";
+  convidadoId?: number; // re-convite: consolida na carteira existente
   nome: string;
   sobrenome: string;
   empresa?: string;
@@ -29,6 +30,7 @@ export type CriarConviteResultado = {
   aviso?: string;
   token?: string;
   preview?: string;
+  entregaDireta?: boolean; // convidado já cadastrado: códigos caem direto na carteira
 };
 
 // ── helpers ────────────────────────────────────────────────────
@@ -79,12 +81,19 @@ export async function criarConvite(input: CriarConviteInput): Promise<CriarConvi
   if (fluxo === "corporativo" && !host.podeCorporativo)
     return { ok: false, erro: "Você não tem a flag corporativa." };
 
-  const nomeCompleto = `${input.nome.trim()} ${input.sobrenome.trim()}`.trim();
+  // re-convite: parte dos dados já conhecidos do convidado
+  const existente = input.convidadoId
+    ? await db.convidado.findUnique({ where: { id: input.convidadoId } })
+    : null;
+  if (input.convidadoId && !existente) return { ok: false, erro: "Convidado não encontrado." };
+
+  const nomeCompleto =
+    `${input.nome.trim()} ${input.sobrenome.trim()}`.trim() || existente?.nome || "";
   if (nomeCompleto.length < 4) return { ok: false, erro: "Preencha nome e sobrenome." };
 
-  const email = normalizaEmail(input.email);
-  const telefone = normalizaTelefone(input.ddi, input.telefone);
-  const empresa = (input.empresa ?? "").trim() || null;
+  const email = normalizaEmail(input.email) ?? (existente ? normalizaEmail(existente.email ?? undefined) : null);
+  const telefone = normalizaTelefone(input.ddi, input.telefone) ?? existente?.telefone ?? null;
+  const empresa = (input.empresa ?? "").trim() || existente?.empresa || null;
 
   if (fluxo === "corporativo") {
     if (!empresa) return { ok: false, erro: "O convite corporativo exige o nome da empresa." };
@@ -121,86 +130,109 @@ export async function criarConvite(input: CriarConviteInput): Promise<CriarConvi
   const token = randomUUID().slice(0, 13);
   const expiraEm = new Date(Date.now() + (await diasDeExpiracao()) * 24 * 60 * 60 * 1000);
   const canais = [email && "email", telefone && "whatsapp"].filter(Boolean).join(",");
+  let entregaDireta = false;
 
+  // D1 não suporta transação interativa do Prisma; a reserva usa operações
+  // sequenciais com guarda contra corrida (updateMany condicionado a
+  // status='disponivel' + conferência do count) e compensação em caso de erro.
+  let conviteId: number | null = null;
   try {
-    await db.$transaction(async (tx) => {
-      // carteira única: consolida por email; senão por telefone; senão cria
-      let convidado =
-        (email && (await tx.convidado.findUnique({ where: { email } }))) ||
-        (telefone && (await tx.convidado.findFirst({ where: { telefone } }))) ||
-        null;
-      if (!convidado) {
-        convidado = await tx.convidado.create({
-          data: { nome: nomeCompleto, email, telefone, empresa },
-        });
-      } else {
-        await tx.convidado.update({
-          where: { id: convidado.id },
-          data: {
-            telefone: convidado.telefone ?? telefone,
-            empresa: convidado.empresa ?? empresa,
-          },
-        });
-      }
-
-      const convite = await tx.convite.create({
+    // carteira única: por id (re-convite), senão por email, senão telefone, senão cria
+    let convidado =
+      existente ||
+      (email && (await db.convidado.findUnique({ where: { email } }))) ||
+      (telefone && (await db.convidado.findFirst({ where: { telefone } }))) ||
+      null;
+    if (!convidado) {
+      convidado = await db.convidado.create({
+        data: { nome: nomeCompleto, email, telefone, empresa },
+      });
+    } else {
+      await db.convidado.update({
+        where: { id: convidado.id },
         data: {
-          hostId: host.id,
-          convidadoId: convidado.id,
-          canais,
-          status: "pendente",
-          expiraEm,
-          vipOmelete: parcelas.some((p) => p.vip || p.tipo === "todos_os_dias"),
-          magicToken: token,
+          nome: nomeCompleto || convidado.nome,
+          email: convidado.email ?? email,
+          telefone: telefone ?? convidado.telefone,
+          empresa: empresa ?? convidado.empresa,
         },
       });
+    }
 
-      // reserva atômica: tudo ou nada dentro da transação
-      for (const p of parcelas) {
-        const livres = await tx.codigo.findMany({
-          where: {
-            pool,
-            tipo: p.tipo,
-            status: "disponivel",
-            ...(pool === "pessoal" ? { donoId: host.id } : {}),
-          },
-          take: p.qtd,
-        });
-        if (livres.length < p.qtd)
-          throw new Error(
-            `Saldo insuficiente em ${TIPO_LABEL[p.tipo]}: pediu ${p.qtd}, restam ${livres.length}.`,
-          );
-        await tx.conviteParcela.create({
-          data: { conviteId: convite.id, pool, tipo: p.tipo, qtd: p.qtd, vip: p.vip || p.tipo === "todos_os_dias" },
-        });
-        await tx.codigo.updateMany({
-          where: { id: { in: livres.map((c) => c.id) } },
-          data: { status: "reservado", conviteId: convite.id },
-        });
-      }
+    // já cadastrado (LGPD ok)? entrega direto na carteira, sem novo cadastro
+    entregaDireta = convidado.consentimentoEm != null;
 
-      await tx.comunicacaoLog.create({
-        data: {
-          convidadoId: convidado.id,
-          categoria: "transacional",
-          passo: "convite",
-          canal: canais || "email",
-          status: "enviado",
+    const convite = await db.convite.create({
+      data: {
+        hostId: host.id,
+        convidadoId: convidado.id,
+        canais,
+        status: entregaDireta ? "cadastrado" : "pendente",
+        expiraEm,
+        vipOmelete: parcelas.some((p) => p.vip || p.tipo === "todos_os_dias"),
+        magicToken: token,
+      },
+    });
+    conviteId = convite.id;
+
+    for (const p of parcelas) {
+      const livres = await db.codigo.findMany({
+        where: {
+          pool,
+          tipo: p.tipo,
+          status: "disponivel",
+          ...(pool === "pessoal" ? { donoId: host.id } : {}),
         },
+        take: p.qtd,
+        select: { id: true },
       });
+      if (livres.length < p.qtd)
+        throw new Error(
+          `Saldo insuficiente em ${TIPO_LABEL[p.tipo]}: pediu ${p.qtd}, restam ${livres.length}.`,
+        );
+      const reservados = await db.codigo.updateMany({
+        where: { id: { in: livres.map((c) => c.id) }, status: "disponivel" },
+        data: { status: entregaDireta ? "entregue" : "reservado", conviteId: convite.id },
+      });
+      if (reservados.count < p.qtd)
+        throw new Error(`Outro convite reservou ${TIPO_LABEL[p.tipo]} primeiro; tente de novo.`);
+      await db.conviteParcela.create({
+        data: { conviteId: convite.id, pool, tipo: p.tipo, qtd: p.qtd, vip: p.vip || p.tipo === "todos_os_dias" },
+      });
+    }
+
+    await db.comunicacaoLog.create({
+      data: {
+        convidadoId: convidado.id,
+        categoria: "transacional",
+        passo: entregaDireta ? "novos_ingressos" : "convite",
+        canal: canais || "email",
+        status: "enviado",
+      },
     });
   } catch (e) {
+    // compensação: devolve códigos e remove o convite incompleto
+    if (conviteId) {
+      await db.codigo
+        .updateMany({ where: { conviteId }, data: { status: "disponivel", conviteId: null } })
+        .catch(() => {});
+      await db.conviteParcela.deleteMany({ where: { conviteId } }).catch(() => {});
+      await db.convite.delete({ where: { id: conviteId } }).catch(() => {});
+    }
     return { ok: false, erro: e instanceof Error ? e.message : "Erro ao reservar os códigos." };
   }
 
   const totalIngressos = parcelas.reduce((acc, p) => acc + p.qtd, 0);
-  const preview =
-    `Olá, ${input.nome.trim()}! ${host.nome} convidou você pra CCXP26 ` +
-    `(03 a 06/dez, São Paulo Expo) com ${totalIngressos} ingresso(s). ` +
-    `Complete seu cadastro pra receber os códigos: {{link}}`;
+  const primeiroNome = nomeCompleto.split(" ")[0];
+  const preview = entregaDireta
+    ? `Olá, ${primeiroNome}! ${host.nome} adicionou ${totalIngressos} ingresso(s) na sua carteira ` +
+      `da CCXP26 (03 a 06/dez, São Paulo Expo). Eles já estão disponíveis: {{link}}`
+    : `Olá, ${primeiroNome}! ${host.nome} convidou você pra CCXP26 ` +
+      `(03 a 06/dez, São Paulo Expo) com ${totalIngressos} ingresso(s). ` +
+      `Complete seu cadastro pra receber os códigos: {{link}}`;
 
   revalidatePath("/funcionario");
-  return { ok: true, token, aviso, preview };
+  return { ok: true, token, aviso, preview, entregaDireta };
 }
 
 // ── F2: gestão do host ─────────────────────────────────────────
@@ -244,34 +276,41 @@ export async function reenviarConvite(formData: FormData) {
   const token = randomUUID().slice(0, 13);
 
   try {
-    await db.$transaction(async (tx) => {
-      if (convite.status === "expirado") {
-        // nova reserva (os códigos voltaram ao pool quando expirou)
-        for (const p of convite.parcelas) {
-          const livres = await tx.codigo.findMany({
-            where: {
-              pool: p.pool,
-              tipo: p.tipo,
-              status: "disponivel",
-              ...(p.pool === "pessoal" ? { donoId: convite.hostId } : {}),
-            },
-            take: p.qtd,
-          });
-          if (livres.length < p.qtd)
-            throw new Error(`Sem saldo pra reenviar: ${TIPO_LABEL[p.tipo]} esgotado.`);
-          await tx.codigo.updateMany({
-            where: { id: { in: livres.map((c) => c.id) } },
-            data: { status: "reservado", conviteId: convite.id },
-          });
-        }
+    if (convite.status === "expirado") {
+      // nova reserva (os códigos voltaram ao pool quando expirou)
+      for (const p of convite.parcelas) {
+        const livres = await db.codigo.findMany({
+          where: {
+            pool: p.pool,
+            tipo: p.tipo,
+            status: "disponivel",
+            ...(p.pool === "pessoal" ? { donoId: convite.hostId } : {}),
+          },
+          take: p.qtd,
+          select: { id: true },
+        });
+        if (livres.length < p.qtd)
+          throw new Error(`Sem saldo pra reenviar: ${TIPO_LABEL[p.tipo]} esgotado.`);
+        const reservados = await db.codigo.updateMany({
+          where: { id: { in: livres.map((c) => c.id) }, status: "disponivel" },
+          data: { status: "reservado", conviteId: convite.id },
+        });
+        if (reservados.count < p.qtd)
+          throw new Error(`Corrida na reserva de ${TIPO_LABEL[p.tipo]}; tente de novo.`);
       }
-      await tx.convite.update({
-        where: { id },
-        data: { status: "pendente", expiraEm, magicToken: token },
-      });
+    }
+    await db.convite.update({
+      where: { id },
+      data: { status: "pendente", expiraEm, magicToken: token },
     });
   } catch {
-    // saldo esgotado: mantém como está; a F5 ganha feedback de erro melhor
+    // compensação: solta o que tiver sido re-reservado e mantém expirado
+    await db.codigo
+      .updateMany({
+        where: { conviteId: convite.id, status: "reservado" },
+        data: { status: "disponivel", conviteId: null },
+      })
+      .catch(() => {});
   }
   revalidatePath("/funcionario");
 }
@@ -302,8 +341,9 @@ export async function completarCadastro(token: string, formData: FormData) {
   if (corporativo && (!cargo || !email || !telefone)) redirect(`/convite/${token}?erro=campos`);
 
   try {
-    await db.$transaction(async (tx) => {
-      await tx.convidado.update({
+    // batch atômico (D1 não aceita transação interativa)
+    await db.$transaction([
+      db.convidado.update({
         where: { id: convite.convidadoId },
         data: {
           nascimento,
@@ -312,13 +352,13 @@ export async function completarCadastro(token: string, formData: FormData) {
           telefone: telefone ?? convite.convidado.telefone,
           consentimentoEm: new Date(),
         },
-      });
-      await tx.convite.update({ where: { id: convite.id }, data: { status: "cadastrado" } });
-      await tx.codigo.updateMany({
+      }),
+      db.convite.update({ where: { id: convite.id }, data: { status: "cadastrado" } }),
+      db.codigo.updateMany({
         where: { conviteId: convite.id },
         data: { status: "entregue" },
-      });
-      await tx.comunicacaoLog.create({
+      }),
+      db.comunicacaoLog.create({
         data: {
           convidadoId: convite.convidadoId,
           categoria: "transacional",
@@ -326,8 +366,8 @@ export async function completarCadastro(token: string, formData: FormData) {
           canal: convite.canais.split(",")[0] || "email",
           status: "enviado",
         },
-      });
-    });
+      }),
+    ]);
   } catch {
     redirect(`/convite/${token}?erro=email_em_uso`);
   }

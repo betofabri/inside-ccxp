@@ -46,6 +46,26 @@ export default async function PaginaConvidado() {
         {convidado.resgateDeclarado && <span className="badge declarado">Resgate declarado</span>}
       </div>
 
+      {(() => {
+        const anfitrioes = [
+          ...new Set(
+            convidado.convites
+              .filter((cv) => cv.status !== "cancelado")
+              .map((cv) => cv.host.nome),
+          ),
+        ];
+        return anfitrioes.length > 0 ? (
+          <div className="sub anfitrioes">
+            <span>
+              {anfitrioes.length > 1 ? "Seus anfitriões na Omelete:" : "Seu anfitrião na Omelete:"}
+            </span>
+            {anfitrioes.map((nome) => (
+              <span className="badge solido" key={nome}>{nome}</span>
+            ))}
+          </div>
+        ) : null;
+      })()}
+
       {pendentes.length > 0 && (
         <div className="aviso">
           <b>Você tem {pendentes.length} convite(s) aguardando cadastro.</b> Complete o cadastro pelo link

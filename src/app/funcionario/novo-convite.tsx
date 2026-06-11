@@ -11,10 +11,20 @@ type TipoInfo = {
   corpDisp: number;
 };
 
+type Anterior = {
+  id: number;
+  nome: string;
+  empresa: string | null;
+  email: string | null;
+  telefone: string | null;
+  ativos: number;
+};
+
 type Props = {
   podeCorporativo: boolean;
   tipos: TipoInfo[];
   empresas: string[];
+  anteriores: Anterior[];
 };
 
 type Fluxo = "pessoal" | "corporativo";
@@ -42,7 +52,7 @@ const DOMINIOS_GENERICOS = [
   "gmx.com", "mail.com", "yandex.com",
 ];
 
-export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props) {
+export default function NovoConvite({ podeCorporativo, tipos, empresas, anteriores }: Props) {
   const [fluxo, setFluxo] = useState<Fluxo>("pessoal");
   const [passo, setPasso] = useState(0);
   const [nome, setNome] = useState("");
@@ -51,6 +61,10 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
   const [email, setEmail] = useState("");
   const [ddi, setDdi] = useState("+55");
   const [telefone, setTelefone] = useState("");
+  const [modo, setModo] = useState<"novo" | "existente">("novo");
+  const [busca, setBusca] = useState("");
+  const [selecionado, setSelecionado] = useState<Anterior | null>(null);
+  const [editando, setEditando] = useState(false);
   const [qtd, setQtd] = useState<Record<string, number>>(
     Object.fromEntries(tipos.map((t) => [t.tipo, 0])),
   );
@@ -72,7 +86,44 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
     setVipTipo(Object.fromEntries(tipos.map((t) => [t.tipo, false])));
     setResultado(null);
     setCopiado(false);
+    setModo("novo");
+    setBusca("");
+    setSelecionado(null);
+    setEditando(false);
   };
+
+  const selecionar = (a: Anterior) => {
+    const [primeiro, ...resto] = a.nome.split(" ");
+    setSelecionado(a);
+    setNome(primeiro);
+    setSobrenome(resto.join(" "));
+    setEmpresa(a.empresa ?? "");
+    setEmail(a.email ?? "");
+    setTelefone(a.telefone ? a.telefone.replace(/^\+\d{1,3}/, "") : "");
+    setEditando(false);
+    setBusca("");
+  };
+
+  const desselecionar = () => {
+    setSelecionado(null);
+    setNome("");
+    setSobrenome("");
+    setEmpresa("");
+    setEmail("");
+    setTelefone("");
+    setEditando(false);
+  };
+
+  const semAcento = (s: string) =>
+    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  const filtrados = anteriores
+    .filter((a) => {
+      const q = semAcento(busca.trim());
+      if (!q) return true;
+      return [a.nome, a.empresa ?? "", a.email ?? ""].some((v) => semAcento(v).includes(q));
+    })
+    .slice(0, 6);
 
   const trocarFluxo = (f: Fluxo) => {
     if (f === fluxo) return;
@@ -116,6 +167,7 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
     startEnvio(async () => {
       const r = await criarConvite({
         fluxo,
+        convidadoId: selecionado?.id,
         nome,
         sobrenome,
         empresa: empresa || undefined,
@@ -145,25 +197,38 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
       <div className="composer wizard">
         <div className="painel sucesso">
           <div className="selo-sucesso" aria-hidden>✓</div>
-          <h3 className="titulo-sucesso">Convite enviado</h3>
+          <h3 className="titulo-sucesso">
+            {resultado.entregaDireta ? "Ingressos adicionados" : "Convite enviado"}
+          </h3>
           <p className="sub-sucesso">
-            {nome.trim()} {sobrenome.trim()} vai receber o link mágico por{" "}
-            {[emailOk && "email", whatsOk && "WhatsApp"].filter(Boolean).join(" e ")}.
-            O envio é mockado no protótipo.
+            {resultado.entregaDireta ? (
+              <>
+                {nome.trim()} {sobrenome.trim()} já tem cadastro: os códigos novos caíram direto na
+                carteira, sem precisar de novo cadastro. O aviso é mockado no protótipo.
+              </>
+            ) : (
+              <>
+                {nome.trim()} {sobrenome.trim()} vai receber o link mágico por{" "}
+                {[emailOk && "email", whatsOk && "WhatsApp"].filter(Boolean).join(" e ")}. O envio é
+                mockado no protótipo.
+              </>
+            )}
           </p>
 
           {resultado.aviso && <div className="aviso">{resultado.aviso}</div>}
 
-          <div className="campo" style={{ marginTop: 20 }}>
-            <label>Link mágico</label>
-            <div className="campo-telefone">
-              <input type="text" readOnly value={linkMagico} onFocus={(e) => e.target.select()} />
-              <button className="cta fantasma" type="button" onClick={copiarLink}>
-                {copiado ? "Copiado ✓" : "Copiar"}
-              </button>
+          {!resultado.entregaDireta && (
+            <div className="campo" style={{ marginTop: 20 }}>
+              <label>Link mágico</label>
+              <div className="campo-telefone">
+                <input type="text" readOnly value={linkMagico} onFocus={(e) => e.target.select()} />
+                <button className="cta fantasma" type="button" onClick={copiarLink}>
+                  {copiado ? "Copiado ✓" : "Copiar"}
+                </button>
+              </div>
+              <div className="dica">No protótipo, abra o link pra ver o cadastro que o convidado recebe.</div>
             </div>
-            <div className="dica">No protótipo, abra o link pra ver o cadastro que o convidado recebe.</div>
-          </div>
+          )}
 
           {resultado.preview && (
             <div className="preview-msg">
@@ -173,7 +238,11 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
           )}
         </div>
         <div className="rodape">
-          <span className="nota">Os códigos ficam reservados até o cadastro (expira em 7 dias).</span>
+          <span className="nota">
+            {resultado.entregaDireta
+              ? "Códigos entregues; aparecem na carteira consolidada do convidado."
+              : "Os códigos ficam reservados até o cadastro (expira em 7 dias)."}
+          </span>
           <div className="acoes">
             <button className="cta" type="button" onClick={limpar}>
               Criar novo convite
@@ -231,6 +300,111 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
       {passo === 0 && (
         <div className="painel" key={`p0-${fluxo}`}>
           <h3>Quem você vai convidar</h3>
+
+          {anteriores.length > 0 && (
+            <div className="modos">
+              <button
+                type="button"
+                className={`modo-btn ${modo === "novo" ? "ativo" : ""}`}
+                onClick={() => {
+                  setModo("novo");
+                  desselecionar();
+                }}
+              >
+                Novo convidado
+              </button>
+              <button
+                type="button"
+                className={`modo-btn ${modo === "existente" ? "ativo" : ""}`}
+                onClick={() => setModo("existente")}
+              >
+                Já convidado
+              </button>
+            </div>
+          )}
+
+          {modo === "existente" && !selecionado && (
+            <div className="campo busca-convidado">
+              <label htmlFor="busca">Buscar entre os seus convidados</label>
+              <input
+                id="busca"
+                type="text"
+                placeholder="Nome, empresa ou email"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                autoFocus
+              />
+              <ul className="lista-busca">
+                {filtrados.map((a) => (
+                  <li key={a.id}>
+                    <button type="button" onClick={() => selecionar(a)}>
+                      <b>{a.nome}</b>
+                      <span className="meta">
+                        {[a.empresa, a.email ?? a.telefone].filter(Boolean).join(" · ")}
+                      </span>
+                      <span className="badge solido">{a.ativos} convite(s)</span>
+                    </button>
+                  </li>
+                ))}
+                {filtrados.length === 0 && <li className="vazio">Ninguém com esse termo.</li>}
+              </ul>
+            </div>
+          )}
+
+          {modo === "existente" && selecionado && !editando && (
+            <div className="resumo-convidado">
+              <div className="dados">
+                <b>{selecionado.nome}</b>
+                <span className="meta">
+                  {[selecionado.empresa, selecionado.email, selecionado.telefone]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+                <span className="badge declarado">{selecionado.ativos} convite(s) na carteira</span>
+              </div>
+              <div className="acoes-resumo">
+                <button type="button" className="acao" onClick={() => setEditando(true)}>
+                  Editar dados
+                </button>
+                <button type="button" className="acao" onClick={desselecionar}>
+                  Trocar
+                </button>
+              </div>
+              {fluxo === "corporativo" && !empresaOk && (
+                <div className="campo">
+                  <label htmlFor="empresa-falta">Empresa</label>
+                  <input
+                    id="empresa-falta"
+                    type="text"
+                    placeholder="Nome da empresa"
+                    value={empresa}
+                    onChange={(e) => setEmpresa(e.target.value)}
+                    list="empresas-conhecidas"
+                  />
+                </div>
+              )}
+              {fluxo === "corporativo" && (!emailOk || dominioGenerico) && (
+                <div className="campo">
+                  <label htmlFor="email-falta">Email corporativo</label>
+                  <input
+                    id="email-falta"
+                    type="email"
+                    placeholder="nome@empresa.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  {dominioGenerico && (
+                    <div className="dica erro">
+                      {dominio} é um domínio genérico; o convite corporativo exige email da empresa.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {(modo === "novo" || editando) && (
+          <>
           <div className="campo-dupla">
             <div className="campo">
               <label htmlFor="nome">Nome</label>
@@ -321,6 +495,8 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas }: Props)
               />
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
 

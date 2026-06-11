@@ -100,6 +100,21 @@ export default async function PaginaFuncionario() {
               .sort(),
           ),
         ]}
+        anteriores={(
+          await db.convidado.findMany({
+            // menor privilégio: host só vê quem ele mesmo convidou; admin vê todos
+            where: persona.role === "admin" ? {} : { convites: { some: { hostId: host.id } } },
+            include: { convites: { where: { status: { in: ["pendente", "cadastrado"] } } } },
+            orderBy: { id: "desc" },
+          })
+        ).map((c) => ({
+          id: c.id,
+          nome: c.nome,
+          empresa: c.empresa,
+          email: c.email,
+          telefone: c.telefone,
+          ativos: c.convites.length,
+        }))}
       />
 
       <section className="secao">

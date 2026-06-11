@@ -855,6 +855,105 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 
 .campo { margin-bottom: 16px; }
 
+/* modos do passo 1: novo × já convidado */
+.modos {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.modo-btn {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+}
+
+.modo-btn:hover { color: var(--ink); border-color: var(--muted); }
+
+.modo-btn.ativo {
+  background: var(--surface-2);
+  border-color: var(--champagne);
+  color: var(--ink);
+}
+
+/* busca de convidado existente */
+.lista-busca {
+  list-style: none;
+  margin-top: 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.lista-busca li + li { border-top: 1px solid var(--line-soft); }
+
+.lista-busca li.vazio {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.lista-busca button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: none;
+  border: none;
+  padding: 11px 14px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+
+.lista-busca button:hover { background: var(--surface-2); }
+
+.lista-busca .meta {
+  flex: 1;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* resumo do convidado selecionado */
+.resumo-convidado {
+  border: 1px solid color-mix(in oklab, var(--champagne) 30%, transparent);
+  background: var(--champagne-soft);
+  border-radius: var(--radius-m);
+  padding: 16px;
+}
+
+.resumo-convidado .dados {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 14.5px;
+}
+
+.resumo-convidado .dados .meta {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.resumo-convidado .acoes-resumo {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.resumo-convidado .campo { margin: 14px 0 0; }
+
 .campo label {
   display: block;
   font-size: 13px;
@@ -1187,6 +1286,8 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 }
 
 .aviso b { color: var(--ink); }
+
+.sub.anfitrioes { margin-top: 12px; }
 
 /* ── Carteira do convidado ── */
 .carteira {
