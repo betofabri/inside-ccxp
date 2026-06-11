@@ -82,6 +82,8 @@ model Convidado {
   empresa          String?
   cargo            String?
   nascimento       DateTime?
+  instagram        String?
+  linkedin         String?
   consentimentoEm  DateTime?
   optoutRegua      Boolean         @default(false)
   resgateDeclarado Boolean         @default(false)

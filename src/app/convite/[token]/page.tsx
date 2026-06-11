@@ -143,6 +143,16 @@ export default async function PaginaCadastro({
                   />
                 </div>
               </div>
+              <div className="campo-dupla">
+                <div className="campo">
+                  <label htmlFor="instagram">Instagram <span style={{ color: "var(--faint)", fontWeight: 400 }}>(opcional)</span></label>
+                  <input id="instagram" name="instagram" type="text" placeholder="@seuuser" />
+                </div>
+                <div className="campo">
+                  <label htmlFor="linkedin">LinkedIn <span style={{ color: "var(--faint)", fontWeight: 400 }}>(opcional)</span></label>
+                  <input id="linkedin" name="linkedin" type="text" placeholder="linkedin.com/in/voce" />
+                </div>
+              </div>
             </>
           )}
 

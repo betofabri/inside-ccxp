@@ -330,6 +330,8 @@ export async function completarCadastro(token: string, formData: FormData) {
   const nascimentoRaw = String(formData.get("nascimento") ?? "");
   const nascimento = nascimentoRaw ? new Date(`${nascimentoRaw}T12:00:00`) : null;
   const cargo = String(formData.get("cargo") ?? "").trim() || null;
+  const instagram = String(formData.get("instagram") ?? "").trim() || null;
+  const linkedin = String(formData.get("linkedin") ?? "").trim() || null;
   const email = normalizaEmail(String(formData.get("email") ?? ""));
   const telefone = normalizaTelefone(
     String(formData.get("ddi") ?? "+55"),
@@ -350,6 +352,8 @@ export async function completarCadastro(token: string, formData: FormData) {
           cargo: cargo ?? convite.convidado.cargo,
           email: email ?? convite.convidado.email,
           telefone: telefone ?? convite.convidado.telefone,
+          instagram: instagram ?? convite.convidado.instagram,
+          linkedin: linkedin ?? convite.convidado.linkedin,
           consentimentoEm: new Date(),
         },
       }),

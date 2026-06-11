@@ -202,23 +202,36 @@ export default async function PaginaFootprint({
       {selecionado && ficha && (
         <>
           <section className="secao ficha-cab">
-            <div>
+            <div className="ficha-topo">
               <h2 style={{ border: "none", paddingBottom: 0 }}>{selecionado.nome}</h2>
-              <div className="sub" style={{ marginTop: 6 }}>
-                {selecionado.empresa && <span>{selecionado.empresa}</span>}
-                {selecionado.cargo && <span className="dim">{selecionado.cargo}</span>}
-                <span className="mono">{selecionado.email ?? selecionado.telefone ?? "—"}</span>
-                <span className="badge solido">{ficha.credentialId}</span>
+              <span className="badge solido">{ficha.credentialId}</span>
+            </div>
+            {/* dados básicos: tudo que o convidado preencheu no cadastro */}
+            <dl className="ficha-dados">
+              <div><dt>Empresa</dt><dd>{selecionado.empresa ?? "—"}</dd></div>
+              <div><dt>Cargo</dt><dd>{selecionado.cargo ?? "—"}</dd></div>
+              <div><dt>Email</dt><dd className="mono">{selecionado.email ?? "—"}</dd></div>
+              <div><dt>WhatsApp</dt><dd className="mono">{selecionado.telefone ?? "—"}</dd></div>
+              <div>
+                <dt>Nascimento</dt>
+                <dd>
+                  {selecionado.nascimento
+                    ? // data pura: formata em UTC pra não escorregar um dia no fuso
+                      selecionado.nascimento.toLocaleDateString("pt-BR", { timeZone: "UTC" })
+                    : "—"}
+                </dd>
               </div>
-              <div className="sub" style={{ marginTop: 10 }}>
-                <span>Ingressos:</span>
-                {ficha.tipos.map((t) => (
-                  <span className={`badge solido t-${t}`} style={{ color: "var(--tipo-cor)" }} key={t}>
-                    {TIPO_LABEL[t]}
-                  </span>
-                ))}
-                <span className="dim">· Anfitriões: {ficha.anfitrioes.join(", ")}</span>
-              </div>
+              <div><dt>Instagram</dt><dd className="mono">{selecionado.instagram ?? "—"}</dd></div>
+              <div><dt>LinkedIn</dt><dd className="mono">{selecionado.linkedin ?? "—"}</dd></div>
+              <div><dt>Anfitriões</dt><dd>{ficha.anfitrioes.join(", ")}</dd></div>
+            </dl>
+            <div className="sub" style={{ marginTop: 14 }}>
+              <span>Ingressos:</span>
+              {ficha.tipos.map((t) => (
+                <span className={`badge solido t-${t}`} style={{ color: "var(--tipo-cor)" }} key={t}>
+                  {TIPO_LABEL[t]}
+                </span>
+              ))}
             </div>
           </section>
 
@@ -226,12 +239,6 @@ export default async function PaginaFootprint({
             <div className="box-ai-cab">
               <h2 style={{ border: "none", paddingBottom: 0 }}>Insights</h2>
               <span className="selo-ai">AI</span>
-              <span className="spacer" />
-              <div className="badges-perfil">
-                {ficha.ai.badges.map((b) => (
-                  <span className="badge-perfil" key={b}>{b}</span>
-                ))}
-              </div>
             </div>
             <div className="ai-cards">
               {ficha.ai.cards.map((c) => (

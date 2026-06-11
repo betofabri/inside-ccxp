@@ -165,7 +165,7 @@ async function main() {
 
   // 2. CADASTRADO + ENTREGUE — viu os códigos, ainda não resgatou
   const bruno = await db.convidado.create({
-    data: { nome: "Bruno Okamoto", email: "bruno.okamoto@netflix.com", empresa: "Netflix", cargo: "Diretor de Conteúdo", nascimento: new Date("1988-03-14"), consentimentoEm: dias(-3) },
+    data: { nome: "Bruno Okamoto", email: "bruno.okamoto@netflix.com", empresa: "Netflix", cargo: "Diretor de Conteúdo", nascimento: new Date("1988-03-14"), instagram: "@brunookamoto", linkedin: "linkedin.com/in/brunookamoto", consentimentoEm: dias(-3) },
   });
   await convite({
     host: camila, convidadoId: bruno.id, canais: "email,whatsapp", status: "cadastrado",
@@ -199,6 +199,7 @@ async function main() {
     data: {
       nome: "Elisa Prado", email: "elisa.prado@paramount.com",
       empresa: "Paramount", cargo: "Head de Distribuição", nascimento: new Date("1985-11-02"),
+      instagram: "@elisaprado", linkedin: "linkedin.com/in/elisaprado",
       consentimentoEm: dias(-6), resgateDeclarado: true,
     },
   });
@@ -226,7 +227,7 @@ async function main() {
 
   // 7. CARTEIRA CONSOLIDADA — Luís: convite do Beto (pessoal) + da Camila (corporativo)
   const luis = await db.convidado.create({
-    data: { nome: "Luís Hernandez", email: "luis.hernandez@hbo.com", empresa: "HBO", cargo: "VP de Programação", nascimento: new Date("1979-05-30"), consentimentoEm: dias(-2) },
+    data: { nome: "Luís Hernandez", email: "luis.hernandez@hbo.com", empresa: "HBO", cargo: "VP de Programação", nascimento: new Date("1979-05-30"), instagram: "@luishdz", linkedin: "linkedin.com/in/luishernandez", consentimentoEm: dias(-2) },
   });
   await convite({
     host: beto, convidadoId: luis.id, canais: "email", status: "cadastrado",

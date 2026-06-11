@@ -58,6 +58,8 @@ CREATE TABLE "Convidado" (
     "empresa" TEXT,
     "cargo" TEXT,
     "nascimento" DATETIME,
+    "instagram" TEXT,
+    "linkedin" TEXT,
     "consentimentoEm" DATETIME,
     "optoutRegua" BOOLEAN NOT NULL DEFAULT false,
     "resgateDeclarado" BOOLEAN NOT NULL DEFAULT false
