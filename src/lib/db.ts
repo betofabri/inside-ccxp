@@ -1,13 +1,24 @@
+import type { D1Database } from "@cloudflare/workers-types";
 import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import path from "node:path";
+import { PrismaD1 } from "@prisma/adapter-d1";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+// O binding D1 só existe dentro do escopo de uma request (workerd em produção,
+// miniflare no `next dev`). O Proxy adia a criação do client até o primeiro
+// acesso, que sempre acontece dentro de uma request.
+let client: PrismaClient | undefined;
 
-const adapter = new PrismaBetterSqlite3({
-  url: `file:${path.join(process.cwd(), "prisma", "dev.db")}`,
+function getClient(): PrismaClient {
+  if (!client) {
+    const { env } = getCloudflareContext();
+    const adapter = new PrismaD1((env as { DB: D1Database }).DB);
+    client = new PrismaClient({ adapter });
+  }
+  return client;
+}
+
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getClient(), prop, receiver);
+  },
 });
-
-export const db = globalForPrisma.prisma ?? new PrismaClient({ adapter });
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;

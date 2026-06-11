@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="topbar">
           <Link href="/" aria-label="Início">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ccxp-logo.png" alt="CCXP" className="logo" />
+            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-logo.png`} alt="CCXP" className="logo" />
           </Link>
           <span className="sistema">RSVP · Convidados VIP</span>
           <nav className="topo-nav">

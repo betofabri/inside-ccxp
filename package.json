@@ -9,10 +9,18 @@
     "lint": "eslint",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts"
+    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
+    "cf:build": "prisma generate && opennextjs-cloudflare build",
+    "deploy": "npm run cf:build && wrangler deploy",
+    "cf:preview": "npm run cf:build && wrangler dev",
+    "db:sql": "prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > prisma/schema.sql",
+    "db:d1:local": "wrangler d1 execute inside-ccxp-db --local --file=prisma/schema.sql && wrangler d1 execute inside-ccxp-db --local --file=prisma/seed.sql",
+    "db:d1:remote": "wrangler d1 execute inside-ccxp-db --remote --file=prisma/schema.sql && wrangler d1 execute inside-ccxp-db --remote --file=prisma/seed.sql"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.19.11",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/adapter-d1": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "next": "16.2.9",
     "prisma": "^7.8.0",
@@ -20,12 +28,14 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260611.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.99.0"
   }
 }

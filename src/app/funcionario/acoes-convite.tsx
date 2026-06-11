@@ -13,7 +13,9 @@ export default function AcoesConvite({ conviteId, token, status }: Props) {
   const [copiado, setCopiado] = useState(false);
 
   const copiar = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/convite/${token}`);
+    await navigator.clipboard.writeText(
+      `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/convite/${token}`,
+    );
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2000);
   };

@@ -18,7 +18,7 @@ export default async function Home() {
     <>
       <section className="hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/ccxp-logo.png" alt="CCXP" className="logo-hero" />
+        <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-logo.png`} alt="CCXP" className="logo-hero" />
         <h1>
           Convidados VIP, <em>do convite à presença</em>
         </h1>

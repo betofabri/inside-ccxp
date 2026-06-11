@@ -129,7 +129,7 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
     });
 
   const linkMagico = resultado?.token
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/convite/${resultado.token}`
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/convite/${resultado.token}`
     : "";
 
   const copiarLink = async () => {
