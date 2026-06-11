@@ -4,7 +4,6 @@ import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, fmtData } from "@/lib/labels";
 import NovoConvite from "./novo-convite";
 import AcoesConvite from "./acoes-convite";
-import ImportarBotao from "./importar-botao";
 import { expirarVencidos } from "@/lib/convites";
 
 export const dynamic = "force-dynamic";
@@ -50,9 +49,6 @@ export default async function PaginaFuncionario() {
   return (
     <div className="pagina">
       <h1>Novo convite</h1>
-      <div style={{ marginTop: 14 }}>
-        <ImportarBotao pool="pessoal" eventoEsperado="CCXP26" />
-      </div>
 
       <div className="estoque">
         <div className="estoque-cab">
@@ -87,6 +83,12 @@ export default async function PaginaFuncionario() {
             </span>
           ))}
         </div>
+        {tipos.every((t) => t.pessoalDisp === 0) && (
+          <div className="aviso">
+            <b>Sua cota pessoal está vazia.</b> Importe sua planilha de cortesias pelo menu do seu
+            perfil, no canto superior direito.
+          </div>
+        )}
       </div>
 
       <NovoConvite

@@ -6,6 +6,7 @@ import { getPersona } from "@/lib/persona";
 import { NIVEL_LABEL, fmtData } from "@/lib/labels";
 import { db } from "@/lib/db";
 import PerfilTopo from "@/components/perfil-topo";
+import ImportarBotao from "@/app/funcionario/importar-botao";
 
 const display = Marcellus({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
@@ -97,6 +98,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               papel={perfil.papel}
               corpOn={perfil.corpOn}
               detalhes={perfil.detalhes}
+              acoes={
+                persona && persona.role !== "convidado" ? (
+                  <ImportarBotao pool="pessoal" eventoEsperado="CCXP26" variante="item" />
+                ) : null
+              }
             />
           )}
         </header>

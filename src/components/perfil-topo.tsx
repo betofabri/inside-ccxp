@@ -7,9 +7,10 @@ type Props = {
   papel: string; // "Funcionário" | "Admin" | "Convidado"
   corpOn?: boolean;
   detalhes: Detalhe[];
+  acoes?: React.ReactNode; // ex: item de importar planilha (hosts)
 };
 
-export default function PerfilTopo({ nome, papel, corpOn, detalhes }: Props) {
+export default function PerfilTopo({ nome, papel, corpOn, detalhes, acoes }: Props) {
   const inicial = nome.trim().charAt(0).toUpperCase();
 
   return (
@@ -39,6 +40,7 @@ export default function PerfilTopo({ nome, papel, corpOn, detalhes }: Props) {
             </div>
           ))}
         </dl>
+        {acoes && <div className="perfil-acoes">{acoes}</div>}
         <form action={sairPersona}>
           <button className="acao" type="submit">Trocar papel</button>
         </form>

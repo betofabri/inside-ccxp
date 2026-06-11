@@ -8,9 +8,10 @@ import { TIPO_LABEL } from "@/lib/labels";
 type Props = {
   pool: "pessoal" | "corporativo";
   eventoEsperado: string;
+  variante?: "botao" | "item"; // item = linha de menu no dropdown do perfil
 };
 
-export default function ImportarBotao({ pool, eventoEsperado }: Props) {
+export default function ImportarBotao({ pool, eventoEsperado, variante = "botao" }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [previa, setPrevia] = useState<PreviaPlanilha | null>(null);
@@ -51,7 +52,11 @@ export default function ImportarBotao({ pool, eventoEsperado }: Props) {
   return (
     <>
       <label
-        className={`cta verde botao-importar ${arrastando ? "arrastando" : ""}`}
+        className={
+          variante === "item"
+            ? `item-importar ${arrastando ? "arrastando" : ""}`
+            : `cta verde botao-importar ${arrastando ? "arrastando" : ""}`
+        }
         onDragOver={(e) => {
           e.preventDefault();
           setArrastando(true);
@@ -65,8 +70,18 @@ export default function ImportarBotao({ pool, eventoEsperado }: Props) {
           accept=".xlsx,.xls,.csv"
           onChange={(e) => e.target.files?.[0] && abrir(e.target.files[0])}
         />
-        <span aria-hidden>⬆</span> Importar planilha
-        <small>ou arraste o arquivo aqui</small>
+        <span className="seta-importar" aria-hidden>⬆</span>
+        {variante === "item" ? (
+          <span className="item-texto">
+            Importar planilha
+            <small>cortesias .xlsx · ou arraste aqui</small>
+          </span>
+        ) : (
+          <>
+            Importar planilha
+            <small>ou arraste o arquivo aqui</small>
+          </>
+        )}
       </label>
 
       <dialog ref={dialogRef} className="modal-import" onClose={fechar}>
