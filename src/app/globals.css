@@ -364,6 +364,45 @@ h1, h2, h3 { text-wrap: balance; }
   margin-top: 2px;
 }
 
+/* ── Strip de saldo (primeira info do host) ── */
+.saldo-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.saldo-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+}
+
+.saldo-chip .nome-tipo {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.saldo-chip .n {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--champagne);
+}
+
+.saldo-chip.zerado .n { color: var(--st-cancelado); }
+
+.saldo-strip .legenda {
+  align-self: center;
+  font-size: 12.5px;
+  color: var(--faint);
+  margin-right: 4px;
+}
+
 /* ── Tabelas ── */
 .tabela-wrap { overflow-x: auto; }
 
@@ -442,11 +481,51 @@ h1, h2, h3 { text-wrap: balance; }
   border-radius: var(--radius-m);
 }
 
+/* seletor de fluxo pessoal × corporativo */
+.fluxos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 20px 28px 0;
+}
+
+.fluxo-tab {
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.fluxo-tab:hover:not(:disabled) { color: var(--ink); border-color: var(--muted); }
+
+.fluxo-tab.ativo {
+  background: var(--champagne);
+  border-color: var(--champagne);
+  color: var(--ink-on-accent);
+}
+
+.fluxo-tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fluxo-dica {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
 .passos {
   list-style: none;
   display: flex;
   gap: 6px;
-  padding: 20px 28px 0;
+  padding: 16px 28px 0;
 }
 
 .passo {
@@ -557,6 +636,37 @@ h1, h2, h3 { text-wrap: balance; }
   color: var(--faint);
   margin-top: 5px;
 }
+
+.campo .dica.erro { color: var(--st-cancelado); }
+
+.campo-dupla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.campo-telefone {
+  display: flex;
+  gap: 8px;
+}
+
+.campo-telefone select {
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: 10px 8px;
+  cursor: pointer;
+}
+
+.campo-telefone select:focus {
+  outline: none;
+  border-color: var(--champagne);
+}
+
+.campo-telefone input { flex: 1; }
 
 .vip-toggle {
   display: flex;

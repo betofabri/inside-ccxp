@@ -1,11 +1,21 @@
-export const TIPOS = ["quinta", "sexta", "sabado", "domingo", "todos_os_dias"] as const;
+export const TIPOS = ["spoiler_night", "quinta", "sexta", "sabado", "domingo", "todos_os_dias"] as const;
 
 export const TIPO_LABEL: Record<string, string> = {
-  quinta: "QUI 03",
-  sexta: "SEX 04",
-  sabado: "SÁB 05",
-  domingo: "DOM 06",
-  todos_os_dias: "FULL PASS",
+  spoiler_night: "Spoiler Night",
+  quinta: "Quinta",
+  sexta: "Sexta",
+  sabado: "Sábado",
+  domingo: "Domingo",
+  todos_os_dias: "Todos os Dias VIP",
+};
+
+export const TIPO_DATA: Record<string, string> = {
+  spoiler_night: "quarta, 02/dez",
+  quinta: "quinta, 03/dez",
+  sexta: "sexta, 04/dez",
+  sabado: "sábado, 05/dez",
+  domingo: "domingo, 06/dez",
+  todos_os_dias: "acesso aos 4 dias",
 };
 
 export const STATUS_CONVITE_LABEL: Record<string, string> = {

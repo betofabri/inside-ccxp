@@ -7,7 +7,7 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 const adapter = new PrismaBetterSqlite3({ url: "file:./prisma/dev.db" });
 const db = new PrismaClient({ adapter });
 
-const TIPOS = ["quinta", "sexta", "sabado", "domingo", "todos_os_dias"] as const;
+const TIPOS = ["spoiler_night", "quinta", "sexta", "sabado", "domingo", "todos_os_dias"] as const;
 
 const dias = (n: number) => new Date(Date.now() + n * 24 * 60 * 60 * 1000);
 
@@ -53,11 +53,16 @@ async function main() {
 
   // ── Códigos pessoais ───────────────────────────────────────────
   // OMLT-<dono><tipo><seq> — unicidade global garantida pelo padrão
-  const pessoalPorTipo: Record<number, number> = { [beto.id]: 4, [camila.id]: 3, [diego.id]: 2 };
+  // Quantidades variadas por tipo (inclui zerado, pra mostrar o estado)
+  const pessoalPorTipo: Record<number, Record<string, number>> = {
+    [beto.id]:   { spoiler_night: 10, quinta: 4, sexta: 4, sabado: 4, domingo: 4, todos_os_dias: 3 },
+    [camila.id]: { spoiler_night: 4,  quinta: 2, sexta: 3, sabado: 3, domingo: 3, todos_os_dias: 2 },
+    [diego.id]:  { spoiler_night: 2,  quinta: 0, sexta: 2, sabado: 2, domingo: 2, todos_os_dias: 1 },
+  };
   const prefixo: Record<number, string> = { [beto.id]: "BF", [camila.id]: "CR", [diego.id]: "DL" };
   for (const dono of [beto, camila, diego]) {
     for (const tipo of TIPOS) {
-      for (let i = 1; i <= pessoalPorTipo[dono.id]; i++) {
+      for (let i = 1; i <= pessoalPorTipo[dono.id][tipo]; i++) {
         await db.codigo.create({
           data: {
             valor: `OMLT-${prefixo[dono.id]}-${tipo.slice(0, 3).toUpperCase()}${i}`,
@@ -275,8 +280,8 @@ async function main() {
   // ── Audit log ──────────────────────────────────────────────────
   await db.auditLog.createMany({
     data: [
-      { atorId: beto.id, acao: "import_planilha_mestre", alvo: "planilha", detalhe: "45 códigos pessoais importados (Modo A)", data: dias(-12) },
-      { atorId: beto.id, acao: "import_lote_corporativo", alvo: "planilha", detalhe: "60 códigos corporativos importados", data: dias(-12) },
+      { atorId: beto.id, acao: "import_planilha_mestre", alvo: "planilha", detalhe: "55 códigos pessoais importados (Modo A)", data: dias(-12) },
+      { atorId: beto.id, acao: "import_lote_corporativo", alvo: "planilha", detalhe: "72 códigos corporativos importados", data: dias(-12) },
       { atorId: diego.id, acao: "cancelar_convite", alvo: "convite:Davi Fontes", detalhe: "1 código devolvido ao pool pessoal", data: dias(-4) },
       { atorId: beto.id, acao: "editar_flag_vip", alvo: "convidado:Elisa Prado", detalhe: "vip_omelete: false → true", data: dias(-5) },
     ],

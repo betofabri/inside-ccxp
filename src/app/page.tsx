@@ -12,7 +12,7 @@ export default async function Home() {
   });
 
   const admins = funcionarios.filter((f) => f.isAdmin);
-  const hosts = funcionarios.filter((f) => !f.isAdmin);
+  const hosts = funcionarios; // todo funcionário é host; VP/Head ganha visão geral extra
 
   return (
     <>

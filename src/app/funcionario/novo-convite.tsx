@@ -15,44 +15,106 @@ type Props = {
   tipos: TipoInfo[];
 };
 
-type Qtd = { pessoal: number; corporativo: number };
+type Fluxo = "pessoal" | "corporativo";
 
 const PASSOS = ["Convidado", "Ingressos", "Revisão"];
 
+const DDIS = [
+  { codigo: "+55", pais: "BR" },
+  { codigo: "+1", pais: "US/CA" },
+  { codigo: "+52", pais: "MX" },
+  { codigo: "+54", pais: "AR" },
+  { codigo: "+44", pais: "UK" },
+  { codigo: "+33", pais: "FR" },
+  { codigo: "+34", pais: "ES" },
+  { codigo: "+49", pais: "DE" },
+  { codigo: "+351", pais: "PT" },
+  { codigo: "+81", pais: "JP" },
+  { codigo: "+82", pais: "KR" },
+];
+
+// hint visual; a validação real (lista editável pelo admin) chega na F2
+const DOMINIOS_GENERICOS = [
+  "gmail.com", "hotmail.com", "outlook.com", "yahoo.com", "icloud.com",
+  "live.com", "msn.com", "aol.com", "proton.me", "protonmail.com",
+  "gmx.com", "mail.com", "yandex.com",
+];
+
 export default function NovoConvite({ podeCorporativo, tipos }: Props) {
+  const [fluxo, setFluxo] = useState<Fluxo>("pessoal");
   const [passo, setPasso] = useState(0);
   const [nome, setNome] = useState("");
+  const [sobrenome, setSobrenome] = useState("");
   const [email, setEmail] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
+  const [ddi, setDdi] = useState("+55");
+  const [telefone, setTelefone] = useState("");
   const [vip, setVip] = useState(false);
-  const [qtd, setQtd] = useState<Record<string, Qtd>>(
-    Object.fromEntries(tipos.map((t) => [t.tipo, { pessoal: 0, corporativo: 0 }])),
+  const [qtd, setQtd] = useState<Record<string, number>>(
+    Object.fromEntries(tipos.map((t) => [t.tipo, 0])),
   );
 
-  const setQuantidade = (tipo: string, pool: keyof Qtd, valor: number, max: number) =>
-    setQtd((q) => ({ ...q, [tipo]: { ...q[tipo], [pool]: Math.max(0, Math.min(max, valor)) } }));
+  const trocarFluxo = (f: Fluxo) => {
+    if (f === fluxo) return;
+    setFluxo(f);
+    setPasso(0);
+    setVip(false);
+    setQtd(Object.fromEntries(tipos.map((t) => [t.tipo, 0])));
+  };
 
-  const totalPessoal = tipos.reduce((acc, t) => acc + qtd[t.tipo].pessoal, 0);
-  const totalCorp = tipos.reduce((acc, t) => acc + qtd[t.tipo].corporativo, 0);
-  const total = totalPessoal + totalCorp;
+  const disp = (t: TipoInfo) => (fluxo === "pessoal" ? t.pessoalDisp : t.corpDisp);
 
-  const contatoOk = nome.trim().length > 1 && (email.trim().length > 3 || whatsapp.trim().length > 7);
-  const corpSemEmail = totalCorp > 0 && email.trim().length <= 3;
+  const setQuantidade = (tipo: string, valor: number, max: number) =>
+    setQtd((q) => ({ ...q, [tipo]: Math.max(0, Math.min(max, valor)) }));
+
+  const total = tipos.reduce((acc, t) => acc + qtd[t.tipo], 0);
+
+  const nomeOk = nome.trim().length > 1 && sobrenome.trim().length > 1;
+  const emailOk = email.trim().length > 3 && email.includes("@");
+  const whatsOk = telefone.trim().length > 7;
+  const dominio = email.trim().toLowerCase().split("@")[1] ?? "";
+  const dominioGenerico = fluxo === "corporativo" && emailOk && DOMINIOS_GENERICOS.includes(dominio);
+
+  const contatoOk =
+    fluxo === "corporativo"
+      ? nomeOk && emailOk && !dominioGenerico
+      : nomeOk && (emailOk || whatsOk);
 
   const podeAvancar = passo === 0 ? contatoOk : passo === 1 ? total > 0 : false;
 
-  const linhasResumo = tipos.flatMap((t) =>
-    (["pessoal", "corporativo"] as const)
-      .filter((pool) => qtd[t.tipo][pool] > 0)
-      .map((pool) => ({
-        chave: `${t.tipo}-${pool}`,
-        texto: `${qtd[t.tipo][pool]}× ${t.label}`,
-        pool: pool === "corporativo" ? "corporativo" : "pessoal",
-      })),
-  );
+  const linhasResumo = tipos
+    .filter((t) => qtd[t.tipo] > 0)
+    .map((t) => ({ chave: t.tipo, texto: `${qtd[t.tipo]}× ${t.label}` }));
 
   return (
     <div className="composer wizard">
+      <div className="fluxos" role="tablist" aria-label="Tipo de convite">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={fluxo === "pessoal"}
+          className={`fluxo-tab ${fluxo === "pessoal" ? "ativo" : ""}`}
+          onClick={() => trocarFluxo("pessoal")}
+        >
+          Convite pessoal
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={fluxo === "corporativo"}
+          className={`fluxo-tab ${fluxo === "corporativo" ? "ativo" : ""}`}
+          onClick={() => trocarFluxo("corporativo")}
+          disabled={!podeCorporativo}
+          title={podeCorporativo ? undefined : "A flag corporativa é atribuída pelo admin"}
+        >
+          Convite corporativo
+        </button>
+        <span className="fluxo-dica">
+          {fluxo === "pessoal"
+            ? "Usa a sua cota da planilha; contato por email ou WhatsApp."
+            : "Usa o lote compartilhado; email corporativo obrigatório."}
+        </span>
+      </div>
+
       <ol className="passos">
         {PASSOS.map((rotulo, i) => (
           <li
@@ -67,21 +129,38 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
       </ol>
 
       {passo === 0 && (
-        <div className="painel" key="p0">
+        <div className="painel" key={`p0-${fluxo}`}>
           <h3>Quem você vai convidar</h3>
-          <div className="campo">
-            <label htmlFor="nome">Nome</label>
-            <input
-              id="nome"
-              type="text"
-              placeholder="Nome do convidado"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              autoFocus
-            />
+          <div className="campo-dupla">
+            <div className="campo">
+              <label htmlFor="nome">Nome</label>
+              <input
+                id="nome"
+                type="text"
+                placeholder="Nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="campo">
+              <label htmlFor="sobrenome">Sobrenome</label>
+              <input
+                id="sobrenome"
+                type="text"
+                placeholder="Sobrenome"
+                value={sobrenome}
+                onChange={(e) => setSobrenome(e.target.value)}
+              />
+            </div>
           </div>
           <div className="campo">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">
+              Email{" "}
+              {fluxo === "pessoal" && (
+                <span style={{ color: "var(--faint)", fontWeight: 400 }}>(ou WhatsApp)</span>
+              )}
+            </label>
             <input
               id="email"
               type="email"
@@ -89,84 +168,98 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <div className="dica">
-              Parcela corporativa exige email de domínio corporativo; domínios genéricos são bloqueados.
-            </div>
+            {fluxo === "corporativo" && !dominioGenerico && (
+              <div className="dica">Obrigatório no convite corporativo; domínios genéricos são bloqueados.</div>
+            )}
+            {dominioGenerico && (
+              <div className="dica erro">
+                {dominio} é um domínio genérico; o convite corporativo exige email da empresa.
+              </div>
+            )}
           </div>
           <div className="campo">
-            <label htmlFor="whatsapp">
+            <label htmlFor="telefone">
               WhatsApp <span style={{ color: "var(--faint)", fontWeight: 400 }}>(opcional)</span>
             </label>
-            <input
-              id="whatsapp"
-              type="tel"
-              placeholder="+55 11 9 0000-0000"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-            />
-            <div className="dica">Convite só pessoal aceita email ou WhatsApp; um dos dois basta.</div>
+            <div className="campo-telefone">
+              <select
+                aria-label="Código do país"
+                value={ddi}
+                onChange={(e) => setDdi(e.target.value)}
+              >
+                {DDIS.map((d) => (
+                  <option key={d.codigo} value={d.codigo}>
+                    {d.pais} {d.codigo}
+                  </option>
+                ))}
+              </select>
+              <input
+                id="telefone"
+                type="tel"
+                placeholder="11 9 0000-0000"
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+              />
+            </div>
           </div>
         </div>
       )}
 
       {passo === 1 && (
-        <div className="painel" key="p1">
-          <h3>Ingressos por dia</h3>
+        <div className="painel" key={`p1-${fluxo}`}>
+          <h3>{fluxo === "pessoal" ? "Ingressos da sua cota" : "Ingressos do lote corporativo"}</h3>
           <div className="parcelas">
-            {tipos.map((t) => (
-              <div className="parcela-linha" key={t.tipo}>
-                <div className="dia">
-                  {t.label}
-                  <small>{t.data}</small>
+            {tipos.map((t) => {
+              const max = disp(t);
+              return (
+                <div className="parcela-linha" key={t.tipo}>
+                  <div className="dia">
+                    {t.label}
+                    <small>{t.data}</small>
+                  </div>
+                  <div className="pool-campo">
+                    <span className="rotulo">
+                      <b>{fluxo === "pessoal" ? "Disponíveis" : "Restam no lote"}</b>
+                      {max}
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={max}
+                      value={qtd[t.tipo]}
+                      disabled={max === 0}
+                      onChange={(e) => setQuantidade(t.tipo, Number(e.target.value), max)}
+                      aria-label={`${t.label}`}
+                    />
+                  </div>
                 </div>
-                <div className="pool-campo">
-                  <span className="rotulo">
-                    <b>Pessoal</b>
-                    {t.pessoalDisp} disponíveis
-                  </span>
-                  <input
-                    type="number"
-                    min={0}
-                    max={t.pessoalDisp}
-                    value={qtd[t.tipo].pessoal}
-                    disabled={t.pessoalDisp === 0}
-                    onChange={(e) => setQuantidade(t.tipo, "pessoal", Number(e.target.value), t.pessoalDisp)}
-                    aria-label={`Pessoal ${t.label}`}
-                  />
-                </div>
-                <div className="pool-campo">
-                  <span className="rotulo">
-                    <b>Corporativo</b>
-                    {podeCorporativo ? `restam ${t.corpDisp}` : "sem flag"}
-                  </span>
-                  <input
-                    type="number"
-                    min={0}
-                    max={t.corpDisp}
-                    value={qtd[t.tipo].corporativo}
-                    disabled={!podeCorporativo || t.corpDisp === 0}
-                    onChange={(e) => setQuantidade(t.tipo, "corporativo", Number(e.target.value), t.corpDisp)}
-                    aria-label={`Corporativo ${t.label}`}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
       {passo === 2 && (
-        <div className="painel" key="p2">
+        <div className="painel" key={`p2-${fluxo}`}>
           <h3>Revise antes de enviar</h3>
           <dl className="revisao">
             <div>
+              <dt>Convite</dt>
+              <dd>
+                <span className={`badge ${fluxo === "corporativo" ? "declarado" : "solido"}`}>{fluxo}</span>
+              </dd>
+            </div>
+            <div>
               <dt>Convidado</dt>
-              <dd>{nome.trim() || "—"}</dd>
+              <dd>{`${nome.trim()} ${sobrenome.trim()}`.trim() || "—"}</dd>
             </div>
             <div>
               <dt>Canais</dt>
               <dd>
-                {[email.trim() && `email (${email.trim()})`, whatsapp.trim() && `WhatsApp (${whatsapp.trim()})`]
+                {[
+                  email.trim() && `email (${email.trim()})`,
+                  telefone.trim() && `WhatsApp (${ddi} ${telefone.trim()})`,
+                ]
                   .filter(Boolean)
                   .join(" + ") || "—"}
               </dd>
@@ -177,9 +270,7 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                 {linhasResumo.length > 0 ? (
                   <ul className="resumo-lista">
                     {linhasResumo.map((l) => (
-                      <li key={l.chave}>
-                        {l.texto} <span className={`badge ${l.pool === "corporativo" ? "declarado" : "solido"}`}>{l.pool}</span>
-                      </li>
+                      <li key={l.chave}>{l.texto}</li>
                     ))}
                   </ul>
                 ) : (
@@ -189,7 +280,7 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
             </div>
           </dl>
 
-          {totalCorp > 0 && (
+          {fluxo === "corporativo" && (
             <label className="vip-toggle">
               <input type="checkbox" checked={vip} onChange={(e) => setVip(e.target.checked)} />
               <span className="texto">
@@ -197,10 +288,6 @@ export default function NovoConvite({ podeCorporativo, tipos }: Props) {
                 <small>Marca o convidado pro recorte VIP do evento. O admin pode editar depois.</small>
               </span>
             </label>
-          )}
-
-          {corpSemEmail && (
-            <p className="alerta">A parcela corporativa exige email; volte ao passo 1 e preencha.</p>
           )}
         </div>
       )}

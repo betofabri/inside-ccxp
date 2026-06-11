@@ -1,18 +1,10 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, NIVEL_LABEL, fmtData } from "@/lib/labels";
+import { TIPOS, TIPO_LABEL, TIPO_DATA, STATUS_CONVITE_LABEL, NIVEL_LABEL, fmtData } from "@/lib/labels";
 import NovoConvite from "./novo-convite";
 
 export const dynamic = "force-dynamic";
-
-const TIPO_DATA: Record<string, string> = {
-  quinta: "quinta, 03/dez",
-  sexta: "sexta, 04/dez",
-  sabado: "sábado, 05/dez",
-  domingo: "domingo, 06/dez",
-  todos_os_dias: "acesso aos 4 dias",
-};
 
 export default async function PaginaFuncionario() {
   const persona = await getPersona();
@@ -49,7 +41,26 @@ export default async function PaginaFuncionario() {
     corpDisp: contar(corpDisponivel, tipo),
   }));
 
-  const saldoPessoalTotal = tipos.reduce((acc, t) => acc + t.pessoalDisp, 0);
+  // visão geral extra pra VP/Head
+  const ehVp = host.nivel === "vp_socio";
+  const ranking = ehVp
+    ? (
+        await db.funcionario.findMany({
+          include: { convites: { include: { codigos: true } } },
+        })
+      )
+        .map((h) => ({
+          nome: h.nome,
+          nivel: NIVEL_LABEL[h.nivel],
+          convites: h.convites.length,
+          ativos: h.convites.filter((cv) => cv.status === "cadastrado" || cv.status === "pendente").length,
+          resgatados: h.convites.reduce(
+            (acc, cv) => acc + cv.codigos.filter((c) => c.status === "resgatado").length,
+            0,
+          ),
+        }))
+        .sort((a, b) => b.convites - a.convites)
+    : [];
 
   return (
     <div className="pagina">
@@ -63,8 +74,28 @@ export default async function PaginaFuncionario() {
         ) : (
           <span className="badge expirado">Cota pessoal apenas</span>
         )}
-        <span>{saldoPessoalTotal} códigos pessoais disponíveis</span>
       </div>
+
+      <div className="saldo-strip" aria-label="Saldo pessoal disponível por tipo">
+        <span className="legenda">Sua cota:</span>
+        {tipos.map((t) => (
+          <span className={`saldo-chip ${t.pessoalDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
+            <span className="nome-tipo">{t.label}</span>
+            <span className="n">{t.pessoalDisp}</span>
+          </span>
+        ))}
+      </div>
+      {host.podeCorporativo && (
+        <div className="saldo-strip" aria-label="Saldo corporativo disponível por tipo">
+          <span className="legenda">Lote corporativo:</span>
+          {tipos.map((t) => (
+            <span className={`saldo-chip ${t.corpDisp === 0 ? "zerado" : ""}`} key={t.tipo}>
+              <span className="nome-tipo">{t.label}</span>
+              <span className="n">{t.corpDisp}</span>
+            </span>
+          ))}
+        </div>
+      )}
 
       <NovoConvite podeCorporativo={host.podeCorporativo} tipos={tipos} />
 
@@ -113,6 +144,38 @@ export default async function PaginaFuncionario() {
           </table>
         </div>
       </section>
+
+      {ehVp && (
+        <section className="secao">
+          <h2>
+            Visão geral do time <span className="nota">exclusivo do nível VP/Head</span>
+          </h2>
+          <div className="tabela-wrap">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Host</th>
+                  <th>Nível</th>
+                  <th>Convites</th>
+                  <th>Em andamento</th>
+                  <th>Códigos resgatados</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranking.map((r) => (
+                  <tr key={r.nome}>
+                    <td><b>{r.nome}</b></td>
+                    <td className="dim">{r.nivel}</td>
+                    <td>{r.convites}</td>
+                    <td>{r.ativos}</td>
+                    <td>{r.resgatados}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
