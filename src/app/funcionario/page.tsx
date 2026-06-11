@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPOS, TIPO_LABEL, STATUS_CONVITE_LABEL, NIVEL_LABEL, fmtData } from "@/lib/labels";
+import NovoConvite from "./novo-convite";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,15 @@ export default async function PaginaFuncionario() {
   const contar = (grupos: { tipo: string; _count: number }[], tipo: string) =>
     grupos.find((g) => g.tipo === tipo)?._count ?? 0;
 
-  const saldoPessoalTotal = pessoalDisponivel.reduce((acc, g) => acc + g._count, 0);
+  const tipos = TIPOS.map((tipo) => ({
+    tipo,
+    label: TIPO_LABEL[tipo],
+    data: TIPO_DATA[tipo],
+    pessoalDisp: contar(pessoalDisponivel, tipo),
+    corpDisp: contar(corpDisponivel, tipo),
+  }));
+
+  const saldoPessoalTotal = tipos.reduce((acc, t) => acc + t.pessoalDisp, 0);
 
   return (
     <div className="pagina">
@@ -57,76 +66,7 @@ export default async function PaginaFuncionario() {
         <span>{saldoPessoalTotal} códigos pessoais disponíveis</span>
       </div>
 
-      <form className="composer">
-        <div className="coluna">
-          <h3>Quem você vai convidar</h3>
-          <div className="campo">
-            <label htmlFor="nome">Nome</label>
-            <input id="nome" type="text" placeholder="Nome do convidado" />
-          </div>
-          <div className="campo">
-            <label htmlFor="email">Email</label>
-            <input id="email" type="email" placeholder="nome@empresa.com" />
-            <div className="dica">
-              Parcela corporativa exige email de domínio corporativo; domínios genéricos são bloqueados.
-            </div>
-          </div>
-          <div className="campo">
-            <label htmlFor="whatsapp">WhatsApp <span style={{ color: "var(--faint)", fontWeight: 400 }}>(opcional)</span></label>
-            <input id="whatsapp" type="tel" placeholder="+55 11 9 0000-0000" />
-          </div>
-          {host.podeCorporativo && (
-            <label className="vip-toggle">
-              <input type="checkbox" />
-              <span className="texto">
-                VIP Omelete
-                <small>Marca o convidado pro recorte VIP do evento. O admin pode editar depois.</small>
-              </span>
-            </label>
-          )}
-        </div>
-
-        <div className="coluna">
-          <h3>Ingressos por dia</h3>
-          <div className="parcelas">
-            {TIPOS.map((tipo) => {
-              const pess = contar(pessoalDisponivel, tipo);
-              const corp = contar(corpDisponivel, tipo);
-              return (
-                <div className="parcela-linha" key={tipo}>
-                  <div className="dia">
-                    {TIPO_LABEL[tipo]}
-                    <small>{TIPO_DATA[tipo]}</small>
-                  </div>
-                  <div className="pool-campo">
-                    <span className="rotulo">
-                      <b>Pessoal</b>
-                      {pess} disponíveis
-                    </span>
-                    <input type="number" min={0} max={pess} defaultValue={0} disabled={pess === 0} aria-label={`Pessoal ${TIPO_LABEL[tipo]}`} />
-                  </div>
-                  <div className="pool-campo">
-                    <span className="rotulo">
-                      <b>Corporativo</b>
-                      {host.podeCorporativo ? `restam ${corp}` : "sem flag"}
-                    </span>
-                    <input type="number" min={0} max={corp} defaultValue={0} disabled={!host.podeCorporativo || corp === 0} aria-label={`Corporativo ${TIPO_LABEL[tipo]}`} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="rodape">
-          <span className="nota">
-            Convite só pessoal aceita email ou WhatsApp; com parcela corporativa, o email é obrigatório.
-          </span>
-          <button className="cta" type="button" disabled title="O envio chega na F2">
-            Enviar convite
-          </button>
-        </div>
-      </form>
+      <NovoConvite podeCorporativo={host.podeCorporativo} tipos={tipos} />
 
       <section className="secao">
         <h2>

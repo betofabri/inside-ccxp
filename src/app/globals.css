@@ -434,22 +434,81 @@ h1, h2, h3 { text-wrap: balance; }
   color: var(--ink);
 }
 
-/* ── Composer de convite (host) ── */
+/* ── Composer de convite (host) — wizard ── */
 .composer {
   margin-top: 30px;
   border: 1px solid var(--line-soft);
   background: var(--surface);
   border-radius: var(--radius-m);
+}
+
+.passos {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  padding: 20px 28px 0;
+}
+
+.passo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--faint);
+  padding: 7px 14px 7px 8px;
+  border-radius: var(--radius-pill);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.passo .bolinha {
   display: grid;
-  grid-template-columns: minmax(260px, 5fr) minmax(380px, 7fr);
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  transition: inherit;
 }
 
-.composer .coluna {
-  padding: 26px 28px 28px;
+.passo.atual {
+  color: var(--ink);
+  background: var(--surface-2);
 }
 
-.composer .coluna + .coluna {
-  border-left: 1px solid var(--line-soft);
+.passo.atual .bolinha {
+  background: var(--champagne);
+  border-color: var(--champagne);
+  color: var(--ink-on-accent);
+}
+
+.passo.feito { color: var(--muted); }
+
+.passo.feito .bolinha {
+  border-color: var(--champagne);
+  color: var(--champagne);
+}
+
+.passo + .passo::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--line);
+  margin-right: 9px;
+}
+
+.painel {
+  padding: 24px 28px 28px;
+  max-width: 640px;
+  animation: painelEntra var(--dur) var(--ease);
+}
+
+@keyframes painelEntra {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
 }
 
 .composer h3 {
@@ -593,7 +652,6 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 .composer .rodape {
-  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -606,6 +664,54 @@ h1, h2, h3 { text-wrap: balance; }
 .composer .rodape .nota {
   font-size: 13px;
   color: var(--faint);
+}
+
+.composer .rodape .acoes {
+  display: flex;
+  gap: 10px;
+}
+
+/* revisão (passo 3) */
+.revisao {
+  display: grid;
+  gap: 14px;
+}
+
+.revisao > div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.revisao dt {
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.revisao dd {
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.resumo-lista {
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+
+.resumo-lista li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.revisao + .vip-toggle { margin-top: 20px; }
+
+.alerta {
+  margin-top: 16px;
+  font-size: 13.5px;
+  color: var(--st-cancelado);
 }
 
 /* ── Botões ── */
@@ -750,15 +856,12 @@ h1, h2, h3 { text-wrap: balance; }
   color: var(--faint);
 }
 
-@media (max-width: 860px) {
-  .composer { grid-template-columns: 1fr; }
-  .composer .coluna + .coluna {
-    border-left: none;
-    border-top: 1px solid var(--line-soft);
-  }
-}
-
 @media (max-width: 640px) {
+  .passos { padding: 16px 18px 0; flex-wrap: wrap; }
+  .passo + .passo::before { display: none; }
+  .painel { padding: 20px 18px 24px; }
+  .composer .rodape { padding: 16px 18px; }
+  .revisao > div { grid-template-columns: 1fr; gap: 4px; }
   .topbar { padding: 14px 18px; gap: 14px; }
   .topbar .sistema { display: none; }
   .hero { padding: 52px 18px 24px; }
