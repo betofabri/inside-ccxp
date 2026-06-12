@@ -11,8 +11,8 @@
   --line-soft: oklch(23.5% 0.009 75);
 
   --ink: oklch(95% 0.012 85);
-  --muted: oklch(73% 0.022 80);
-  --faint: oklch(58% 0.018 78);
+  --muted: oklch(76% 0.022 80);
+  --faint: oklch(64% 0.018 78);
 
   --champagne: oklch(84% 0.088 85);
   --champagne-soft: oklch(84% 0.088 85 / 0.14);
@@ -227,8 +227,8 @@ h1, h2, h3 { text-wrap: balance; }
 .persona-btn {
   width: 100%;
   text-align: left;
-  background: none;
-  border: none;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
   border-radius: var(--radius-s);
   color: var(--ink);
   padding: 11px 12px;
@@ -238,10 +238,15 @@ h1, h2, h3 { text-wrap: balance; }
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: background var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 
-.persona-btn:hover { background: var(--surface-2); }
+.persona-btn:hover {
+  border-color: var(--champagne);
+  transform: translateX(3px);
+}
+
+.persona-btn:active { transform: translateX(3px) scale(0.99); }
 
 .persona-btn .nome { font-weight: 600; flex: 1; }
 
@@ -253,7 +258,7 @@ h1, h2, h3 { text-wrap: balance; }
 
 .persona-btn .seta {
   color: var(--champagne);
-  opacity: 0;
+  opacity: 0.45;
   transform: translateX(-4px);
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
@@ -1606,7 +1611,9 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 }
 
 .cta:hover { filter: brightness(1.07); }
-.cta:active { transform: translateY(1px); }
+.cta:active { transform: translateY(1px) scale(0.99); }
+
+.cta.fantasma:active { transform: translateY(1px); }
 
 .cta:disabled {
   opacity: 0.45;
@@ -2111,6 +2118,16 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 
 .acao:hover { color: var(--ink); border-color: var(--champagne); }
 
+a.acao {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.acao:active { transform: scale(0.97); }
+
+.acao:disabled { opacity: 0.45; cursor: not-allowed; }
+
 .acao.perigo:hover { color: var(--st-cancelado); border-color: var(--st-cancelado); }
 
 /* ── Sucesso do envio ── */
@@ -2522,4 +2539,55 @@ a.topo-link:hover { color: var(--ink); border-color: var(--champagne); }
   font-size: 24px !important;
   letter-spacing: 0.45em;
   text-align: center;
+}
+
+
+/* ── Microinterações (polish) ── */
+@keyframes entra-pagina {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+main > * {
+  animation: entra-pagina 0.26s var(--ease) both;
+}
+
+@keyframes abre-secao {
+  from { opacity: 0; transform: translateY(-4px); }
+}
+
+details.secao[open] > *:not(summary) {
+  animation: abre-secao 0.22s var(--ease) both;
+}
+
+.ticket {
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.ticket:not(.copiado):hover { transform: translateY(-2px); }
+
+.admin-tab:active,
+.fluxo-tab:active,
+.modo-btn:active,
+.topo-link:not(:disabled):active { transform: scale(0.97); }
+
+@keyframes entra-modal {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+.modal-import[open] { animation: entra-modal 0.24s var(--ease) both; }
+
+.insight-card,
+.passo-regua,
+.ai-card {
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.insight-card:hover { transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+  main > *,
+  details.secao[open] > *:not(summary),
+  .modal-import[open] {
+    animation: none;
+  }
 }

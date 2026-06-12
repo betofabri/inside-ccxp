@@ -91,6 +91,7 @@ export default async function PaginaFollowUp({
 }) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
+  const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
   const { erro, adhoc, teste, canal, envio, dest } = await searchParams;
 
   const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
@@ -115,6 +116,17 @@ export default async function PaginaFollowUp({
     },
   ];
 
+  const linkWhatsTeste = (passo: Passo) => {
+    const nome = admin?.nome ?? "Admin";
+    const corpo = passo.corpo
+      .replaceAll("{{nome}}", nome.split(" ")[0])
+      .replaceAll("{{host}}", nome)
+      .replaceAll("{{qtd}}", "2")
+      .replaceAll("{{tipos}}", "2× Sábado")
+      .replaceAll("{{link}}", "https://betofabri.com/lab/inside-ccxp");
+    return `https://wa.me/?text=${encodeURIComponent(`*[TESTE] ${passo.assunto}*\n\n${corpo}\n\n_CCXP INSIDER · CCXP26 · 03 a 06/dez · São Paulo Expo_`)}`;
+  };
+
   const CardPasso = ({ passo }: { passo: Passo }) => (
     <article className={`passo-regua ${passo.ativo ? "" : "pausado"}`}>
       <div className="passo-cab">
@@ -133,10 +145,19 @@ export default async function PaginaFollowUp({
         <div className="passo-controles">
           <form action={enviarTestePasso}>
             <input type="hidden" name="passoId" value={passo.id} />
-            <button className="acao" type="submit" title="Dispara este passo só pro seu email (mock)">
-              Enviar teste
+            <button className="acao" type="submit" title="Dispara este passo pro email de teste">
+              Testar por email
             </button>
           </form>
+          <a
+            className="acao"
+            href={linkWhatsTeste(passo)}
+            target="_blank"
+            rel="noreferrer"
+            title="Abre o WhatsApp com a mensagem renderizada pra você enviar"
+          >
+            Testar no WhatsApp
+          </a>
           <form action={alternarPassoRegua}>
             <input type="hidden" name="passoId" value={passo.id} />
             <button className={`toggle-passo ${passo.ativo ? "on" : ""}`} type="submit">
