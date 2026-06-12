@@ -206,16 +206,36 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas, anterior
             {resultado.entregaDireta ? (
               <>
                 {nome.trim()} {sobrenome.trim()} já tem cadastro: os códigos novos caíram direto na
-                carteira, sem precisar de novo cadastro. O aviso é mockado no protótipo.
+                carteira, sem precisar de novo cadastro.
               </>
             ) : (
               <>
-                {nome.trim()} {sobrenome.trim()} vai receber o link mágico por{" "}
-                {[emailOk && "email", whatsOk && "WhatsApp"].filter(Boolean).join(" e ")}. O envio é
-                mockado no protótipo.
+                {nome.trim()} {sobrenome.trim()} recebe o convite por{" "}
+                {[emailOk && "email", whatsOk && "WhatsApp"].filter(Boolean).join(" e ")}.
               </>
             )}
           </p>
+
+          {resultado.envioEmail === "real" && (
+            <div className="aviso ok">
+              <b>Email enviado ✓</b> de insider@betofabri.com pra {resultado.emailDestino}.
+            </div>
+          )}
+          {resultado.envioEmail === "mock" && (
+            <div className="aviso">
+              Email simulado (sem RESEND_API_KEY neste ambiente) — use o link mágico abaixo.
+            </div>
+          )}
+          {resultado.envioEmail === "falha" && (
+            <div className="aviso erro">
+              O email não saiu (detalhe no audit log) — use o link mágico abaixo enquanto isso.
+            </div>
+          )}
+          {!resultado.emailDestino && !resultado.entregaDireta && (
+            <div className="aviso">
+              Convite sem email (só WhatsApp): envie o link mágico abaixo pelo WhatsApp.
+            </div>
+          )}
 
           {resultado.aviso && <div className="aviso">{resultado.aviso}</div>}
 

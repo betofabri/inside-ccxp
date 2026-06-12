@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPO_LABEL } from "@/lib/labels";
+import { enviarEmail, templateEmail, linkar } from "@/lib/email";
 
 // ── tipos ──────────────────────────────────────────────────────
 
@@ -31,6 +32,8 @@ export type CriarConviteResultado = {
   token?: string;
   preview?: string;
   entregaDireta?: boolean; // convidado já cadastrado: códigos caem direto na carteira
+  envioEmail?: "real" | "mock" | "falha" | null; // resultado do email do convite
+  emailDestino?: string | null;
 };
 
 // ── helpers ────────────────────────────────────────────────────
@@ -136,6 +139,7 @@ export async function criarConvite(input: CriarConviteInput): Promise<CriarConvi
   // sequenciais com guarda contra corrida (updateMany condicionado a
   // status='disponivel' + conferência do count) e compensação em caso de erro.
   let conviteId: number | null = null;
+  let convidadoIdFinal: number | null = null;
   try {
     // carteira única: por id (re-convite), senão por email, senão telefone, senão cria
     let convidado =
@@ -158,6 +162,7 @@ export async function criarConvite(input: CriarConviteInput): Promise<CriarConvi
         },
       });
     }
+    convidadoIdFinal = convidado.id;
 
     // já cadastrado (LGPD ok)? entrega direto na carteira, sem novo cadastro
     entregaDireta = convidado.consentimentoEm != null;
@@ -231,8 +236,47 @@ export async function criarConvite(input: CriarConviteInput): Promise<CriarConvi
       `(03 a 06/dez, São Paulo Expo) com ${totalIngressos} ingresso(s). ` +
       `Complete seu cadastro pra receber os códigos: {{link}}`;
 
+  // o convite SAI por email na hora (domínio verificado no Resend; sem chave = mock)
+  const destinoEmail = email ?? null;
+  let envioEmail: "real" | "mock" | "falha" | null = null;
+  if (destinoEmail) {
+    const link = `https://betofabri.com/insider-ccxp/convite/${token}`;
+    const corpoEmail = preview.replaceAll("{{link}}", link);
+    const assunto = entregaDireta
+      ? "Seus ingressos da CCXP26 chegaram"
+      : "Você foi convidado pra CCXP26";
+    const envio = await enviarEmail({
+      para: destinoEmail,
+      assunto,
+      html: templateEmail(assunto, `<p>${linkar(corpoEmail)}</p>`, {
+        cta: { texto: entregaDireta ? "Abrir minha carteira" : "Abrir meu convite", url: link },
+        notaRodape: `Convite enviado por ${host.nome} · Omelete Company.`,
+      }),
+    });
+    envioEmail = envio.mock ? "mock" : envio.ok ? "real" : "falha";
+    await db.comunicacaoLog.create({
+      data: {
+        convidadoId: convidadoIdFinal!,
+        categoria: "transacional",
+        passo: entregaDireta ? "ingressos_diretos" : "Convite",
+        canal: "email",
+        status: envio.mock ? "enviado_mock" : envio.ok ? "enviado" : "falha",
+      },
+    });
+    if (!envio.ok && !envio.mock) {
+      await db.auditLog.create({
+        data: {
+          atorId: host.id,
+          acao: "falha_email_convite",
+          alvo: `convite:${conviteId}`,
+          detalhe: `${destinoEmail}: ${envio.erro}`,
+        },
+      });
+    }
+  }
+
   revalidatePath("/funcionario");
-  return { ok: true, token, aviso, preview, entregaDireta };
+  return { ok: true, token, aviso, preview, entregaDireta, envioEmail, emailDestino: destinoEmail };
 }
 
 // ── F2: gestão do host ─────────────────────────────────────────
@@ -350,6 +394,32 @@ export async function reenviarConvite(formData: FormData) {
       where: { id },
       data: { status: "pendente", expiraEm, magicToken: token },
     });
+
+    // o link novo sai por email na hora (mock declarado sem RESEND_API_KEY)
+    const convidado = await db.convidado.findUnique({ where: { id: convite.convidadoId } });
+    if (convidado?.email) {
+      const link = `https://betofabri.com/insider-ccxp/convite/${token}`;
+      const envio = await enviarEmail({
+        para: convidado.email,
+        assunto: "Seu convite pra CCXP26 foi renovado",
+        html: templateEmail(
+          "Seu convite foi renovado",
+          `<p>${linkar(
+            `Olá, ${convidado.nome.split(" ")[0]}! Seu convite pra CCXP26 ganhou um link novo com prazo renovado. Complete seu cadastro pra receber os códigos: ${link}`,
+          )}</p>`,
+          { cta: { texto: "Abrir meu convite", url: link } },
+        ),
+      });
+      await db.comunicacaoLog.create({
+        data: {
+          convidadoId: convidado.id,
+          categoria: "transacional",
+          passo: "reenvio_convite",
+          canal: "email",
+          status: envio.mock ? "enviado_mock" : envio.ok ? "enviado" : "falha",
+        },
+      });
+    }
   } catch {
     // compensação: solta o que tiver sido re-reservado e mantém expirado
     await db.codigo
