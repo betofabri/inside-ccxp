@@ -204,4 +204,4 @@ INSERT INTO Config VALUES('expiracao_dias','7');
 INSERT INTO Config VALUES('evento_inicio','2026-12-03');
 INSERT INTO Config VALUES('evento_fim','2026-12-06');
 INSERT INTO Config VALUES('evento_local','São Paulo Expo');
-INSERT INTO Config VALUES('link_mundo_ticket','https://mundoticket.com.br/ccxp26/resgate');
+INSERT INTO Config VALUES('link_mundo_ticket','https://mundo-ticket.com/en-US/login');

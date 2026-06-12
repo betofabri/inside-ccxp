@@ -329,7 +329,7 @@ async function main() {
       { chave: "evento_inicio", valor: "2026-12-03" },
       { chave: "evento_fim", valor: "2026-12-06" },
       { chave: "evento_local", valor: "São Paulo Expo" },
-      { chave: "link_mundo_ticket", valor: "https://mundoticket.com.br/ccxp26/resgate" },
+      { chave: "link_mundo_ticket", valor: "https://mundo-ticket.com/en-US/login" },
     ],
   });
 

@@ -102,6 +102,19 @@ export default async function PaginaConvidado() {
             que você já copiou ficam marcados aqui na carteira.
           </div>
           <div className="aviso">
+            <b>Precisa de cadastro na Mundo Ticket</b> pra resgatar — se ainda não tem, é só criar na
+            própria página de login. Dúvidas? Veja o{" "}
+            <a
+              href="https://ajuda.ccxp.com.br/hc/pt-br/articles/4411868666637-Recebi-um-c%C3%B3digo-de-cortesia-como-resgatar-o-ingresso"
+              target="_blank"
+              rel="noreferrer"
+              style={{ textDecoration: "underline" }}
+            >
+              passo a passo do resgate de cortesia
+            </a>{" "}
+            na central de ajuda da CCXP.
+          </div>
+          <div className="aviso">
             <b>Dica:</b> na aba <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/apoio`} style={{ textDecoration: "underline" }}>Assets</a>{" "}
             tem mapa do evento, horários, por onde entrar, como chegar e o que levar.
           </div>
