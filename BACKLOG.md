@@ -32,6 +32,7 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 - Opções: Quadrinhos · Games · Terror · Filmes · Anime · Momento com a família · Negócios · Networking · Oportunidades de patrocínio
 - Alimenta: segmentação de follow-up, scoring de VIP
 - Loop futuro: cruzar interesse declarado × comportamento real (Footprint) — ex: disse terror e passou 4h no Thunder
+- **Posição no fluxo (decisão 12/jun)**: a pesquisa acontece ANTES do resgate — mesmo com magic link/OTP, a pessoa responde a mini pesquisa e a relação fica gravada no perfil dela antes de receber os códigos
 
 ## P2 — Operação diária
 
@@ -123,9 +124,10 @@ Falta pra virar real:
 - Acesso sem código ou sem perfil → página estilo landing (hoje abre o switcher de personas do protótipo)
 - Texto descritivo curto + duas opções: "Sou host" / "Sou convidado"
 
-### 13. Admin oculto ⬜
+### 13. Admin oculto ⬜ ⚠️ (subiu de prioridade)
 
 - Acessível apenas por link direto (fora da navegação)
+- ⚠️ Urgência nova: desde 12/jun o app está **público** em `betofabri.com/insider-ccxp` (fora do Cloudflare Access, pra testar com convidados reais e ter preview de link). O switcher de personas — incluindo Admin — está acessível a qualquer um com o link. Ok pra fase de teste com dados de exemplo; resolver antes de circular o link amplamente.
 
 ### 14. Mobile — topo colapsado 🟡
 
@@ -139,7 +141,8 @@ Falta pra virar real:
 - ✅ Microinterações: fade de entrada de página, seções colapsáveis, modal, hover-lifts (com `prefers-reduced-motion`)
 - ⬜ Card profile: mouseover (vindo do fade / arrasta)
 - ⬜ Card profile: mover avatar para a direita (hoje à esquerda)
-- ⬜ Imagens de compartilhamento (OG/share) corretas
+- ✅ Imagens de compartilhamento (OG/share) corretas — og.png 1200×630 com logo Insider + metadata OG/Twitter completa
+- ✅ Telas de estado terminal do convite (expirado/cancelado/não encontrado) desenhadas — glifo, próximo passo destacado, tom acolhedor
 - ⬜ Gradiente triplo `#FFD000 → #FF7A2F → #ED3A86` em palavras de destaque de títulos e subtítulos
 - 🟡 Bottom nav glass no mobile (conceito aprovado, "em digestão" — aguarda go)
 

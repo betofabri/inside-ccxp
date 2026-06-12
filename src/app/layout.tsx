@@ -12,9 +12,28 @@ const display = Marcellus({ weight: "400", subsets: ["latin"], variable: "--font
 const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
 const mono = IBM_Plex_Mono({ weight: ["400", "500", "700"], subsets: ["latin"], variable: "--font-mono" });
 
+const URL_PUBLICA = `https://betofabri.com${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}`;
+const DESCRICAO =
+  "A plataforma de convites e relacionamento corporativo da CCXP. CCXP26: 03 a 06 de dezembro, São Paulo Expo.";
+
 export const metadata: Metadata = {
   title: "CCXP INSIDER · O Backstage do Backstage",
-  description: "A plataforma de convites e relacionamento corporativo da CCXP. CCXP26: 03 a 06 de dezembro, São Paulo Expo.",
+  description: DESCRICAO,
+  openGraph: {
+    title: "CCXP INSIDER",
+    description: DESCRICAO,
+    url: URL_PUBLICA,
+    siteName: "CCXP INSIDER",
+    locale: "pt_BR",
+    type: "website",
+    images: [{ url: `${URL_PUBLICA}/og.png`, width: 1200, height: 630, alt: "CCXP INSIDER · O Backstage do Backstage" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CCXP INSIDER · O Backstage do Backstage",
+    description: DESCRICAO,
+    images: [`${URL_PUBLICA}/og.png`],
+  },
 };
 
 const PAPEL_LABEL: Record<string, string> = {

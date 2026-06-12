@@ -11,7 +11,7 @@
   "workers_dev": false,
   "routes": [
     {
-      "pattern": "betofabri.com/lab/inside-ccxp*",
+      "pattern": "betofabri.com/insider-ccxp*",
       "zone_name": "betofabri.com"
     }
   ],

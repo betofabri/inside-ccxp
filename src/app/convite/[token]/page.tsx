@@ -27,12 +27,17 @@ export default async function PaginaCadastro({
   if (!convite) {
     return (
       <div className="pagina cadastro">
-        <div className="cartao-convite">
+        <div className="cartao-convite estado-convite">
+          <span className="glifo-estado" aria-hidden>?</span>
+          <span className="de-quem">CCXP INSIDER · CCXP26</span>
           <h1>Convite não encontrado</h1>
           <p className="texto-convite">
-            Esse link não é válido. Confira a mensagem que você recebeu ou peça um novo link a quem
-            convidou você.
+            Esse link não é válido — pode ter sido digitado errado ou substituído por um mais novo.
           </p>
+          <div className="proximo-passo">
+            <b>O que fazer:</b> confira a mensagem que você recebeu (o link certo é o mais recente) ou
+            peça um novo link a quem convidou você.
+          </div>
         </div>
       </div>
     );
@@ -43,15 +48,31 @@ export default async function PaginaCadastro({
   const primeiroNome = convite.convidado.nome.split(" ")[0];
 
   if (convite.status === "cancelado" || convite.status === "expirado") {
+    const expirado = convite.status === "expirado";
     return (
       <div className="pagina cadastro">
-        <div className="cartao-convite">
-          <h1>{convite.status === "cancelado" ? "Convite cancelado" : "Convite expirado"}</h1>
+        <div className="cartao-convite estado-convite">
+          <span className="glifo-estado" aria-hidden>{expirado ? "⌛" : "✕"}</span>
+          <span className="de-quem">
+            Convite de <b>{convite.host.nome}</b> · Omelete Company
+          </span>
+          <h1>{expirado ? "Esse convite venceu" : "Convite cancelado"}</h1>
           <p className="texto-convite">
-            {convite.status === "cancelado"
-              ? `Este convite foi cancelado por ${convite.host.nome}.`
-              : `O prazo de cadastro venceu em ${fmtData(convite.expiraEm)} e os códigos voltaram ao pool. Peça a ${convite.host.nome} pra reenviar o convite.`}
+            {expirado ? (
+              <>
+                {primeiroNome}, o prazo de cadastro terminou em <b>{fmtData(convite.expiraEm)}</b> e os{" "}
+                {totalIngressos} ingresso(s) reservados voltaram pro pool da CCXP26.
+              </>
+            ) : (
+              <>Este convite pra CCXP26 foi cancelado por quem convidou você.</>
+            )}
           </p>
+          <div className="proximo-passo">
+            <b>Mas calma — isso tem volta:</b> fale com <b>{convite.host.nome}</b> e peça pra{" "}
+            {expirado ? "reenviar o convite" : "enviar um novo convite"}. Leva um clique do lado de lá
+            e você recebe um link novo{expirado ? " com prazo renovado" : ""}.
+          </div>
+          <p className="nota-estado">CCXP26 · 03 a 06 de dezembro de 2026 · São Paulo Expo</p>
         </div>
       </div>
     );

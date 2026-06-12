@@ -13,7 +13,7 @@ async function exigirAdmin() {
   return persona;
 }
 
-const URL_HUB = "https://betofabri.com/lab/inside-ccxp";
+const URL_HUB = "https://betofabri.com/insider-ccxp";
 
 // {{link}} de um disparo real aponta pro convite do destinatário; no teste,
 // usamos o convite pendente mais recente como amostra pra cair na página certa
