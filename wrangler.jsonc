@@ -15,6 +15,12 @@
       "zone_name": "betofabri.com"
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "OTP",
+      "id": "6061c8931d2c41e597d4a68a03fbe172"
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",

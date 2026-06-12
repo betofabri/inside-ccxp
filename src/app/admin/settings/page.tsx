@@ -106,6 +106,11 @@ export default async function PaginaSettings({
             <label>Link de resgate (Mundo Ticket)</label>
             <input type="text" name="link_mundo_ticket" defaultValue={configs.link_mundo_ticket ?? ""} />
           </div>
+          <div className="campo">
+            <label>Email pra testes do Follow up</label>
+            <input type="email" name="email_teste" placeholder="voce@omeletecompany.com" defaultValue={configs.email_teste ?? ""} />
+            <div className="dica">Destinatário do botão Enviar teste; vazio usa o email do admin logado.</div>
+          </div>
           <div className="form-acoes">
             <button className="cta" type="submit">Salvar configurações</button>
           </div>

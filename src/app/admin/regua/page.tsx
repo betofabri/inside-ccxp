@@ -87,11 +87,11 @@ function CamposPasso({ passo }: { passo?: Passo }) {
 export default async function PaginaFollowUp({
   searchParams,
 }: {
-  searchParams: Promise<{ erro?: string; adhoc?: string; teste?: string; canal?: string }>;
+  searchParams: Promise<{ erro?: string; adhoc?: string; teste?: string; canal?: string; envio?: string; dest?: string }>;
 }) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
-  const { erro, adhoc, teste, canal } = await searchParams;
+  const { erro, adhoc, teste, canal, envio, dest } = await searchParams;
 
   const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
   const grupos = [
@@ -182,11 +182,16 @@ export default async function PaginaFollowUp({
       <AdminTabs ativa="regua" />
 
       {erro === "campos" && <div className="aviso erro">Preencha nome, assunto e mensagem da etapa.</div>}
-      {teste && (
+      {teste && envio !== "falha" && (
         <div className="aviso ok">
-          <b>Teste enviado ✓</b> (mock): &ldquo;{teste}&rdquo; disparado só pra você via{" "}
+          <b>Teste enviado ✓</b>{envio === "mock" ? " (mock, sem RESEND_API_KEY)" : " por email de verdade"}:{" "}
+          &ldquo;{teste}&rdquo; disparado pra {dest}. Canal configurado:{" "}
           {(canal ?? "email").split(",").map((c) => (c === "whatsapp" ? "WhatsApp" : "email")).join(" e ")}.
-          O envio real chega com o Resend na F4.
+        </div>
+      )}
+      {teste && envio === "falha" && (
+        <div className="aviso erro">
+          Falha no envio do teste de &ldquo;{teste}&rdquo; pra {dest}; detalhe no audit log (Settings).
         </div>
       )}
 

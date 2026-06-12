@@ -87,6 +87,7 @@ export default async function Home() {
           </header>
           <p className="desc">
             Carteira de códigos consolidada, link da Mundo Ticket e agenda do evento (perfil corporativo).
+            Já se cadastrou? <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/acesso`} style={{ textDecoration: "underline" }}>Entre com seu código</a>.
           </p>
           <ul>
             {convidados.map((c) => (

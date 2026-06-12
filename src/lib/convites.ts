@@ -325,6 +325,12 @@ export async function completarCadastro(token: string, formData: FormData) {
   });
   if (!convite || convite.status !== "pendente") redirect(`/convite/${token}`);
 
+  // com email, o cadastro exige OTP validado (prova de posse server-side)
+  if (convite.convidado.email) {
+    const { verificado } = await import("@/lib/otp");
+    if (!(await verificado(token))) redirect(`/convite/${token}`);
+  }
+
   const corporativo = convite.parcelas.some((p) => p.pool === "corporativo");
 
   const nascimentoRaw = String(formData.get("nascimento") ?? "");

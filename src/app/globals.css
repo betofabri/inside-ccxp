@@ -2515,3 +2515,11 @@ a.topo-link:hover { color: var(--ink); border-color: var(--champagne); }
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ── Input de OTP ── */
+.campo-otp {
+  font-family: var(--font-mono), monospace !important;
+  font-size: 24px !important;
+  letter-spacing: 0.45em;
+  text-align: center;
+}

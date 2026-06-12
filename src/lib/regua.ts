@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
+import { enviarEmail, templateEmail } from "@/lib/email";
 
 async function exigirAdmin() {
   const persona = await getPersona();
@@ -111,17 +112,39 @@ export async function enviarTestePasso(formData: FormData) {
   const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
   if (!passo || !admin) redirect("/admin/regua");
 
-  // envio mockado pro próprio admin; o disparo real chega com o Resend (F4)
+  // destinatário do teste: Config email_teste (Settings) ou o email do admin
+  const cfg = await db.config.findUnique({ where: { chave: "email_teste" } });
+  const destino = cfg?.valor || admin.email;
+
+  // renderiza o template com dados de amostra
+  const corpo = passo.corpo
+    .replaceAll("{{nome}}", admin.nome.split(" ")[0])
+    .replaceAll("{{host}}", admin.nome)
+    .replaceAll("{{qtd}}", "2")
+    .replaceAll("{{tipos}}", "2× Sábado")
+    .replaceAll("{{link}}", "https://betofabri.com/lab/inside-ccxp");
+
+  const envio = await enviarEmail({
+    para: destino,
+    assunto: `[TESTE] ${passo.assunto}`,
+    html: templateEmail(passo.assunto, `<p>${corpo}</p>`),
+  });
+
   await db.auditLog.create({
     data: {
       atorId: admin.id,
       acao: "teste_followup",
       alvo: `passo:${passo.rotulo}`,
-      detalhe: `teste enviado pra ${admin.email} via ${passo.canal}`,
+      detalhe: envio.mock
+        ? `teste mockado (sem RESEND_API_KEY) pra ${destino}`
+        : envio.ok
+          ? `teste REAL enviado pra ${destino} (id ${envio.id})`
+          : `falha no envio pra ${destino}: ${envio.erro}`,
     },
   });
+  const status = envio.mock ? "mock" : envio.ok ? "real" : "falha";
   redirect(
-    `/admin/regua?teste=${encodeURIComponent(passo.rotulo)}&canal=${encodeURIComponent(passo.canal)}`,
+    `/admin/regua?teste=${encodeURIComponent(passo.rotulo)}&canal=${encodeURIComponent(passo.canal)}&envio=${status}&dest=${encodeURIComponent(destino)}`,
   );
 }
 

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { TIPO_LABEL, fmtData } from "@/lib/labels";
 import { completarCadastro, entrarNaCarteira, expirarVencidos } from "@/lib/convites";
+import { solicitarOtpConvite, validarOtpConvite, verificado } from "@/lib/otp";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,10 @@ export default async function PaginaCadastro({
   searchParams,
 }: {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ erro?: string }>;
+  searchParams: Promise<{ erro?: string; otp?: string; demo?: string; falha?: string }>;
 }) {
   const { token } = await params;
-  const { erro } = await searchParams;
+  const { erro, otp, demo, falha } = await searchParams;
 
   await expirarVencidos();
 
@@ -71,6 +72,13 @@ export default async function PaginaCadastro({
     );
   }
 
+  // OTP: com email, o cadastro exige prova de posse (magic link descartado)
+  const emailConvidado = convite.convidado.email;
+  const otpOk = emailConvidado ? await verificado(token) : true;
+  const mascarado = emailConvidado
+    ? `${emailConvidado.slice(0, 2)}***@${emailConvidado.split("@")[1]}`
+    : null;
+
   const cadastrar = completarCadastro.bind(null, token);
   const telefoneAtual = convite.convidado.telefone?.replace(/^\+\d\d?/, "") ?? "";
 
@@ -95,6 +103,55 @@ export default async function PaginaCadastro({
           ))}
         </div>
 
+        {!otpOk ? (
+          <div className="form-cadastro otp-bloco">
+            <h3>Confirme que é você</h3>
+            <p className="texto-convite">
+              Por segurança, enviamos um código de 6 dígitos pra <b>{mascarado}</b>.
+            </p>
+            {falha && (
+              <div className="aviso erro">O envio falhou; tente reenviar o código.</div>
+            )}
+            {demo && (
+              <div className="aviso">
+                <b>Modo demo</b> (envio de email ainda não configurado): seu código é{" "}
+                <b className="mono">{demo}</b>.
+              </div>
+            )}
+            {erro === "codigo" && <p className="alerta">Código incorreto ou vencido; tente de novo.</p>}
+            {otp !== "enviado" ? (
+              <form action={solicitarOtpConvite}>
+                <input type="hidden" name="token" value={token} />
+                <button className="cta enviar-cadastro" type="submit">Receber código por email</button>
+              </form>
+            ) : (
+              <>
+                <form action={validarOtpConvite}>
+                  <input type="hidden" name="token" value={token} />
+                  <div className="campo">
+                    <label htmlFor="codigo">Código de 6 dígitos</label>
+                    <input
+                      id="codigo"
+                      name="codigo"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      placeholder="000000"
+                      className="campo-otp"
+                      autoFocus
+                      required
+                    />
+                  </div>
+                  <button className="cta enviar-cadastro" type="submit">Confirmar código</button>
+                </form>
+                <form action={solicitarOtpConvite} style={{ marginTop: 10, textAlign: "center" }}>
+                  <input type="hidden" name="token" value={token} />
+                  <button className="acao" type="submit">Reenviar código</button>
+                </form>
+              </>
+            )}
+          </div>
+        ) : (
         <form action={cadastrar} className="form-cadastro">
           <h3>Complete seu cadastro pra receber os códigos</h3>
 
@@ -174,6 +231,7 @@ export default async function PaginaCadastro({
             Cadastro até {fmtData(convite.expiraEm)}; depois disso o convite expira.
           </p>
         </form>
+        )}
       </div>
     </div>
   );
