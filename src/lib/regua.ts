@@ -104,6 +104,27 @@ export async function excluirPassoRegua(formData: FormData) {
   revalidatePath("/admin/regua");
 }
 
+export async function enviarTestePasso(formData: FormData) {
+  const persona = await exigirAdmin();
+  const id = Number(formData.get("passoId"));
+  const passo = await db.reguaPasso.findUnique({ where: { id } });
+  const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
+  if (!passo || !admin) redirect("/admin/regua");
+
+  // envio mockado pro próprio admin; o disparo real chega com o Resend (F4)
+  await db.auditLog.create({
+    data: {
+      atorId: admin.id,
+      acao: "teste_followup",
+      alvo: `passo:${passo.rotulo}`,
+      detalhe: `teste enviado pra ${admin.email} via ${passo.canal}`,
+    },
+  });
+  redirect(
+    `/admin/regua?teste=${encodeURIComponent(passo.rotulo)}&canal=${encodeURIComponent(passo.canal)}`,
+  );
+}
+
 export async function enviarMensagemAdHoc(formData: FormData) {
   const persona = await exigirAdmin();
   const audiencia = String(formData.get("audiencia") ?? "vips");

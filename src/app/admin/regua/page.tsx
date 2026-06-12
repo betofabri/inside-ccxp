@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import {
   alternarPassoRegua,
+  enviarTestePasso,
   salvarPassoRegua,
   criarPassoRegua,
   excluirPassoRegua,
@@ -86,11 +87,11 @@ function CamposPasso({ passo }: { passo?: Passo }) {
 export default async function PaginaFollowUp({
   searchParams,
 }: {
-  searchParams: Promise<{ erro?: string; adhoc?: string }>;
+  searchParams: Promise<{ erro?: string; adhoc?: string; teste?: string; canal?: string }>;
 }) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
-  const { erro, adhoc } = await searchParams;
+  const { erro, adhoc, teste, canal } = await searchParams;
 
   const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
   const grupos = [
@@ -129,12 +130,20 @@ export default async function PaginaFollowUp({
             ))}
           </span>
         </div>
-        <form action={alternarPassoRegua}>
-          <input type="hidden" name="passoId" value={passo.id} />
-          <button className={`toggle-passo ${passo.ativo ? "on" : ""}`} type="submit">
-            {passo.ativo ? "Ativo" : "Pausado"}
-          </button>
-        </form>
+        <div className="passo-controles">
+          <form action={enviarTestePasso}>
+            <input type="hidden" name="passoId" value={passo.id} />
+            <button className="acao" type="submit" title="Dispara este passo só pro seu email (mock)">
+              Enviar teste
+            </button>
+          </form>
+          <form action={alternarPassoRegua}>
+            <input type="hidden" name="passoId" value={passo.id} />
+            <button className={`toggle-passo ${passo.ativo ? "on" : ""}`} type="submit">
+              {passo.ativo ? "Ativo" : "Pausado"}
+            </button>
+          </form>
+        </div>
       </div>
       <div className="passo-corpo">
         <div className="assunto">{passo.assunto}</div>
@@ -173,6 +182,14 @@ export default async function PaginaFollowUp({
       <AdminTabs ativa="regua" />
 
       {erro === "campos" && <div className="aviso erro">Preencha nome, assunto e mensagem da etapa.</div>}
+      {teste && (
+        <div className="aviso ok">
+          <b>Teste enviado ✓</b> (mock): &ldquo;{teste}&rdquo; disparado só pra você via{" "}
+          {(canal ?? "email").split(",").map((c) => (c === "whatsapp" ? "WhatsApp" : "email")).join(" e ")}.
+          O envio real chega com o Resend na F4.
+        </div>
+      )}
+
       {adhoc && (
         <div className="aviso ok">
           <b>Mensagem enviada ✓</b> (mock) pra {adhoc} convidado(s). Registrada no log de comunicação de cada um.

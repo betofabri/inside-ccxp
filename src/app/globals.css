@@ -410,6 +410,13 @@ details.secao summary:hover h2::after { border-color: var(--champagne); }
 
 .passo-titulo .canais { display: flex; gap: 6px; }
 
+.passo-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .toggle-passo {
   font-family: inherit;
   font-size: 12.5px;
