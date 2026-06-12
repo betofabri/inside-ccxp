@@ -2731,3 +2731,112 @@ details.secao[open] > *:not(summary) {
 @media (max-width: 760px) {
   .ficha-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Mini pesquisa de afinidade ────────────────────────────────────────────── */
+
+.pesquisa-afinidade { max-width: 620px; margin: 0 auto; }
+
+.chips-interesses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.chip-interesse {
+  padding: 10px 18px;
+  font-size: 14.5px;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.chip-interesse:hover {
+  border-color: var(--champagne);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.chip-interesse.ativo {
+  color: var(--ink-on-accent);
+  background: var(--champagne);
+  border-color: var(--champagne);
+  font-weight: 600;
+}
+
+.chip-interesse:active { transform: scale(0.97); }
+
+.interesses-lista { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── Gestão de usuários (P0) ───────────────────────────────────────────────── */
+
+.lista-usuarios { display: grid; gap: 12px; }
+
+.usuario-card {
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  border-radius: var(--radius-m);
+  padding: 16px 18px;
+}
+
+.usuario-card.desativado { opacity: 0.55; }
+
+.usuario-cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 14px;
+}
+
+.usuario-id { display: flex; flex-direction: column; gap: 2px; }
+.usuario-id b { font-size: 16px; }
+.usuario-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.badge.erro {
+  color: var(--st-cancelado);
+  border-color: color-mix(in oklab, var(--st-cancelado) 45%, transparent);
+}
+
+.usuario-metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 14px 0 4px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border-radius: var(--radius-s);
+}
+
+.usuario-metricas dt {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.usuario-metricas dd { margin: 2px 0 0; font-size: 15px; }
+
+.check-linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* ── Backstage (admin oculto) ──────────────────────────────────────────────── */
+
+.lista-backstage {
+  list-style: none;
+  margin: 22px auto 0;
+  padding: 0;
+  max-width: 380px;
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}

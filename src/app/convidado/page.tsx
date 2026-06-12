@@ -10,9 +10,9 @@ export const dynamic = "force-dynamic";
 export default async function PaginaConvidado({
   searchParams,
 }: {
-  searchParams: Promise<{ cadastro?: string }>;
+  searchParams: Promise<{ cadastro?: string; interesses?: string }>;
 }) {
-  const { cadastro } = await searchParams;
+  const { cadastro, interesses } = await searchParams;
   const persona = await getPersona();
   if (!persona || persona.role !== "convidado") redirect("/");
 
@@ -51,6 +51,23 @@ export default async function PaginaConvidado({
         <div className="aviso ok">
           <b>Cadastro concluído ✓</b> Bem-vindo(a) ao CCXP INSIDER — seus códigos já estão na carteira
           abaixo.
+        </div>
+      )}
+      {interesses === "ok" && (
+        <div className="aviso ok">
+          <b>Interesses salvos ✓</b> Valeu! Agora a experiência fica com a sua cara.
+        </div>
+      )}
+      {!convidado.interesses && cadastro !== "ok" && (
+        <div className="aviso">
+          <b>10 segundos:</b> conta pra gente{" "}
+          <a
+            href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/convidado/interesses?origem=carteira`}
+            style={{ textDecoration: "underline" }}
+          >
+            o que te atrai na CCXP
+          </a>{" "}
+          — deixa os convites e a programação com a sua cara.
         </div>
       )}
       <h1>Sua carteira, {convidado.nome.split(" ")[0]}</h1>

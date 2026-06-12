@@ -8,16 +8,16 @@ export const dynamic = "force-dynamic";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ reset?: string; qtd?: string; token?: string }>;
+  searchParams: Promise<{ reset?: string; qtd?: string; token?: string; erro?: string }>;
 }) {
-  const { reset, qtd, token } = await searchParams;
-  const funcionarios = await db.funcionario.findMany({ orderBy: { id: "asc" } });
+  const { reset, qtd, token, erro } = await searchParams;
+  // só ativos aparecem no hub; admin entra por /backstage (fora da navegação)
+  const funcionarios = await db.funcionario.findMany({ where: { ativo: true }, orderBy: { id: "asc" } });
   const convidados = await db.convidado.findMany({
     orderBy: { id: "asc" },
     include: { convites: true },
   });
 
-  const admins = funcionarios.filter((f) => f.isAdmin);
   const hosts = funcionarios; // todo funcionário é host; VP/Head ganha visão geral extra
 
   return (
@@ -37,31 +37,14 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="personas">
-        <div className="persona-col">
-          <header>
-            Admin <span className="num">master</span>
-          </header>
-          <p className="desc">
-            Vê tudo: funil, pool corporativo, convidados, audit log e configurações. Também convida (tem as duas cotas).
-          </p>
-          <ul>
-            {admins.map((f) => (
-              <li key={f.id}>
-                <form action={assumirPersona}>
-                  <input type="hidden" name="role" value="admin" />
-                  <input type="hidden" name="id" value={f.id} />
-                  <button className="persona-btn" type="submit">
-                    <span className="nome">{f.nome}</span>
-                    <span className="meta">{NIVEL_LABEL[f.nivel]}</span>
-                    <span className="seta">→</span>
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
+      {erro === "desativado" && (
+        <div className="aviso erro" style={{ maxWidth: 720, margin: "18px auto 0" }}>
+          Esse acesso foi desativado pelo admin. Fale com a equipe CCXP INSIDER.
         </div>
+      )}
 
+      {/* Admin fora da navegação (P4): entrada só por /backstage */}
+      <section className="personas">
         <div className="persona-col">
           <header>
             Colaborador O&CO <span className="num">host</span>

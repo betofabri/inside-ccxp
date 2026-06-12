@@ -234,6 +234,20 @@ export default async function PaginaFootprint({
                 <div><dt>Instagram</dt><dd className="mono">{selecionado.instagram ?? "—"}</dd></div>
                 <div><dt>LinkedIn</dt><dd className="mono">{selecionado.linkedin ?? "—"}</dd></div>
                 <div><dt>Anfitriões</dt><dd>{ficha.anfitrioes.join(", ")}</dd></div>
+                <div>
+                  <dt>Interesses declarados</dt>
+                  <dd>
+                    {selecionado.interesses ? (
+                      <span className="interesses-lista">
+                        {(JSON.parse(selecionado.interesses) as string[]).map((i) => (
+                          <span className="badge solido" key={i}>{i}</span>
+                        ))}
+                      </span>
+                    ) : (
+                      "— (mini pesquisa não respondida)"
+                    )}
+                  </dd>
+                </div>
               </dl>
               <RadarPerfil dados={radarDoConvidado(selecionado.id)} />
             </div>

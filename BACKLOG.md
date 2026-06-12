@@ -7,14 +7,12 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 
 ## P0 — Fundacional (destrava o resto)
 
-### 1. Gestão de usuários ⬜
+### 1. Gestão de usuários 🟡 (núcleo feito 12/jun — auth real fica pra produção)
 
-Único núcleo ainda não no code (hoje o acesso é via switcher de personas do protótipo).
-
-- CRUD de usuários
-- Papéis: admin / host / produção / portaria (quem vê o quê)
-- Convidar host por email, desativar acesso, reset de sessão
-- Quota por host (quantas cortesias pode distribuir) + histórico (taxa de comparecimento dos convidados dele)
+- CRUD de usuários ✅ — aba **Usuários** no admin (`/admin/usuarios`): criar, editar, lista com cards
+- Papéis: admin / host / produção / portaria ✅ — campo `papel` no schema + seletor; o gating fino de "quem vê o quê" por papel entra com a auth real (F6)
+- Convidar host por email ✅ (boas-vindas via Resend, mock sem chave) · desativar/reativar acesso ✅ (some do hub, não assume persona, não se auto-desativa) · reset de sessão ⬜ (depende de sessão real — hoje é cookie de persona do protótipo)
+- Quota por host ✅ (códigos disponíveis) + histórico ✅ (convites, resgatados, % de comparecimento por host)
 
 ## P1 — Funil de relacionamento (alto valor, início do ciclo)
 
@@ -25,7 +23,7 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 - Enviado antes de saber os dias que ela vai (reservar data, gerar expectativa, reduzir recusa)
 - Demonstração de interesse mora na mini pesquisa (item 3)
 
-### 3. Mini pesquisa de interesse (pós-token, 1º acesso do convidado) ⬜
+### 3. Mini pesquisa de interesse (pós-token, 1º acesso do convidado) ✅ (12/jun)
 
 - Estilo "app de relacionamento": chips/cards selecionáveis, leve e rápido
 - Pergunta: o que te atrai na CCXP e no universo geek? (múltipla escolha)
@@ -144,10 +142,10 @@ Perfumaria (12/jun):
 - Acesso sem código ou sem perfil → página estilo landing (hoje abre o switcher de personas do protótipo)
 - Texto descritivo curto + duas opções: "Sou host" / "Sou convidado"
 
-### 13. Admin oculto ⬜ ⚠️ (subiu de prioridade)
+### 13. Admin oculto ✅ (12/jun)
 
-- Acessível apenas por link direto (fora da navegação)
-- ⚠️ Urgência nova: desde 12/jun o app está **público** em `betofabri.com/insider-ccxp` (fora do Cloudflare Access, pra testar com convidados reais e ter preview de link). O switcher de personas — incluindo Admin — está acessível a qualquer um com o link. Ok pra fase de teste com dados de exemplo; resolver antes de circular o link amplamente.
+- Coluna Admin saiu do hub; entrada do admin só por **`/backstage`** (link direto, fora da navegação, sem menção no hub)
+- Nota: segurança real (não só obscuridade) chega com a auth do item 1 / F6
 
 ### 14. Mobile — topo colapsado 🟡
 

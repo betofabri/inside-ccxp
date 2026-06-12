@@ -40,3 +40,22 @@ export const NIVEL_LABEL: Record<string, string> = {
 
 export const fmtData = (d: Date) =>
   d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+export const PAPEL_OPERACIONAL_LABEL: Record<string, string> = {
+  host: "Host",
+  producao: "Produção",
+  portaria: "Portaria",
+};
+
+// Mini pesquisa de afinidade (P1): o que te atrai na CCXP e no universo geek?
+export const INTERESSES_OPCOES = [
+  "Quadrinhos",
+  "Games",
+  "Terror",
+  "Filmes",
+  "Anime",
+  "Momento com a família",
+  "Negócios",
+  "Networking",
+  "Oportunidades de patrocínio",
+];

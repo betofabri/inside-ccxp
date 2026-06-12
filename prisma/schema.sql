@@ -5,7 +5,9 @@ CREATE TABLE "Funcionario" (
     "email" TEXT NOT NULL,
     "nivel" TEXT NOT NULL,
     "podeCorporativo" BOOLEAN NOT NULL DEFAULT false,
-    "isAdmin" BOOLEAN NOT NULL DEFAULT false
+    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
+    "papel" TEXT NOT NULL DEFAULT 'host',
+    "ativo" BOOLEAN NOT NULL DEFAULT true
 );
 
 -- CreateTable
@@ -62,7 +64,8 @@ CREATE TABLE "Convidado" (
     "linkedin" TEXT,
     "consentimentoEm" DATETIME,
     "optoutRegua" BOOLEAN NOT NULL DEFAULT false,
-    "resgateDeclarado" BOOLEAN NOT NULL DEFAULT false
+    "resgateDeclarado" BOOLEAN NOT NULL DEFAULT false,
+    "interesses" TEXT
 );
 
 -- CreateTable

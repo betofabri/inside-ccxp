@@ -25,6 +25,10 @@ model Funcionario {
   nivel           String
   podeCorporativo Boolean   @default(false)
   isAdmin         Boolean   @default(false)
+  // papel operacional: host | producao | portaria (quem vê o quê)
+  papel           String    @default("host")
+  // desativado: some do hub e não consegue assumir persona
+  ativo           Boolean   @default(true)
   codigos         Codigo[]
   convites        Convite[]
 }
@@ -87,6 +91,8 @@ model Convidado {
   consentimentoEm  DateTime?
   optoutRegua      Boolean         @default(false)
   resgateDeclarado Boolean         @default(false)
+  // mini pesquisa de afinidade (JSON array de strings), respondida antes do resgate
+  interesses       String?
   convites         Convite[]
   comunicacoes     ComunicacaoLog[]
 }
