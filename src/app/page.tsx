@@ -1,10 +1,16 @@
 import { db } from "@/lib/db";
 import { assumirPersona } from "@/lib/actions";
+import { resetarDemoConvidado } from "@/lib/demo";
 import { NIVEL_LABEL } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ reset?: string; qtd?: string; token?: string }>;
+}) {
+  const { reset, qtd, token } = await searchParams;
   const funcionarios = await db.funcionario.findMany({ orderBy: { id: "asc" } });
   const convidados = await db.convidado.findMany({
     orderBy: { id: "asc" },
@@ -110,6 +116,42 @@ export default async function Home() {
             ))}
           </ul>
         </div>
+      </section>
+
+      <section className="demo-reset">
+        {reset === "ok" && (
+          <div className="aviso ok">
+            <b>Demo resetada ✓</b> {qtd} convite(s) de volta pra pendente — OTP e cadastro vão rodar de
+            novo.{" "}
+            {token && (
+              <a
+                href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/convite/${token}`}
+                style={{ textDecoration: "underline" }}
+              >
+                Abrir o convite de teste
+              </a>
+            )}
+          </div>
+        )}
+        {reset === "nada" && (
+          <div className="aviso">
+            Nada pra resetar: o convidado de teste não tem convite cadastrado no momento.
+          </div>
+        )}
+        {reset === "sem_config" && (
+          <div className="aviso erro">
+            Defina o <b>email pra testes</b> em Admin → Settings antes de usar o reset.
+          </div>
+        )}
+        <form action={resetarDemoConvidado}>
+          <button className="acao" type="submit" title="Volta os convites cadastrados do convidado de teste pra pendente — o funil completo (OTP + cadastro) roda de novo">
+            ↺ Resetar demo do convidado
+          </button>
+        </form>
+        <span className="dica">
+          Volta o convidado de teste (email de testes do Settings) pro estado pré-cadastro, pra rodar o
+          funil completo de novo.
+        </span>
       </section>
     </>
   );

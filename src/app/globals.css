@@ -2641,3 +2641,18 @@ details.secao[open] > *:not(summary) {
   text-transform: uppercase;
   color: var(--faint);
 }
+
+/* ── Reset de demo no hub ──────────────────────────────────────────────────── */
+
+.demo-reset {
+  margin-top: 34px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--line-soft);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.demo-reset .aviso { flex-basis: 100%; margin: 0 0 6px; }
+.demo-reset .dica { margin: 0; max-width: 52ch; }
