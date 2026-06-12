@@ -157,6 +157,9 @@ Perfumaria (12/jun):
 
 ## P5 — Polish (fase final)
 
+- ⬜ **Semiótica de sucesso = verde** (12/jun): a tela de sucesso pós-envio do convite (passo 3 do wizard) precisa de confirmação verde inequívoca — e auditar TODOS os estados de sucesso do app (avisos ✓, demo resetada, teste enviado, cadastro concluído, configurações salvas) pra ficarem verdes de forma consistente, não champagne/neutro
+- ⬜ Perfumaria do sucesso: **confetes em JavaScript** pulando na confirmação (convite enviado, cadastro concluído) — diversão calibrada, com `prefers-reduced-motion` desligando
+
 - ✅ Hub: botão de navegação entre páginas mais marcado (borda, fundo, seta sempre visível)
 - ✅ Microinterações: fade de entrada de página, seções colapsáveis, modal, hover-lifts (com `prefers-reduced-motion`)
 - ⬜ Card profile: mouseover (vindo do fade / arrasta)
