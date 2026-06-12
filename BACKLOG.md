@@ -126,6 +126,16 @@ Falta pra virar real:
 Perfumaria (12/jun):
 
 - ⬜ Cards pessoais com cara de game: badges como conquistas visuais, com uma **imagem/arte própria pra cada badge** (Terror Master, Shopper, CCXP Fan...) em vez de chips de texto — estética de achievement desbloqueado
+- ⬜ **Gráfico radar do perfil** ao lado do card de perfil do convidado na ficha individual — 7 eixos:
+  1. Tempo (horas no evento)
+  2. Quantidade de dias
+  3. Quantidade de painéis
+  4. Compras
+  5. Alimentação
+  6. VIP area
+  7. M&G (meet & greet)
+  - Modelo de referência: radar chart shadcn/recharts com **glowing stroke** (traço com filtro `feGaussianBlur` de glow, grid pontilhado, fill none) — adaptar pro nosso design system como nos outros gráficos: **sem Tailwind/shadcn**, recharts puro (já instalado) + tokens CSS (traço champagne ou gradiente Insider, grid `--line-soft`, tooltip no padrão dos cards), valores normalizados 0–100 por eixo pra escala comparável
+  - Mesmo dado que alimenta os insights AI (bipagens agregadas por `credentialId`) — dá pra nascer com mock agora e plugar no real junto com o resto da Footprint
 
 ## P4 — Responsivo / Acesso
 
