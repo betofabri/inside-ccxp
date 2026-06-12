@@ -387,7 +387,7 @@ export async function completarCadastro(token: string, formData: FormData) {
     JSON.stringify({ role: "convidado", id: convite.convidadoId }),
     { path: "/" },
   );
-  redirect("/convidado");
+  redirect("/convidado?cadastro=ok");
 }
 
 export async function entrarNaCarteira(formData: FormData) {

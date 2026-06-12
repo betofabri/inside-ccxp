@@ -2656,3 +2656,78 @@ details.secao[open] > *:not(summary) {
 
 .demo-reset .aviso { flex-basis: 100%; margin: 0 0 6px; }
 .demo-reset .dica { margin: 0; max-width: 52ch; }
+
+/* ── Semiótica de sucesso: verde, sem ambiguidade ──────────────────────────── */
+
+:root { --sucesso: var(--st-resgatado); }
+
+.selo-sucesso {
+  background: var(--sucesso);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--sucesso) 35%, transparent);
+}
+
+.painel.sucesso {
+  border-color: color-mix(in oklab, var(--sucesso) 38%, var(--line));
+}
+
+.aviso.ok {
+  background: color-mix(in oklab, var(--sucesso) 7%, transparent);
+}
+
+/* ── Confetes 🎉 ───────────────────────────────────────────────────────────── */
+
+.confetes {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.confetes span {
+  position: absolute;
+  top: -14px;
+  border-radius: 2px;
+  opacity: 0;
+  transform: rotate(var(--rot));
+  animation: confete-cai linear forwards;
+}
+
+@keyframes confete-cai {
+  0% { opacity: 1; transform: translateY(-12px) rotate(var(--rot)); }
+  100% { opacity: 0.85; transform: translateY(105vh) rotate(calc(var(--rot) + 560deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetes { display: none; }
+}
+
+/* ── Ficha do Footprint: dados + radar lado a lado ─────────────────────────── */
+
+.ficha-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.radar-perfil {
+  border: 1px solid var(--line-soft);
+  background: var(--surface-2);
+  border-radius: var(--radius-m);
+  padding: 12px 8px 14px;
+  text-align: center;
+}
+
+.radar-legenda {
+  display: block;
+  margin-top: 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+@media (max-width: 760px) {
+  .ficha-grid { grid-template-columns: 1fr; }
+}

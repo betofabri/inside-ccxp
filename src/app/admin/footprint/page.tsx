@@ -6,8 +6,17 @@ import { FOOTPRINT_ENABLED } from "@/lib/flags";
 import { TIPO_LABEL } from "@/lib/labels";
 import type { BipagemEvento } from "@/lib/footprint";
 import AdminTabs from "../admin-tabs";
+import RadarPerfil from "./radar-perfil";
 
 export const dynamic = "force-dynamic";
+
+// Radar de perfil (mock determinístico por convidado, 0–100 por eixo)
+const EIXOS_RADAR = ["Tempo", "Dias", "Painéis", "Compras", "Alimentação", "VIP Area", "M&G"];
+const radarDoConvidado = (id: number) =>
+  EIXOS_RADAR.map((eixo, i) => ({
+    eixo,
+    valor: 28 + ((id * 37 + i * 47 + (id + 2) * (i + 1) * 13) % 68),
+  }));
 
 const norm = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -206,25 +215,28 @@ export default async function PaginaFootprint({
               <h2 style={{ border: "none", paddingBottom: 0 }}>{selecionado.nome}</h2>
               <span className="badge solido">{ficha.credentialId}</span>
             </div>
-            {/* dados básicos: tudo que o convidado preencheu no cadastro */}
-            <dl className="ficha-dados">
-              <div><dt>Empresa</dt><dd>{selecionado.empresa ?? "—"}</dd></div>
-              <div><dt>Cargo</dt><dd>{selecionado.cargo ?? "—"}</dd></div>
-              <div><dt>Email</dt><dd className="mono">{selecionado.email ?? "—"}</dd></div>
-              <div><dt>WhatsApp</dt><dd className="mono">{selecionado.telefone ?? "—"}</dd></div>
-              <div>
-                <dt>Nascimento</dt>
-                <dd>
-                  {selecionado.nascimento
-                    ? // data pura: formata em UTC pra não escorregar um dia no fuso
-                      selecionado.nascimento.toLocaleDateString("pt-BR", { timeZone: "UTC" })
-                    : "—"}
-                </dd>
-              </div>
-              <div><dt>Instagram</dt><dd className="mono">{selecionado.instagram ?? "—"}</dd></div>
-              <div><dt>LinkedIn</dt><dd className="mono">{selecionado.linkedin ?? "—"}</dd></div>
-              <div><dt>Anfitriões</dt><dd>{ficha.anfitrioes.join(", ")}</dd></div>
-            </dl>
+            {/* dados básicos + radar de comportamento lado a lado */}
+            <div className="ficha-grid">
+              <dl className="ficha-dados">
+                <div><dt>Empresa</dt><dd>{selecionado.empresa ?? "—"}</dd></div>
+                <div><dt>Cargo</dt><dd>{selecionado.cargo ?? "—"}</dd></div>
+                <div><dt>Email</dt><dd className="mono">{selecionado.email ?? "—"}</dd></div>
+                <div><dt>WhatsApp</dt><dd className="mono">{selecionado.telefone ?? "—"}</dd></div>
+                <div>
+                  <dt>Nascimento</dt>
+                  <dd>
+                    {selecionado.nascimento
+                      ? // data pura: formata em UTC pra não escorregar um dia no fuso
+                        selecionado.nascimento.toLocaleDateString("pt-BR", { timeZone: "UTC" })
+                      : "—"}
+                  </dd>
+                </div>
+                <div><dt>Instagram</dt><dd className="mono">{selecionado.instagram ?? "—"}</dd></div>
+                <div><dt>LinkedIn</dt><dd className="mono">{selecionado.linkedin ?? "—"}</dd></div>
+                <div><dt>Anfitriões</dt><dd>{ficha.anfitrioes.join(", ")}</dd></div>
+              </dl>
+              <RadarPerfil dados={radarDoConvidado(selecionado.id)} />
+            </div>
             <div className="sub" style={{ marginTop: 14 }}>
               <span>Ingressos:</span>
               {ficha.tipos.map((t) => (

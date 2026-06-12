@@ -3,10 +3,16 @@ import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPO_LABEL, fmtData } from "@/lib/labels";
 import Ticket from "./ticket";
+import Confetes from "@/components/confetes";
 
 export const dynamic = "force-dynamic";
 
-export default async function PaginaConvidado() {
+export default async function PaginaConvidado({
+  searchParams,
+}: {
+  searchParams: Promise<{ cadastro?: string }>;
+}) {
+  const { cadastro } = await searchParams;
   const persona = await getPersona();
   if (!persona || persona.role !== "convidado") redirect("/");
 
@@ -40,6 +46,13 @@ export default async function PaginaConvidado() {
 
   return (
     <div className="pagina">
+      {cadastro === "ok" && <Confetes />}
+      {cadastro === "ok" && (
+        <div className="aviso ok">
+          <b>Cadastro concluído ✓</b> Bem-vindo(a) ao CCXP INSIDER — seus códigos já estão na carteira
+          abaixo.
+        </div>
+      )}
       <h1>Sua carteira, {convidado.nome.split(" ")[0]}</h1>
       <div className="sub">
         <span className="mono">{convidado.email ?? convidado.telefone}</span>

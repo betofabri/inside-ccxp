@@ -126,7 +126,7 @@ Falta pra virar real:
 Perfumaria (12/jun):
 
 - ⬜ Cards pessoais com cara de game: badges como conquistas visuais, com uma **imagem/arte própria pra cada badge** (Terror Master, Shopper, CCXP Fan...) em vez de chips de texto — estética de achievement desbloqueado
-- ⬜ **Gráfico radar do perfil** ao lado do card de perfil do convidado na ficha individual — 7 eixos:
+- 🟡 **Gráfico radar do perfil** ao lado do card de perfil do convidado na ficha individual — FEITO com mock determinístico (12/jun, `radar-perfil.tsx`, glowing-stroke recharts no design system); falta plugar dado real via P2.5 — 7 eixos:
   1. Tempo (horas no evento)
   2. Quantidade de dias
   3. Quantidade de painéis
@@ -157,8 +157,8 @@ Perfumaria (12/jun):
 
 ## P5 — Polish (fase final)
 
-- ⬜ **Semiótica de sucesso = verde** (12/jun): a tela de sucesso pós-envio do convite (passo 3 do wizard) precisa de confirmação verde inequívoca — e auditar TODOS os estados de sucesso do app (avisos ✓, demo resetada, teste enviado, cadastro concluído, configurações salvas) pra ficarem verdes de forma consistente, não champagne/neutro
-- ⬜ Perfumaria do sucesso: **confetes em JavaScript** pulando na confirmação (convite enviado, cadastro concluído) — diversão calibrada, com `prefers-reduced-motion` desligando
+- ✅ **Semiótica de sucesso = verde** (12/jun): selo ✓ do wizard verde com glow, painel de sucesso com borda verde, avisos .ok com tint verde de fundo, aviso verde "Cadastro concluído ✓" na chegada à carteira (token `--sucesso`)
+- ✅ Perfumaria do sucesso: **confetes em JavaScript** (`src/components/confetes.tsx`, paleta Insider + verde) no convite enviado e no cadastro concluído — com `prefers-reduced-motion` desligando
 
 - ✅ Hub: botão de navegação entre páginas mais marcado (borda, fundo, seta sempre visível)
 - ✅ Microinterações: fade de entrada de página, seções colapsáveis, modal, hover-lifts (com `prefers-reduced-motion`)

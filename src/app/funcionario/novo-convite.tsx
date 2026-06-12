@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { criarConvite, type CriarConviteResultado } from "@/lib/convites";
+import Confetes from "@/components/confetes";
 
 type TipoInfo = {
   tipo: string;
@@ -195,6 +196,7 @@ export default function NovoConvite({ podeCorporativo, tipos, empresas, anterior
   if (resultado?.ok) {
     return (
       <div className="composer wizard">
+        <Confetes />
         <div className="painel sucesso">
           <div className="selo-sucesso" aria-hidden>✓</div>
           <h3 className="titulo-sucesso">
