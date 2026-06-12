@@ -2,6 +2,8 @@
 
 Estado em 11/jun/2026. Fases do plano original em `~/Downloads/plano_rsvp_ccxp_final.md` (§12).
 
+> **O backlog vivo e priorizado está em [`BACKLOG.md`](BACKLOG.md)** — é lá que os status são atualizados. Este arquivo guarda o histórico por fases (F0–F6) e as decisões registradas.
+
 ## Feito
 
 - **F0 — Scaffold**: Next 16 + Prisma 7/SQLite, modelo §11 (+ empresa/cargo/nascimento no Convidado, vip na ConviteParcela), switcher de papéis, seed rico, identidade CCXP (escuro premium, champagne, cor por tipo de ingresso).
