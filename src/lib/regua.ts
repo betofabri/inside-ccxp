@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { enviarEmail, templateEmail } from "@/lib/email";
+import { enviarEmail, templateEmail, linkar } from "@/lib/email";
 
 async function exigirAdmin() {
   const persona = await getPersona();
@@ -127,7 +127,10 @@ export async function enviarTestePasso(formData: FormData) {
   const envio = await enviarEmail({
     para: destino,
     assunto: `[TESTE] ${passo.assunto}`,
-    html: templateEmail(passo.assunto, `<p>${corpo}</p>`),
+    html: templateEmail(passo.assunto, `<p>${linkar(corpo)}</p>`, {
+      cta: { texto: "Abrir o CCXP INSIDER", url: "https://betofabri.com/lab/inside-ccxp" },
+      notaRodape: `Disparo de teste do passo "${passo.rotulo}" (${passo.timing}) · canal: ${passo.canal}.`,
+    }),
   });
 
   await db.auditLog.create({

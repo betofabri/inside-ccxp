@@ -33,7 +33,7 @@ async function enviarCodigo(chaveKv: string, email: string) {
     html: templateEmail(
       "Seu código de acesso",
       `<p>Use o código abaixo pra confirmar que é você. Ele vale por 10 minutos.</p>
-       <p style="font-size:30px;letter-spacing:.3em;color:#e3c98e;font-weight:bold;margin:18px 0;">${codigo}</p>
+       <p style="font-size:32px;letter-spacing:.3em;color:#E3C98E;font-weight:bold;margin:20px 0;font-family:Courier,monospace;">${codigo}</p>
        <p>Se você não pediu este código, ignore este email.</p>`,
     ),
   });
