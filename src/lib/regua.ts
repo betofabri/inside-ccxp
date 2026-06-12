@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { enviarEmail, templateEmail, linkar } from "@/lib/email";
+import { enviarWhatsApp } from "@/lib/whatsapp";
 
 async function exigirAdmin() {
   const persona = await getPersona();
@@ -162,6 +163,49 @@ export async function enviarTestePasso(formData: FormData) {
   const status = envio.mock ? "mock" : envio.ok ? "real" : "falha";
   redirect(
     `/admin/regua?teste=${encodeURIComponent(passo.rotulo)}&canal=${encodeURIComponent(passo.canal)}&envio=${status}&dest=${encodeURIComponent(destino)}`,
+  );
+}
+
+export async function enviarTesteWhatsPasso(formData: FormData) {
+  const persona = await exigirAdmin();
+  const id = Number(formData.get("passoId"));
+  const passo = await db.reguaPasso.findUnique({ where: { id } });
+  const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
+  if (!passo || !admin) redirect("/admin/regua");
+
+  // destinatário do teste: Config whats_teste (Settings)
+  const cfg = await db.config.findUnique({ where: { chave: "whats_teste" } });
+  const destino = cfg?.valor;
+  if (!destino) redirect("/admin/regua?erro=sem_whats");
+
+  const link = await linkAmostraTeste();
+  const corpo = passo.corpo
+    .replaceAll("{{nome}}", admin.nome.split(" ")[0])
+    .replaceAll("{{host}}", admin.nome)
+    .replaceAll("{{qtd}}", "2")
+    .replaceAll("{{tipos}}", "2× Sábado")
+    .replaceAll("{{link}}", link);
+
+  const envio = await enviarWhatsApp({
+    para: destino,
+    corpo: `*[TESTE] ${passo.assunto}*\n\n${corpo}\n\n_CCXP INSIDER · CCXP26 · 03 a 06/dez · São Paulo Expo_`,
+  });
+
+  await db.auditLog.create({
+    data: {
+      atorId: admin.id,
+      acao: "teste_followup_whats",
+      alvo: `passo:${passo.rotulo}`,
+      detalhe: envio.mock
+        ? `teste mockado (sem WHATSAPP_TOKEN) pra ${destino}`
+        : envio.ok
+          ? `teste REAL via Cloud API pra ${destino} (id ${envio.id})`
+          : `falha no envio pra ${destino}: ${envio.erro}`,
+    },
+  });
+  const status = envio.mock ? "mock" : envio.ok ? "real" : "falha";
+  redirect(
+    `/admin/regua?teste=${encodeURIComponent(passo.rotulo)}&via=whats&envio=${status}&dest=${encodeURIComponent(destino)}${envio.erro ? `&detalhe=${encodeURIComponent(envio.erro)}` : ""}`,
   );
 }
 

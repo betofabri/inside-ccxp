@@ -106,10 +106,17 @@ export default async function PaginaSettings({
             <label>Link de resgate (Mundo Ticket)</label>
             <input type="text" name="link_mundo_ticket" defaultValue={configs.link_mundo_ticket ?? ""} />
           </div>
-          <div className="campo">
-            <label>Email pra testes do Follow up</label>
-            <input type="email" name="email_teste" placeholder="voce@omeletecompany.com" defaultValue={configs.email_teste ?? ""} />
-            <div className="dica">Destinatário do botão Enviar teste; vazio usa o email do admin logado.</div>
+          <div className="campo-dupla">
+            <div className="campo">
+              <label>Email pra testes do Follow up</label>
+              <input type="email" name="email_teste" placeholder="voce@omeletecompany.com" defaultValue={configs.email_teste ?? ""} />
+              <div className="dica">Destinatário do botão Testar por email; vazio usa o email do admin logado.</div>
+            </div>
+            <div className="campo">
+              <label>WhatsApp pra testes do Follow up</label>
+              <input type="tel" name="whats_teste" placeholder="+55 11 99999-8888" defaultValue={configs.whats_teste ?? ""} />
+              <div className="dica">Destinatário do Testar no WhatsApp (Cloud API); no app de teste da Meta, precisa estar na lista de números verificados.</div>
+            </div>
           </div>
           <div className="form-acoes">
             <button className="cta" type="submit">Salvar configurações</button>

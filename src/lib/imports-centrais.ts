@@ -138,7 +138,7 @@ export async function processarCsv(
 
 export async function salvarConfigs(formData: FormData) {
   const persona = await exigirAdmin();
-  const chaves = ["expiracao_dias", "link_mundo_ticket", "evento_inicio", "evento_fim", "evento_local", "email_teste"];
+  const chaves = ["expiracao_dias", "link_mundo_ticket", "evento_inicio", "evento_fim", "evento_local", "email_teste", "whats_teste"];
   for (const chave of chaves) {
     const valor = String(formData.get(chave) ?? "").trim();
     if (!valor) continue;

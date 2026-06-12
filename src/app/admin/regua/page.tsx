@@ -8,6 +8,7 @@ import {
   criarPassoRegua,
   excluirPassoRegua,
   enviarMensagemAdHoc,
+  enviarTesteWhatsPasso,
   linkAmostraTeste,
 } from "@/lib/regua";
 import AdminTabs from "../admin-tabs";
@@ -88,12 +89,21 @@ function CamposPasso({ passo }: { passo?: Passo }) {
 export default async function PaginaFollowUp({
   searchParams,
 }: {
-  searchParams: Promise<{ erro?: string; adhoc?: string; teste?: string; canal?: string; envio?: string; dest?: string }>;
+  searchParams: Promise<{
+    erro?: string;
+    adhoc?: string;
+    teste?: string;
+    canal?: string;
+    envio?: string;
+    dest?: string;
+    via?: string;
+    detalhe?: string;
+  }>;
 }) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
   const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
-  const { erro, adhoc, teste, canal, envio, dest } = await searchParams;
+  const { erro, adhoc, teste, canal, envio, dest, via, detalhe } = await searchParams;
 
   const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
   const grupos = [
@@ -151,14 +161,24 @@ export default async function PaginaFollowUp({
               Testar por email
             </button>
           </form>
+          <form action={enviarTesteWhatsPasso}>
+            <input type="hidden" name="passoId" value={passo.id} />
+            <button
+              className="acao"
+              type="submit"
+              title="Dispara este passo via Cloud API pro WhatsApp de teste (Settings)"
+            >
+              Testar no WhatsApp
+            </button>
+          </form>
           <a
             className="acao"
             href={linkWhatsTeste(passo)}
             target="_blank"
             rel="noreferrer"
-            title="Abre o WhatsApp com a mensagem renderizada pra você enviar"
+            title="Plano B sem API: abre o WhatsApp com a mensagem renderizada pra você enviar"
           >
-            Testar no WhatsApp
+            wa.me
           </a>
           <form action={alternarPassoRegua}>
             <input type="hidden" name="passoId" value={passo.id} />
@@ -205,14 +225,31 @@ export default async function PaginaFollowUp({
       <AdminTabs ativa="regua" />
 
       {erro === "campos" && <div className="aviso erro">Preencha nome, assunto e mensagem da etapa.</div>}
-      {teste && envio !== "falha" && (
+      {erro === "sem_whats" && (
+        <div className="aviso erro">
+          Configure o <b>WhatsApp pra testes</b> em Settings antes de disparar o teste pela Cloud API.
+        </div>
+      )}
+      {teste && via === "whats" && envio !== "falha" && (
+        <div className="aviso ok">
+          <b>Teste enviado ✓</b>
+          {envio === "mock" ? " (mock, sem WHATSAPP_TOKEN no worker)" : " pelo WhatsApp de verdade"}: &ldquo;{teste}
+          &rdquo; disparado pra {dest} via Cloud API.
+        </div>
+      )}
+      {teste && via === "whats" && envio === "falha" && (
+        <div className="aviso erro">
+          Falha no WhatsApp de &ldquo;{teste}&rdquo; pra {dest}{detalhe ? <>: {detalhe}</> : "; detalhe no audit log (Settings)."}
+        </div>
+      )}
+      {teste && !via && envio !== "falha" && (
         <div className="aviso ok">
           <b>Teste enviado ✓</b>{envio === "mock" ? " (mock, sem RESEND_API_KEY)" : " por email de verdade"}:{" "}
           &ldquo;{teste}&rdquo; disparado pra {dest}. Canal configurado:{" "}
           {(canal ?? "email").split(",").map((c) => (c === "whatsapp" ? "WhatsApp" : "email")).join(" e ")}.
         </div>
       )}
-      {teste && envio === "falha" && (
+      {teste && !via && envio === "falha" && (
         <div className="aviso erro">
           Falha no envio do teste de &ldquo;{teste}&rdquo; pra {dest}; detalhe no audit log (Settings).
         </div>
