@@ -78,10 +78,10 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 .topbar .logo {
-  height: 44px;
+  height: 65px;
   width: auto;
   display: block;
-  margin: -6px 0; /* o desenho tem respiro interno; compensa sem engordar a barra */
+  margin: -16px 0; /* o desenho tem respiro interno; compensa sem engordar a barra */
 }
 
 .topbar .sistema {
