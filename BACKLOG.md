@@ -74,6 +74,12 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 
 - Dashboard 100% colapsável; funil e Resgates Corporativos como gráficos
 
+### 15. Corrigir contato de convite pendente ⬜ (novo, 12/jun)
+
+- Host (e admin) pode editar o email/WhatsApp de um convite ainda pendente e redisparar o OTP
+- Motivo: convidado com email errado (typo na hora do convite, dado fake de import) trava no gate de OTP num beco sem saída silencioso — hoje a única saída é cancelar e reconvidar
+- Registrar a correção no audit log
+
 ## P2.5 — Integração Mundo Ticket (destrava a Footprint real)
 
 ### 10. Webhooks / API — Mundo Ticket ❓ (bloqueado)

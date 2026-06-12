@@ -20,7 +20,8 @@ export default async function Home() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-insider.svg`} alt="CCXP Insider" className="logo-hero" />
         <h1>
-          Convidados VIP, <em>do convite à presença</em>
+          A plataforma de RSVP e relacionamento para convidados especiais{" "}
+          <em>pré, durante e pós CCXP</em>
         </h1>
         <div className="evento">
           <span><b>CCXP26</b></span>
