@@ -19,12 +19,21 @@ function kv(): KVNamespace {
 
 const gerarCodigo = () => String(Math.floor(100000 + Math.random() * 900000));
 
-const mascarar = (email: string) => {
-  const [usuario, dominio] = email.split("@");
-  return `${usuario.slice(0, 2)}***@${dominio}`;
-};
+// rate-limit de reenvio: 3 códigos por janela de 10 min por chave
+const LIMITE_ENVIOS = 3;
+
+async function estourouLimite(chaveKv: string): Promise<boolean> {
+  const chave = `rl:${chaveKv}`;
+  const atual = Number((await kv().get(chave)) ?? "0");
+  if (atual >= LIMITE_ENVIOS) return true;
+  await kv().put(chave, String(atual + 1), { expirationTtl: TTL_CODIGO });
+  return false;
+}
 
 async function enviarCodigo(chaveKv: string, email: string) {
+  if (await estourouLimite(chaveKv)) {
+    return { mock: false, erroEnvio: "limite", codigoDemo: null };
+  }
   const codigo = gerarCodigo();
   await kv().put(chaveKv, codigo, { expirationTtl: TTL_CODIGO });
   const envio = await enviarEmail({
@@ -58,7 +67,13 @@ export async function solicitarOtpConvite(formData: FormData) {
   if (!email) redirect(`/convite/${token}`); // sem email: fluxo direto (SMS futuro)
 
   const r = await enviarCodigo(`otp:${token}`, email);
-  const extra = r.codigoDemo ? `&demo=${r.codigoDemo}` : r.erroEnvio ? `&falha=1` : "";
+  const extra = r.codigoDemo
+    ? `&demo=${r.codigoDemo}`
+    : r.erroEnvio === "limite"
+      ? `&falha=limite`
+      : r.erroEnvio
+        ? `&falha=1`
+        : "";
   redirect(`/convite/${token}?otp=enviado${extra}`);
 }
 
@@ -81,7 +96,13 @@ export async function solicitarOtpAcesso(formData: FormData) {
   if (!convidado || !convidado.consentimentoEm) redirect(`/acesso?erro=nao_encontrado`);
 
   const r = await enviarCodigo(`acesso:${email}`, email);
-  const extra = r.codigoDemo ? `&demo=${r.codigoDemo}` : r.erroEnvio ? `&falha=1` : "";
+  const extra = r.codigoDemo
+    ? `&demo=${r.codigoDemo}`
+    : r.erroEnvio === "limite"
+      ? `&falha=limite`
+      : r.erroEnvio
+        ? `&falha=1`
+        : "";
   redirect(`/acesso?email=${encodeURIComponent(email)}${extra}`);
 }
 

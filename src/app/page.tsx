@@ -35,6 +35,12 @@ export default async function Home({
           <span>São Paulo Expo</span>
           <span>Protótipo navegável · escolha um papel pra entrar</span>
         </div>
+        <div className="hero-ctas">
+          <a className="cta" href="#personas">Sou host</a>
+          <a className="cta fantasma" href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/acesso`}>
+            Sou convidado
+          </a>
+        </div>
       </section>
 
       {erro === "desativado" && (
@@ -44,7 +50,7 @@ export default async function Home({
       )}
 
       {/* Admin fora da navegação (P4): entrada só por /backstage */}
-      <section className="personas">
+      <section className="personas" id="personas">
         <div className="persona-col">
           <header>
             Colaborador O&CO <span className="num">host</span>
@@ -99,6 +105,22 @@ export default async function Home({
             ))}
           </ul>
         </div>
+      </section>
+
+      <section className="backlog-vivo">
+        <h2>Backlog vivo</h2>
+        <p className="dica">
+          O que vem por aí e o que ainda é demonstração — visível pra todos durante a fase de teste.
+        </p>
+        <ul>
+          <li>▸ Disparo automático da régua por agendamento (hoje: botão &ldquo;Processar régua agora&rdquo; no admin)</li>
+          <li>▸ Integração Mundo Ticket (bipagens reais da Footprint) — aguardando definição com o fornecedor</li>
+          <li>▸ Email com domínio próprio (hoje os envios reais chegam só no email de teste) e templates oficiais de WhatsApp</li>
+          <li>▸ Login definitivo com Google SSO pro time e gating por papel (produção/portaria)</li>
+        </ul>
+        <p className="dica atencao">
+          ⚠️ Protótipo com dados de exemplo; resgates e presenças são simulados. Este quadro sai do ar no go-live.
+        </p>
       </section>
 
       <section className="demo-reset">

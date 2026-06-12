@@ -7,6 +7,8 @@ import { TIPO_LABEL } from "@/lib/labels";
 import type { BipagemEvento } from "@/lib/footprint";
 import AdminTabs from "../admin-tabs";
 import RadarPerfil from "./radar-perfil";
+import { gerarInsightsAI } from "@/lib/insights-ai";
+import BadgeArte from "./badge-arte";
 
 export const dynamic = "force-dynamic";
 
@@ -138,18 +140,27 @@ export default async function PaginaFootprint({
       : null;
 
   const ficha = selecionado
-    ? (() => {
+    ? await (async () => {
         const codigos = selecionado.convites.flatMap((cv) => cv.codigos);
         const tipos = [...new Set(codigos.map((c) => c.tipo))];
         const credentialId = `CRD-${String(selecionado.id).padStart(5, "0")}`;
         const eventos = bipagensFake(selecionado.id, credentialId, tipos);
         const diasNoEvento = new Set(eventos.map((e) => e.timestamp.slice(0, 10))).size;
+        // Claude API com ANTHROPIC_API_KEY no worker; sem ela, mock determinístico
+        const mock = insightsIndividuais(selecionado.id, selecionado.nome, diasNoEvento);
+        const ai = await gerarInsightsAI({
+          nome: selecionado.nome,
+          dias: diasNoEvento,
+          interesses: selecionado.interesses ? (JSON.parse(selecionado.interesses) as string[]) : null,
+          bipagens: eventos,
+          fallback: mock.cards,
+        });
         return {
           credentialId,
           tipos,
           anfitrioes: [...new Set(selecionado.convites.map((cv) => cv.host.nome))],
           eventos,
-          ai: insightsIndividuais(selecionado.id, selecionado.nome, diasNoEvento),
+          ai,
         };
       })()
     : null;
@@ -265,10 +276,12 @@ export default async function PaginaFootprint({
             <div className="box-ai-cab">
               <h2 style={{ border: "none", paddingBottom: 0 }}>Insights</h2>
               <span className="selo-ai">AI</span>
+              <span className="nota">{ficha.ai.origem === "claude" ? "gerado pela Claude API" : "demonstração · ativa com ANTHROPIC_API_KEY"}</span>
             </div>
             <div className="ai-cards">
               {ficha.ai.cards.map((c) => (
                 <article className="ai-card" key={c.titulo}>
+                  <BadgeArte nome={c.badge} />
                   <header>
                     {c.titulo} <span className="badge-perfil mini">{c.badge}</span>
                   </header>

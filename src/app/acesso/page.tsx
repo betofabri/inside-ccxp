@@ -21,7 +21,11 @@ export default async function PaginaAcesso({
         {erro === "nao_encontrado" && (
           <p className="alerta">Não achamos cadastro com esse email. Confira ou fale com seu anfitrião.</p>
         )}
-        {falha && <div className="aviso erro">O envio falhou; tente de novo.</div>}
+        {falha === "limite" ? (
+          <div className="aviso erro">Muitos códigos pedidos em sequência; espere uns 10 minutos.</div>
+        ) : falha ? (
+          <div className="aviso erro">O envio falhou; tente de novo.</div>
+        ) : null}
         {demo && (
           <div className="aviso">
             <b>Modo demo</b> (envio de email ainda não configurado): seu código é{" "}

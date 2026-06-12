@@ -69,7 +69,7 @@ export default function ImportarCsv({ tipo }: Props) {
       setResultado(await processarCsv(tipo, linhas, true));
     });
 
-  const Relatorio = ({ r }: { r: RelatorioCsv }) => (
+  const relatorio = (r: RelatorioCsv) => (
     <>
       <div className="sub" style={{ marginTop: 12 }}>
         <span className="mono">{nomeArquivo}</span>
@@ -105,7 +105,7 @@ export default function ImportarCsv({ tipo }: Props) {
           <b>Import aplicado ✓</b> {resultado.casados} código(s){" "}
           {tipo === "resgate" ? "marcados como resgatados" : "marcados como presentes"}. Operação no audit log.
         </div>
-        <Relatorio r={resultado} />
+        {relatorio(resultado)}
         <button className="cta fantasma" type="button" onClick={limpar} style={{ marginTop: 14 }}>
           Importar outro arquivo
         </button>
@@ -140,7 +140,7 @@ export default function ImportarCsv({ tipo }: Props) {
           <p className="dica" style={{ marginTop: 4 }}>
             Prévia: nada foi alterado ainda. Confira o relatório e confirme.
           </p>
-          <Relatorio r={previa} />
+          {relatorio(previa)}
           <div className="form-acoes" style={{ marginTop: 16 }}>
             <button className="cta fantasma" type="button" onClick={limpar}>Cancelar</button>
             <button

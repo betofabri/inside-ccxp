@@ -26,7 +26,8 @@ export default function Ticket({ codigoId, valor, tipo, tipoLabel, host }: Props
 
   // estado persistido localmente: nunca saberemos do resgate real neste modelo
   useEffect(() => {
-    setCopiado(lerCopiados().includes(codigoId));
+    const raf = requestAnimationFrame(() => setCopiado(lerCopiados().includes(codigoId)));
+    return () => cancelAnimationFrame(raf);
   }, [codigoId]);
 
   const copiar = async () => {

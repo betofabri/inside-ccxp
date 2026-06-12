@@ -80,7 +80,7 @@ export async function importarPreCadastros(formData: FormData) {
   redirect(`/admin/regua?prec=${criados}&puladas=${pulados}`);
 }
 
-export async function dispararSaveTheDate(formData: FormData) {
+export async function dispararSaveTheDate() {
   const persona = await exigirAdmin();
   const passo = await db.reguaPasso.findFirst({
     where: { categoria: "pre_convite", ativo: true },

@@ -20,7 +20,7 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 
 - Nova fase ANTES do RSVP — passo 0 da comunicação ✅ (grupo "Save the Date" no Follow up, etapa padrão D-180 editável com Testar por email/WhatsApp)
 - **Decisão (12/jun): destinatários vêm de import de planilha ou pré-cadastro manual do admin** ✅ — seção "Audiência do Save the Date" no Follow up: form nome+email e import colando linhas do Excel (`;`, vírgula ou tab; inválidas/repetidas puladas com aviso). Pré-cadastrado = Convidado sem convite; quando o host convidar, o "Já convidado" encontra a pessoa
-- Disparo pra audiência ✅ mockado e registrado no log de comunicação por destinatário · ⬜ envio real entra com o motor da F4
+- Disparo pra audiência ✅ — botão imediato (mock) E pelo motor F4 quando a data da etapa vence (email real com RESEND_API_KEY); agendamento automático por cron = infra de produção (F6)
 - Demonstração de interesse mora na mini pesquisa (item 3)
 
 ### 3. Mini pesquisa de interesse (pós-token, 1º acesso do convidado) ✅ (12/jun)
@@ -48,7 +48,7 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
   - `CÓDIGO` ex: `CRT-XXXX-NNNNN` · `RESGATADO`: SIM/NÃO
 - ❓ Pendência: planilha única do corporativo usa o mesmo layout de colunas ou tem campo a mais (empresa/depto)? (hoje o import central assume o mesmo layout)
 
-### 6. FOLLOW UP 🟡 (painel pronto · motor de disparo pendente = F4)
+### 6. FOLLOW UP ✅ (12/jun — motor F4 entregue; cron automático = produção/F6)
 
 - Renomeado de "Régua de comunicação" ✅
 - CRUD completo das etapas (criar/editar/excluir/pausar) ✅
@@ -58,7 +58,7 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
   3. Divulgação de números / after movie
 - Envio de mensagens ad hoc (sob demanda) para todos os convidados VIPs ✅ (registro mock no log de comunicação)
 - Testar por email (Resend real) ✅ · Testar no WhatsApp (Meta Cloud API real, wa.me como plano B) ✅
-- ⬜ Motor real de disparo com condições e opt-out (F4)
+- ✅ Motor de disparo F4 (12/jun, `src/lib/motor.ts` + botão "Processar régua agora"): processa etapas ativas com data vencida, audiência por categoria (pré-convite/transacional/corporativa/pós), aplica condições, opt-out LGPD e dedupe pelo log (mock conta como entregue), envia email real com RESEND_API_KEY; etapas relativas ao convite são disparadas pelos próprios eventos. ⬜ agendamento por cron do Workers = infra de produção (F6)
 
 ### 7. Autocomplete de empresas no cadastro ✅
 
@@ -114,14 +114,14 @@ Front já construído. Estrutura atual:
 
 Falta pra virar real:
 
-- ⬜ Trocar fonte mock pelo stream real de bipagens (via P2.5 / adapter)
-- ⬜ Ligar o Box de Insights AI na Claude API real (input = bipagens agregadas por `credentialId`)
-- ⬜ Validar agregação por `credentialId` com dado real
-- ⬜ Remover estado de demo quando os dados reais entrarem
+- ⬜ Trocar fonte mock pelo stream real de bipagens (via P2.5 / adapter) — **bloqueado pela Mundo Ticket**
+- ✅ Box de Insights AI ligado na Claude API (12/jun, `src/lib/insights-ai.ts`, claude-haiku, cruza interesses declarados × bipagens; sem `ANTHROPIC_API_KEY` no worker cai no mock — o selo do box mostra a origem)
+- ⬜ Validar agregação por `credentialId` com dado real — **bloqueado pela Mundo Ticket**
+- ⬜ Remover estado de demo quando os dados reais entrarem — **bloqueado pela Mundo Ticket**
 
 Perfumaria (12/jun):
 
-- ⬜ Cards pessoais com cara de game: badges como conquistas visuais, com uma **imagem/arte própria pra cada badge** (Terror Master, Shopper, CCXP Fan...) em vez de chips de texto — estética de achievement desbloqueado
+- ✅ Cards pessoais com cara de game (12/jun): emblemas SVG estilo conquista (medalhão dourado + fita) com ícone próprio por badge — caveira (Terror Master), sacola (Shopper), raio (CCXP Fan) e estrela genérica pra badges novos criados pela AI (`badge-arte.tsx`)
 - 🟡 **Gráfico radar do perfil** ao lado do card de perfil do convidado na ficha individual — FEITO com mock determinístico (12/jun, `radar-perfil.tsx`, glowing-stroke recharts no design system); falta plugar dado real via P2.5 — 7 eixos:
   1. Tempo (horas no evento)
   2. Quantidade de dias
@@ -135,21 +135,19 @@ Perfumaria (12/jun):
 
 ## P4 — Responsivo / Acesso
 
-### 12. Home / Landing genérica ⬜
+### 12. Home / Landing genérica ✅ (12/jun)
 
-- Acesso sem código ou sem perfil → página estilo landing (hoje abre o switcher de personas do protótipo)
-- Texto descritivo curto + duas opções: "Sou host" / "Sou convidado"
+- Hero do hub virou landing: headline + "Sou host" / "Sou convidado" em destaque (convidado → /acesso por OTP); o switcher de personas segue abaixo como modo demo e sai no go-live junto com a auth real
 
 ### 13. Admin oculto ✅ (12/jun)
 
 - Coluna Admin saiu do hub; entrada do admin só por **`/backstage`** (link direto, fora da navegação, sem menção no hub)
 - Nota: segurança real (não só obscuridade) chega com a auth do item 1 / F6
 
-### 14. Mobile — topo colapsado 🟡
+### 14. Mobile — topo colapsado ✅ (12/jun)
 
-- ✅ Card de perfil global no topo com dropdown (detalhes, Assets/Fotos no mobile, importar, trocar papel)
-- ⬜ Topo colapsa e vira ícone de perfil (bonequinho) → perfil/detalhes da conta
-- ⬜ Conteúdo: logo + perfil logado (ou botão de login se deslogado)
+- Card de perfil global no topo com dropdown (detalhes, Assets/Fotos no mobile, importar, trocar papel) ✅
+- Em telas ≤640px o topo colapsa: só logo + bonequinho (avatar) que abre o perfil ✅
 
 ## P5 — Polish (fase final)
 
@@ -158,32 +156,33 @@ Perfumaria (12/jun):
 
 - ✅ Hub: botão de navegação entre páginas mais marcado (borda, fundo, seta sempre visível)
 - ✅ Microinterações: fade de entrada de página, seções colapsáveis, modal, hover-lifts (com `prefers-reduced-motion`)
-- ⬜ Card profile: mouseover (vindo do fade / arrasta)
+- ✅ Card profile: dropdown entra com fade + desliza ao abrir; summary com hover (12/jun)
 - ✅ Card profile: avatar movido pra direita (12/jun)
 - ✅ Imagens de compartilhamento (OG/share) corretas — og.png 1200×630 com logo Insider + metadata OG/Twitter completa
 - ✅ Telas de estado terminal do convite (expirado/cancelado/não encontrado) desenhadas — glifo, próximo passo destacado, tom acolhedor
-- ⬜ Gradiente triplo `#FFD000 → #FF7A2F → #ED3A86` em palavras de destaque de títulos e subtítulos
-- 🟡 Bottom nav glass no mobile (conceito aprovado, "em digestão" — aguarda go)
+- ✅ Gradiente triplo `#FFD000 → #FF7A2F → #ED3A86` nos destaques (em) de títulos do hero e dos cartões de convite (12/jun)
+- ❓ Bottom nav glass no mobile — conceito aprovado, **aguardando o "vai" do Beto** (pedido explícito de não executar ainda)
 
 ## Hub — Backlog vivo
 
-- ⬜ Exibir os next steps do backlog de melhorias + pontos de atenção na própria página hub
+- ✅ Next steps + pontos de atenção exibidos no hub (12/jun): seção "Backlog vivo" com o que falta (cron, Mundo Ticket, domínio de email, SSO) e aviso de protótipo
 - Visibilidade: visível pra todos (por enquanto)
 - ⚠️ Reavaliar antes do go-live: backlog interno exposto pode revelar o que ainda não está pronto a hosts/produção
 
 ## P6 — QA final (última etapa)
 
-- ⬜ Revisão geral de código
-- ⬜ Revisão de UX
-- ⬜ Consistência visual (componentes, espaçamentos, cores, tipografia)
-- ⬜ Consistência de linguagem (tom, termos PT-BR, labels de abas)
+- ✅ Revisão geral de código (12/jun): eslint zerado em todo o `src` (4 erros e 3 warnings corrigidos — setState em effect, componentes criados no render, código morto), build limpo; bug real achado e corrigido no teste do motor (dedupe não contava envios mock)
+- ✅ Revisão de UX: fluxos completos verificados em browser (funil do convidado, motor, Save the Date, gestão de usuários, correção de contato)
+- ✅ Consistência visual: tokens centralizados (--sucesso, gradiente, champagne), checagens mobile 375px nas telas novas
+- ✅ Consistência de linguagem: termos unificados (Colaborador O&CO, Follow up, Assets, pt-BR informal)
+- ⬜ Repetir o pacote completo antes do go-live (quando as features pararem de mudar)
 
 ## Referências de contexto
 
 - Autenticação: OTP de 6 dígitos, token por pessoa ✅ (já no code)
   - Canal: email como padrão (infra Resend pronta) ✅; SMS como opção futura se houver atrito no balcão
   - Código com TTL ~10 min em Cloudflare KV ✅ · magic link descartado ✅ (token do convite é só o endereço)
-  - 🟡 Incluir: reenviar/recuperar código com rate-limit, estados usado/expirado/inválido (reenvio existe; rate-limit e estados detalhados pendentes)
+  - ✅ Reenviar código com **rate-limit** (3 envios/10min por chave, KV) e aviso próprio; estados usado/expirado/inválido cobertos no gate (12/jun)
 - Email: Resend real com template padrão (logo embutido, CTA, rodapé do evento) ✅ · ⬜ verificar domínio próprio (DKIM/SPF) pra entregar a qualquer destinatário
 - WhatsApp: Meta Cloud API integrada (teste do Follow up) ✅ · ⬜ token permanente via System User + templates aprovados pra disparo fora da janela de 24h
 - Ciclo completo do convidado: `Save the Date → Convite/RSVP (escolhe dias) → Confirmação → Lembrete pré-evento → Evento/check-in → Follow-up pós-evento`

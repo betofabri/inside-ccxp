@@ -130,7 +130,12 @@ export default async function PaginaCadastro({
             <p className="texto-convite">
               Por segurança, enviamos um código de 6 dígitos pra <b>{mascarado}</b>.
             </p>
-            {falha && (
+            {falha === "limite" && (
+              <div className="aviso erro">
+                Muitos códigos pedidos em sequência. Espere uns 10 minutos e tente de novo.
+              </div>
+            )}
+            {falha && falha !== "limite" && (
               <div className="aviso erro">O envio falhou; tente reenviar o código.</div>
             )}
             {demo && (

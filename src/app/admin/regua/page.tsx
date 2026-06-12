@@ -12,6 +12,7 @@ import {
   linkAmostraTeste,
 } from "@/lib/regua";
 import { adicionarPreCadastro, importarPreCadastros, dispararSaveTheDate } from "@/lib/savethedate";
+import { processarRegua } from "@/lib/motor";
 import AdminTabs from "../admin-tabs";
 
 export const dynamic = "force-dynamic";
@@ -102,12 +103,14 @@ export default async function PaginaFollowUp({
     prec?: string;
     puladas?: string;
     std?: string;
+    motor?: string;
+    relativos?: string;
   }>;
 }) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
   const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
-  const { erro, adhoc, teste, canal, envio, dest, via, detalhe, prec, puladas, std } = await searchParams;
+  const { erro, adhoc, teste, canal, envio, dest, via, detalhe, prec, puladas, std, motor, relativos } = await searchParams;
 
   const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
   // pré-cadastros: convidados sem nenhum convite (audiência do Save the Date)
@@ -232,7 +235,16 @@ export default async function PaginaFollowUp({
     <div className="pagina">
       <h1>Follow up</h1>
       <div className="sub">
-        <span>Régua de comunicação, pós-evento e mensagens avulsas. Disparos mockados; o motor real chega na F4.</span>
+        <span>Régua de comunicação, pós-evento e mensagens avulsas.</span>
+        <form action={processarRegua} style={{ display: "inline" }}>
+          <button
+            className="acao"
+            type="submit"
+            title="Motor F4: processa as etapas ativas com data vencida — condições, opt-out e dedupe aplicados; email real com RESEND_API_KEY"
+          >
+            ▸ Processar régua agora
+          </button>
+        </form>
       </div>
       <AdminTabs ativa="regua" />
 
@@ -292,6 +304,30 @@ export default async function PaginaFollowUp({
         <div className="aviso ok">
           <b>Save the Date disparado ✓</b> (mock) pra {std} pré-cadastrado(s). Registrado no log de
           comunicação de cada um.
+        </div>
+      )}
+      {motor && motor !== "vazio" && (
+        <div className="aviso ok">
+          <b>Régua processada ✓</b>{" "}
+          {motor.split(";").map((linha) => {
+            const [rotulo, env, pul] = linha.split("|");
+            return (
+              <span key={rotulo} className="motor-linha">
+                {rotulo}: {env} enviado(s), {pul} pulado(s) (condição/opt-out/já recebeu).{" "}
+              </span>
+            );
+          })}
+          {relativos && Number(relativos) > 0 && (
+            <span className="dim">
+              {relativos} etapa(s) relativas ao convite (sem data fixa) são disparadas pelos próprios
+              eventos, não pelo motor.
+            </span>
+          )}
+        </div>
+      )}
+      {motor === "vazio" && (
+        <div className="aviso">
+          Nenhuma etapa com data vencida pra processar — confira as datas de disparo das etapas ativas.
         </div>
       )}
 

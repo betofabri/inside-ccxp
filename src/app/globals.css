@@ -2880,3 +2880,92 @@ details.secao[open] > *:not(summary) {
 .perfil-topo .avatar { order: 2; }
 .perfil-topo .perfil-nome { order: 1; text-align: right; }
 .perfil-topo .chevron { order: 3; }
+
+/* ── Hero: CTAs Sou host / Sou convidado (P4-12) ───────────────────────────── */
+
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  margin-top: 26px;
+}
+
+/* ── Gradiente triplo nas palavras de destaque (P5) ────────────────────────── */
+
+.hero h1 em,
+.cartao-convite h1 em {
+  background: linear-gradient(100deg, #ffd000 0%, #ff7a2f 50%, #ed3a86 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Backlog vivo no hub ───────────────────────────────────────────────────── */
+
+.backlog-vivo {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 26px 32px 6px;
+  border-top: 1px dashed var(--line-soft);
+}
+
+.backlog-vivo h2 {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 19px;
+}
+
+.backlog-vivo ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.backlog-vivo li { font-size: 13.5px; color: var(--muted); }
+.backlog-vivo .dica.atencao { margin-top: 14px; color: var(--champagne); }
+
+.demo-reset { max-width: 1120px; margin-left: auto; margin-right: auto; padding: 18px 32px 60px; border-top: none; }
+
+/* ── Topo mobile colapsado (P4-14): logo + avatar ──────────────────────────── */
+
+@media (max-width: 640px) {
+  .topbar .sistema { display: none; }
+  .topbar .topo-nav { display: none; } /* Assets/Fotos já vivem no dropdown do perfil */
+  .perfil-topo .perfil-nome { display: none; } /* vira só o bonequinho */
+  .perfil-topo > summary { padding: 4px; }
+  .perfil-topo .avatar { width: 36px; height: 36px; }
+}
+
+/* ── Card de perfil: dropdown entra com fade + desliza (P5) ────────────────── */
+
+.perfil-host[open] .perfil-drop {
+  animation: entra-drop 0.22s var(--ease) both;
+}
+
+@keyframes entra-drop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.perfil-host > summary { transition: background 0.15s ease, border-color 0.15s ease; }
+.perfil-host > summary:hover { background: var(--surface-2); }
+
+/* ── Insights AI: arte dos badges ──────────────────────────────────────────── */
+
+.ai-card { position: relative; }
+
+.badge-arte {
+  width: 46px;
+  height: 46px;
+  float: right;
+  margin: -4px -2px 6px 10px;
+  filter: drop-shadow(0 2px 6px oklch(0% 0 0 / 0.4));
+}
+
+.motor-linha { display: inline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .perfil-host[open] .perfil-drop { animation: none; }
+}

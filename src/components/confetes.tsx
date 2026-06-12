@@ -21,7 +21,7 @@ export default function Confetes({ qtd = 80 }: { qtd?: number }) {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setPedacos(
+    const raf = requestAnimationFrame(() => setPedacos(
       Array.from({ length: qtd }, () => ({
         left: Math.random() * 100,
         delay: Math.random() * 0.7,
@@ -30,9 +30,12 @@ export default function Confetes({ qtd = 80 }: { qtd?: number }) {
         rot: Math.random() * 360,
         tam: 6 + Math.random() * 6,
       })),
-    );
+    ));
     const t = setTimeout(() => setPedacos([]), 5600);
-    return () => clearTimeout(t);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
   }, [qtd]);
 
   if (pedacos.length === 0) return null;
