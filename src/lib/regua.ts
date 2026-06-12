@@ -12,6 +12,19 @@ async function exigirAdmin() {
   return persona;
 }
 
+const URL_HUB = "https://betofabri.com/lab/inside-ccxp";
+
+// {{link}} de um disparo real aponta pro convite do destinatário; no teste,
+// usamos o convite pendente mais recente como amostra pra cair na página certa
+export async function linkAmostraTeste() {
+  const convite = await db.convite.findFirst({
+    where: { status: "pendente" },
+    orderBy: { criadoEm: "desc" },
+    select: { magicToken: true },
+  });
+  return convite ? `${URL_HUB}/convite/${convite.magicToken}` : URL_HUB;
+}
+
 const lerCampos = (formData: FormData) => ({
   rotulo: String(formData.get("rotulo") ?? "").trim(),
   timing: String(formData.get("timing") ?? "").trim(),
@@ -117,18 +130,19 @@ export async function enviarTestePasso(formData: FormData) {
   const destino = cfg?.valor || admin.email;
 
   // renderiza o template com dados de amostra
+  const link = await linkAmostraTeste();
   const corpo = passo.corpo
     .replaceAll("{{nome}}", admin.nome.split(" ")[0])
     .replaceAll("{{host}}", admin.nome)
     .replaceAll("{{qtd}}", "2")
     .replaceAll("{{tipos}}", "2× Sábado")
-    .replaceAll("{{link}}", "https://betofabri.com/lab/inside-ccxp");
+    .replaceAll("{{link}}", link);
 
   const envio = await enviarEmail({
     para: destino,
     assunto: `[TESTE] ${passo.assunto}`,
     html: templateEmail(passo.assunto, `<p>${linkar(corpo)}</p>`, {
-      cta: { texto: "Abrir o CCXP INSIDER", url: "https://betofabri.com/lab/inside-ccxp" },
+      cta: { texto: "Abrir meu convite", url: link },
       notaRodape: `Disparo de teste do passo "${passo.rotulo}" (${passo.timing}) · canal: ${passo.canal}.`,
     }),
   });

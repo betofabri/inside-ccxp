@@ -8,6 +8,7 @@ import {
   criarPassoRegua,
   excluirPassoRegua,
   enviarMensagemAdHoc,
+  linkAmostraTeste,
 } from "@/lib/regua";
 import AdminTabs from "../admin-tabs";
 
@@ -116,6 +117,7 @@ export default async function PaginaFollowUp({
     },
   ];
 
+  const linkTeste = await linkAmostraTeste();
   const linkWhatsTeste = (passo: Passo) => {
     const nome = admin?.nome ?? "Admin";
     const corpo = passo.corpo
@@ -123,7 +125,7 @@ export default async function PaginaFollowUp({
       .replaceAll("{{host}}", nome)
       .replaceAll("{{qtd}}", "2")
       .replaceAll("{{tipos}}", "2× Sábado")
-      .replaceAll("{{link}}", "https://betofabri.com/lab/inside-ccxp");
+      .replaceAll("{{link}}", linkTeste);
     return `https://wa.me/?text=${encodeURIComponent(`*[TESTE] ${passo.assunto}*\n\n${corpo}\n\n_CCXP INSIDER · CCXP26 · 03 a 06/dez · São Paulo Expo_`)}`;
   };
 
