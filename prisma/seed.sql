@@ -205,3 +205,4 @@ INSERT INTO Config VALUES('evento_inicio','2026-12-03');
 INSERT INTO Config VALUES('evento_fim','2026-12-06');
 INSERT INTO Config VALUES('evento_local','São Paulo Expo');
 INSERT INTO Config VALUES('link_mundo_ticket','https://mundo-ticket.com/en-US/login');
+INSERT INTO ReguaPasso (categoria, ordem, rotulo, timing, dataRef, canal, condicao, assunto, corpo, ativo) SELECT 'pre_convite', 1, 'Save the Date', 'D-180', NULL, 'email', NULL, 'Save the Date: CCXP26 · 03 a 06 de dezembro', 'Olá, {{nome}}! Reserva essas datas: a CCXP26 acontece de 03 a 06 de dezembro no São Paulo Expo — e você está no nosso radar de convidados especiais. O convite oficial chega em breve; por enquanto, só guarda a data e prepara o coração. {{link}}', 1 WHERE NOT EXISTS (SELECT 1 FROM ReguaPasso WHERE categoria='pre_convite');

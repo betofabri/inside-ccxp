@@ -8,7 +8,12 @@ import { expirarVencidos } from "@/lib/convites";
 
 export const dynamic = "force-dynamic";
 
-export default async function PaginaFuncionario() {
+export default async function PaginaFuncionario({
+  searchParams,
+}: {
+  searchParams: Promise<{ contato?: string }>;
+}) {
+  const { contato } = await searchParams;
   const persona = await getPersona();
   if (!persona || (persona.role !== "funcionario" && persona.role !== "admin")) redirect("/");
 
@@ -48,6 +53,21 @@ export default async function PaginaFuncionario() {
 
   return (
     <div className="pagina">
+      {contato === "ok" && (
+        <div className="aviso ok">
+          <b>Contato corrigido ✓</b> O código de verificação antigo foi invalidado; peça pro convidado
+          abrir o link de novo e pedir um código novo.
+        </div>
+      )}
+      {contato === "email_em_uso" && (
+        <div className="aviso erro">Esse email já pertence a outro convidado da base.</div>
+      )}
+      {contato === "vazio" && (
+        <div className="aviso erro">Preencha o email ou o WhatsApp novo pra corrigir o contato.</div>
+      )}
+      {contato === "nao_pendente" && (
+        <div className="aviso erro">Só dá pra corrigir contato de convite ainda pendente.</div>
+      )}
       <h1>Novo convite</h1>
 
       <div className="estoque">

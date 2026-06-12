@@ -237,6 +237,53 @@ export async function criarConvite(input: CriarConviteInput): Promise<CriarConvi
 
 // ── F2: gestão do host ─────────────────────────────────────────
 
+// Item 15 do backlog: typo no email trava o convidado no gate de OTP.
+// Host (ou admin) corrige o contato do convite pendente; o código OTP em
+// trânsito é invalidado pra forçar reenvio pro endereço novo.
+export async function corrigirContatoConvite(formData: FormData) {
+  const persona = await getPersona();
+  if (!persona || persona.role === "convidado") redirect("/");
+  const id = Number(formData.get("conviteId"));
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const telefone = String(formData.get("telefone") ?? "").trim();
+  const convite = await db.convite.findUnique({ where: { id }, include: { convidado: true } });
+  if (!convite || (convite.hostId !== persona.id && persona.role !== "admin")) redirect("/funcionario");
+  if (convite.status !== "pendente") redirect("/funcionario?contato=nao_pendente");
+  if (!email && !telefone) redirect("/funcionario?contato=vazio");
+
+  if (email && email !== convite.convidado.email) {
+    const emUso = await db.convidado.findUnique({ where: { email } });
+    if (emUso && emUso.id !== convite.convidadoId) redirect("/funcionario?contato=email_em_uso");
+  }
+
+  await db.convidado.update({
+    where: { id: convite.convidadoId },
+    data: {
+      ...(email ? { email } : {}),
+      ...(telefone ? { telefone } : {}),
+    },
+  });
+  // invalida OTP pendente/verificado do token (chega no email antigo)
+  try {
+    const { env } = (await import("@opennextjs/cloudflare")).getCloudflareContext() as unknown as {
+      env: { OTP: { delete(k: string): Promise<void> } };
+    };
+    await env.OTP.delete(`otp:${convite.magicToken}`);
+    await env.OTP.delete(`otpok:${convite.magicToken}`);
+  } catch {}
+
+  await db.auditLog.create({
+    data: {
+      atorId: persona.id,
+      acao: "corrigir_contato",
+      alvo: `convite:${id}`,
+      detalhe: `contato de ${convite.convidado.nome} atualizado${email ? ` · email ${email}` : ""}${telefone ? ` · whats ${telefone}` : ""}; OTP invalidado`,
+    },
+  });
+  revalidatePath("/funcionario");
+  redirect("/funcionario?contato=ok");
+}
+
 export async function cancelarConvite(formData: FormData) {
   const persona = await getPersona();
   if (!persona || persona.role === "convidado") redirect("/");

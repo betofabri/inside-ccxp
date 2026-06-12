@@ -304,6 +304,10 @@ async function main() {
       { categoria: "pos_evento", ordem: 3, rotulo: "Números + after movie", timing: "D+7", dataRef: "2026-12-13", canal: "email",
         assunto: "CCXP26 em números (e o after movie)",
         corpo: "{{nome}}, a CCXP26 em números: público, palcos e os melhores momentos no after movie. Assista e compartilhe: {{link}}" },
+      // pré-convite — passo 0: Save the Date pra audiência pré-cadastrada
+      { categoria: "pre_convite", ordem: 1, rotulo: "Save the Date", timing: "D-180", canal: "email",
+        assunto: "Save the Date: CCXP26 · 03 a 06 de dezembro",
+        corpo: "Olá, {{nome}}! Reserva essas datas: a CCXP26 acontece de 03 a 06 de dezembro no São Paulo Expo — e você está no nosso radar de convidados especiais. O convite oficial chega em breve; por enquanto, só guarda a data e prepara o coração. {{link}}" },
     ],
   });
 

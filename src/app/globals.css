@@ -2840,3 +2840,43 @@ details.secao[open] > *:not(summary) {
   gap: 10px;
   text-align: left;
 }
+
+/* ── Corrigir contato do convite pendente ──────────────────────────────────── */
+
+.corrigir-contato { position: relative; }
+.corrigir-contato summary { list-style: none; cursor: pointer; }
+.corrigir-contato summary::-webkit-details-marker { display: none; }
+
+.form-contato {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-s);
+}
+
+.form-contato input {
+  flex: 1 1 150px;
+  min-width: 0;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-s);
+}
+
+/* ── Save the Date · audiência ─────────────────────────────────────────────── */
+
+.std-audiencia { display: grid; gap: 18px; margin-top: 16px; }
+.std-audiencia textarea { font-family: var(--font-mono), monospace; font-size: 13px; }
+
+/* ── Card de perfil: avatar à direita (P5) ─────────────────────────────────── */
+
+.perfil-topo > summary { padding: 6px 7px 6px 14px; }
+.perfil-topo .avatar { order: 2; }
+.perfil-topo .perfil-nome { order: 1; text-align: right; }
+.perfil-topo .chevron { order: 3; }

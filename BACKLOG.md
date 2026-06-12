@@ -16,11 +16,11 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 
 ## P1 — Funil de relacionamento (alto valor, início do ciclo)
 
-### 2. Save the Date (pré-convite) ⬜
+### 2. Save the Date (pré-convite) 🟡 (núcleo feito 12/jun — disparo real = F4)
 
-- Nova fase ANTES do RSVP — passo 0 da comunicação
-- Disparo antecipado: pessoa sabe que o evento está chegando e se planeja
-- Enviado antes de saber os dias que ela vai (reservar data, gerar expectativa, reduzir recusa)
+- Nova fase ANTES do RSVP — passo 0 da comunicação ✅ (grupo "Save the Date" no Follow up, etapa padrão D-180 editável com Testar por email/WhatsApp)
+- **Decisão (12/jun): destinatários vêm de import de planilha ou pré-cadastro manual do admin** ✅ — seção "Audiência do Save the Date" no Follow up: form nome+email e import colando linhas do Excel (`;`, vírgula ou tab; inválidas/repetidas puladas com aviso). Pré-cadastrado = Convidado sem convite; quando o host convidar, o "Já convidado" encontra a pessoa
+- Disparo pra audiência ✅ mockado e registrado no log de comunicação por destinatário · ⬜ envio real entra com o motor da F4
 - Demonstração de interesse mora na mini pesquisa (item 3)
 
 ### 3. Mini pesquisa de interesse (pós-token, 1º acesso do convidado) ✅ (12/jun)
@@ -72,11 +72,9 @@ Legenda: ✅ feito · 🟡 mock/parcial · ⬜ a fazer · ❓ pendência/decisã
 
 - Dashboard 100% colapsável; funil e Resgates Corporativos como gráficos
 
-### 15. Corrigir contato de convite pendente ⬜ (novo, 12/jun)
+### 15. Corrigir contato de convite pendente ✅ (12/jun)
 
-- Host (e admin) pode editar o email/WhatsApp de um convite ainda pendente e redisparar o OTP
-- Motivo: convidado com email errado (typo na hora do convite, dado fake de import) trava no gate de OTP num beco sem saída silencioso — hoje a única saída é cancelar e reconvidar
-- Registrar a correção no audit log
+- "Corrigir contato" nas ações do convite pendente (host e admin): atualiza email/WhatsApp, invalida o código OTP em trânsito (chegaria no endereço errado) e registra no audit log; email já usado por outro convidado é barrado
 
 ## P2.5 — Integração Mundo Ticket (destrava a Footprint real)
 
@@ -161,7 +159,7 @@ Perfumaria (12/jun):
 - ✅ Hub: botão de navegação entre páginas mais marcado (borda, fundo, seta sempre visível)
 - ✅ Microinterações: fade de entrada de página, seções colapsáveis, modal, hover-lifts (com `prefers-reduced-motion`)
 - ⬜ Card profile: mouseover (vindo do fade / arrasta)
-- ⬜ Card profile: mover avatar para a direita (hoje à esquerda)
+- ✅ Card profile: avatar movido pra direita (12/jun)
 - ✅ Imagens de compartilhamento (OG/share) corretas — og.png 1200×630 com logo Insider + metadata OG/Twitter completa
 - ✅ Telas de estado terminal do convite (expirado/cancelado/não encontrado) desenhadas — glifo, próximo passo destacado, tom acolhedor
 - ⬜ Gradiente triplo `#FFD000 → #FF7A2F → #ED3A86` em palavras de destaque de títulos e subtítulos

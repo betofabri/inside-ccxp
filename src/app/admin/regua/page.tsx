@@ -11,6 +11,7 @@ import {
   enviarTesteWhatsPasso,
   linkAmostraTeste,
 } from "@/lib/regua";
+import { adicionarPreCadastro, importarPreCadastros, dispararSaveTheDate } from "@/lib/savethedate";
 import AdminTabs from "../admin-tabs";
 
 export const dynamic = "force-dynamic";
@@ -98,15 +99,26 @@ export default async function PaginaFollowUp({
     dest?: string;
     via?: string;
     detalhe?: string;
+    prec?: string;
+    puladas?: string;
+    std?: string;
   }>;
 }) {
   const persona = await getPersona();
   if (!persona || persona.role !== "admin") redirect("/");
   const admin = await db.funcionario.findUnique({ where: { id: persona.id } });
-  const { erro, adhoc, teste, canal, envio, dest, via, detalhe } = await searchParams;
+  const { erro, adhoc, teste, canal, envio, dest, via, detalhe, prec, puladas, std } = await searchParams;
 
   const passos = await db.reguaPasso.findMany({ orderBy: { ordem: "asc" } });
+  // pré-cadastros: convidados sem nenhum convite (audiência do Save the Date)
+  const preCadastrados = await db.convidado.count({ where: { convites: { none: {} } } });
   const grupos = [
+    {
+      chave: "pre_convite",
+      titulo: "Save the Date",
+      nota: "passo 0 · antes do convite · audiência pré-cadastrada",
+      passos: passos.filter((p) => p.categoria === "pre_convite"),
+    },
     {
       chave: "transacional",
       titulo: "Transacionais",
@@ -260,6 +272,77 @@ export default async function PaginaFollowUp({
           <b>Mensagem enviada ✓</b> (mock) pra {adhoc} convidado(s). Registrada no log de comunicação de cada um.
         </div>
       )}
+      {erro === "pre_campos" && <div className="aviso erro">Preencha nome e um email válido.</div>}
+      {erro === "pre_email_em_uso" && (
+        <div className="aviso erro">Esse email já existe na base (pré-cadastrado ou convidado).</div>
+      )}
+      {erro === "std_vazio" && (
+        <div className="aviso erro">Nenhum pré-cadastrado com email na audiência; adicione ou importe antes de disparar.</div>
+      )}
+      {erro === "std_sem_passo" && (
+        <div className="aviso erro">Crie (e ative) uma etapa no grupo Save the Date antes de disparar.</div>
+      )}
+      {prec && (
+        <div className="aviso ok">
+          <b>Pré-cadastro ✓</b> {prec} pessoa(s) adicionada(s) à audiência do Save the Date
+          {puladas && Number(puladas) > 0 ? <> · {puladas} linha(s) pulada(s) (inválida ou repetida)</> : null}.
+        </div>
+      )}
+      {std && (
+        <div className="aviso ok">
+          <b>Save the Date disparado ✓</b> (mock) pra {std} pré-cadastrado(s). Registrado no log de
+          comunicação de cada um.
+        </div>
+      )}
+
+      <details className="secao">
+        <summary>
+          <h2>
+            Audiência do Save the Date{" "}
+            <span className="nota">{preCadastrados} pré-cadastrado(s) · sem convite ainda</span>
+          </h2>
+        </summary>
+        <div className="std-audiencia">
+          <form action={adicionarPreCadastro} className="form-passo">
+            <div className="campo-dupla">
+              <div className="campo">
+                <label>Nome</label>
+                <input type="text" name="nome" placeholder="Nome e sobrenome" required />
+              </div>
+              <div className="campo">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="pessoa@empresa.com" required />
+              </div>
+            </div>
+            <div className="form-acoes">
+              <button className="cta fantasma" type="submit">Pré-cadastrar</button>
+            </div>
+          </form>
+          <form action={importarPreCadastros} className="form-passo">
+            <div className="campo">
+              <label>Importar planilha <span className="opcional">(cole as linhas do Excel)</span></label>
+              <textarea
+                name="linhas"
+                rows={4}
+                placeholder={"Uma pessoa por linha: Nome; email\nAna Souza; ana@empresa.com\nCaio Lima; caio@empresa.com"}
+              />
+              <div className="dica">Aceita ponto-e-vírgula, vírgula ou tab (colar direto do Excel). Emails repetidos são pulados.</div>
+            </div>
+            <div className="form-acoes">
+              <button className="cta fantasma" type="submit">Importar audiência</button>
+            </div>
+          </form>
+          <form action={dispararSaveTheDate}>
+            <button
+              className="cta"
+              type="submit"
+              title="Dispara a etapa ativa do grupo Save the Date pra todos os pré-cadastrados (mock até a F4)"
+            >
+              Disparar Save the Date pra {preCadastrados} pessoa(s)
+            </button>
+          </form>
+        </div>
+      </details>
 
       <details className="secao">
         <summary>

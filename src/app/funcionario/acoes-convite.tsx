@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { cancelarConvite, reenviarConvite } from "@/lib/convites";
+import { cancelarConvite, reenviarConvite, corrigirContatoConvite } from "@/lib/convites";
 
 type Props = {
   conviteId: number;
@@ -37,6 +37,19 @@ export default function AcoesConvite({ conviteId, token, status }: Props) {
             Reenviar
           </button>
         </form>
+      )}
+      {status === "pendente" && (
+        <details className="corrigir-contato">
+          <summary className="acao" title="Email errado trava o convidado no código de verificação">
+            Corrigir contato
+          </summary>
+          <form action={corrigirContatoConvite} className="form-contato">
+            <input type="hidden" name="conviteId" value={conviteId} />
+            <input type="email" name="email" placeholder="email certo" />
+            <input type="tel" name="telefone" placeholder="whatsapp (opcional)" />
+            <button className="acao" type="submit">Salvar</button>
+          </form>
+        </details>
       )}
       {ativo && (
         <form action={cancelarConvite}>
