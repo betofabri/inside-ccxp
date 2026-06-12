@@ -19,6 +19,8 @@ const DESCRICAO =
 export const metadata: Metadata = {
   title: "CCXP INSIDER · O Backstage do Backstage",
   description: DESCRICAO,
+  // fase de teste pública: fora dos buscadores (link continua compartilhável)
+  robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
   openGraph: {
     title: "CCXP INSIDER",
     description: DESCRICAO,
