@@ -9,6 +9,10 @@
     "binding": "ASSETS"
   },
   "workers_dev": false,
+  "vars": {
+    // domínio verificado no Resend em 12/jun — o endereço é só remetente, não precisa de caixa
+    "EMAIL_FROM": "CCXP INSIDER <insider@betofabri.com>"
+  },
   "routes": [
     {
       "pattern": "betofabri.com/insider-ccxp*",
