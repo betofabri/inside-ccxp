@@ -38,7 +38,7 @@ export async function importarCodigos(
     return { ok: false, erro: "Só o admin importa o lote corporativo." };
 
   const host = await db.funcionario.findUnique({ where: { id: persona.id } });
-  if (!host) return { ok: false, erro: "Funcionário não encontrado." };
+  if (!host) return { ok: false, erro: "Colaborador não encontrado." };
 
   if (linhas.length === 0) return { ok: false, erro: "Nenhuma linha válida pra importar." };
   if (linhas.length > 5000) return { ok: false, erro: "Limite de 5.000 linhas por importação." };

@@ -57,7 +57,7 @@ export default async function Home() {
 
         <div className="persona-col">
           <header>
-            Funcionário <span className="num">host</span>
+            Colaborador O&CO <span className="num">host</span>
           </header>
           <p className="desc">
             Convida direto da tela inicial e acompanha os próprios convites. A flag corporativa libera o lote compartilhado.

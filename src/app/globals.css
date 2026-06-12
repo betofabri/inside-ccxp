@@ -2370,6 +2370,74 @@ a.topo-link:hover { color: var(--ink); border-color: var(--champagne); }
   padding: 2px 7px;
 }
 
+/* ── Settings: exports e domínios ── */
+.exports {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dominios {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dominio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  border-radius: var(--radius-pill);
+  padding: 6px 8px 6px 14px;
+  font-size: 12.5px;
+}
+
+.dominio-chip button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.dominio-chip button:hover {
+  background: color-mix(in oklab, var(--st-cancelado) 22%, transparent);
+  color: var(--st-cancelado);
+}
+
+.form-dominio {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.form-dominio input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: 9px 12px;
+}
+
+.form-dominio input:focus {
+  outline: none;
+  border-color: var(--champagne);
+}
+
 /* ── Rodapé ── */
 .rodape-app {
   border-top: 1px solid var(--line-soft);

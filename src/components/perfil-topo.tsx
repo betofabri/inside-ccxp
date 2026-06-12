@@ -5,7 +5,7 @@ type Detalhe = { rotulo: string; valor: React.ReactNode };
 
 type Props = {
   nome: string;
-  papel: string; // "Funcionário" | "Admin" | "Convidado"
+  papel: string; // "Colaborador O&CO" | "Admin" | "Convidado"
   corpOn?: boolean;
   detalhes: Detalhe[];
   acoes?: React.ReactNode; // ex: item de importar planilha (hosts)

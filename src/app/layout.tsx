@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 const PAPEL_LABEL: Record<string, string> = {
   admin: "Admin",
-  funcionario: "Funcionário",
+  funcionario: "Colaborador O&CO",
   convidado: "Convidado",
 };
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FOOTPRINT_ENABLED } from "@/lib/flags";
 
-export default function AdminTabs({ ativa }: { ativa: "dashboard" | "regua" | "footprint" }) {
+export default function AdminTabs({ ativa }: { ativa: "dashboard" | "regua" | "footprint" | "settings" }) {
   return (
     <nav className="admin-tabs" aria-label="Seções do admin">
       <Link href="/admin" className={`admin-tab ${ativa === "dashboard" ? "ativa" : ""}`}>
@@ -9,6 +9,9 @@ export default function AdminTabs({ ativa }: { ativa: "dashboard" | "regua" | "f
       </Link>
       <Link href="/admin/regua" className={`admin-tab ${ativa === "regua" ? "ativa" : ""}`}>
         Follow up
+      </Link>
+      <Link href="/admin/settings" className={`admin-tab ${ativa === "settings" ? "ativa" : ""}`}>
+        Settings
       </Link>
       {FOOTPRINT_ENABLED ? (
         <Link href="/admin/footprint" className={`admin-tab ${ativa === "footprint" ? "ativa" : ""}`}>
