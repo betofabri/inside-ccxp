@@ -4,6 +4,7 @@ import { getPersona } from "@/lib/persona";
 import { salvarConfigs, adicionarDominio, removerDominio } from "@/lib/imports-centrais";
 import AdminTabs from "../admin-tabs";
 import ImportarCsv from "./importar-csv";
+import ImportarPlanilha from "../../funcionario/importar-planilha";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,15 @@ export default async function PaginaSettings({
       {erro === "dominio" && <div className="aviso erro">Domínio inválido; use o formato empresa.com.</div>}
 
       <details className="secao" open>
+        <summary>
+          <h2>
+            Import · Lote corporativo <span className="nota">planilha central · só admin · formato oficial</span>
+          </h2>
+        </summary>
+        <ImportarPlanilha pool="corporativo" eventoEsperado="CCXP26" />
+      </details>
+
+      <details className="secao">
         <summary>
           <h2>
             Import · Resgates confirmados <span className="nota">CSV da Mundo Ticket · marca códigos como resgatados</span>

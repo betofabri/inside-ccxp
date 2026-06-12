@@ -10,9 +10,6 @@ export default function AdminTabs({ ativa }: { ativa: "dashboard" | "regua" | "f
       <Link href="/admin/regua" className={`admin-tab ${ativa === "regua" ? "ativa" : ""}`}>
         Follow up
       </Link>
-      <Link href="/admin/settings" className={`admin-tab ${ativa === "settings" ? "ativa" : ""}`}>
-        Settings
-      </Link>
       {FOOTPRINT_ENABLED ? (
         <Link href="/admin/footprint" className={`admin-tab ${ativa === "footprint" ? "ativa" : ""}`}>
           Footprint
@@ -27,6 +24,10 @@ export default function AdminTabs({ ativa }: { ativa: "dashboard" | "regua" | "f
           Footprint <span className="selo-breve">em breve</span>
         </button>
       )}
+      {/* Settings sempre por último */}
+      <Link href="/admin/settings" className={`admin-tab ${ativa === "settings" ? "ativa" : ""}`}>
+        Settings
+      </Link>
     </nav>
   );
 }

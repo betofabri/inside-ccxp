@@ -123,6 +123,10 @@ Falta pra virar real:
 - ⬜ Validar agregação por `credentialId` com dado real
 - ⬜ Remover estado de demo quando os dados reais entrarem
 
+Perfumaria (12/jun):
+
+- ⬜ Cards pessoais com cara de game: badges como conquistas visuais, com uma **imagem/arte própria pra cada badge** (Terror Master, Shopper, CCXP Fan...) em vez de chips de texto — estética de achievement desbloqueado
+
 ## P4 — Responsivo / Acesso
 
 ### 12. Home / Landing genérica ⬜

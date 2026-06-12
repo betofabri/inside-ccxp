@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { TIPOS } from "@/lib/labels";
 import AdminTabs from "./admin-tabs";
-import ImportarPlanilha from "../funcionario/importar-planilha";
 import { FunilEvento, BarrasResgates } from "./graficos-cliente";
 
 export const dynamic = "force-dynamic";
@@ -80,8 +79,6 @@ export default async function PaginaAdmin() {
   const empresas = [...porEmpresa.values()].sort(
     (a, b) => b.codigos - a.codigos || b.convidados - a.convidados,
   );
-
-  const configs = await db.config.findMany();
 
   const contar = (grupos: { tipo: string; _count: number }[], tipo: string) =>
     grupos.find((g) => g.tipo === tipo)?._count ?? 0;
@@ -186,34 +183,6 @@ export default async function PaginaAdmin() {
         </div>
       </details>
 
-      
-
-      <details className="secao">
-        <summary><h2>
-          Importar lote corporativo <span className="nota">planilha central · só admin · formato oficial</span>
-        </h2></summary>
-        <ImportarPlanilha pool="corporativo" eventoEsperado="CCXP26" />
-      </details>
-
-      
-
-      <details className="secao">
-        <summary><h2>
-          Configuração <span className="nota">edição chega na F5</span>
-        </h2></summary>
-        <div className="tabela-wrap">
-          <table className="tabela">
-            <tbody>
-              {configs.map((c) => (
-                <tr key={c.chave}>
-                  <td className="mono dim">{c.chave}</td>
-                  <td className="mono">{c.valor}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
     </div>
   );
 }
