@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { assumirPersona } from "@/lib/actions";
-import { resetarDemoConvidado } from "@/lib/demo";
+import { resetarDemoConvidado, resetarDemoHost } from "@/lib/demo";
 import { NIVEL_LABEL } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
@@ -8,9 +8,17 @@ export const dynamic = "force-dynamic";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ reset?: string; qtd?: string; token?: string; erro?: string }>;
+  searchParams: Promise<{
+    reset?: string;
+    qtd?: string;
+    token?: string;
+    erro?: string;
+    resethost?: string;
+    convites?: string;
+    apagados?: string;
+  }>;
 }) {
-  const { reset, qtd, token, erro } = await searchParams;
+  const { reset, qtd, token, erro, resethost, convites, apagados } = await searchParams;
   // só ativos aparecem no hub; admin entra por /backstage (fora da navegação)
   const funcionarios = await db.funcionario.findMany({ where: { ativo: true }, orderBy: { id: "asc" } });
   const convidados = await db.convidado.findMany({
@@ -148,14 +156,37 @@ export default async function Home({
             Defina o <b>email pra testes</b> em Admin → Settings antes de usar o reset.
           </div>
         )}
-        <form action={resetarDemoConvidado}>
-          <button className="acao" type="submit" title="Volta os convites cadastrados do convidado de teste pra pendente — o funil completo (OTP + cadastro) roda de novo">
-            ↺ Resetar demo do convidado
-          </button>
-        </form>
+        {resethost === "ok" && (
+          <div className="aviso ok">
+            <b>Camila Ramos zerada ✓</b> {convites} convite(s) apagado(s){apagados && Number(apagados) > 0 ? ` e ${apagados} convidado(s) removido(s)` : ""}; a cota dela voltou cheia ao pool. Entre como Camila e simule o fluxo do zero.
+          </div>
+        )}
+        {resethost === "sem_host" && (
+          <div className="aviso erro">Host &ldquo;Camila Ramos&rdquo; não encontrado na base.</div>
+        )}
+        <div className="reset-acoes">
+          <form action={resetarDemoHost}>
+            <button
+              className="acao"
+              type="submit"
+              title="Apaga todos os convites e convidados da Camila e devolve a cota dela ao pool — host volta a zero"
+            >
+              ↺ Resetar Camila (host)
+            </button>
+          </form>
+          <form action={resetarDemoConvidado}>
+            <button
+              className="acao"
+              type="submit"
+              title="Volta os convites cadastrados do convidado de teste pra pendente — o funil completo (OTP + cadastro) roda de novo"
+            >
+              ↺ Resetar convidado de teste
+            </button>
+          </form>
+        </div>
         <span className="dica">
-          Volta o convidado de teste (email de testes do Settings) pro estado pré-cadastro, pra rodar o
-          funil completo de novo.
+          <b>Camila (host):</b> zera tudo dela (códigos + convidados) pra simular o envio do começo.{" "}
+          <b>Convidado de teste:</b> volta quem tem o email de testes pro estado pré-cadastro.
         </span>
       </section>
     </>

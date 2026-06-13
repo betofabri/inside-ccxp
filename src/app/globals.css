@@ -2991,3 +2991,7 @@ details.secao[open] > *:not(summary) {
 }
 
 .card-apoio.com-imagem .card-acao .dica { flex-basis: 100%; margin: 0; }
+
+/* ── Reset demo: dois botões lado a lado ───────────────────────────────────── */
+
+.reset-acoes { display: flex; flex-wrap: wrap; gap: 10px; }
