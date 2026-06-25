@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { INTERESSES_OPCOES } from "@/lib/labels";
 import { salvarInteresses } from "@/lib/interesses";
+import { getT } from "@/lib/i18n";
 import ChipsInteresses from "./chips";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,7 @@ export default async function PaginaInteresses({
   const persona = await getPersona();
   if (!persona || persona.role !== "convidado") redirect("/");
   const { erro, origem } = await searchParams;
+  const { t } = await getT();
 
   const convidado = await db.convidado.findUnique({ where: { id: persona.id } });
   if (!convidado) redirect("/");
@@ -22,18 +23,20 @@ export default async function PaginaInteresses({
   return (
     <div className="pagina cadastro">
       <div className="cartao-convite pesquisa-afinidade">
-        <span className="de-quem">Última coisa, {convidado.nome.split(" ")[0]} · leva 10 segundos</span>
+        <span className="de-quem">{t.pesquisa.ultima(convidado.nome.split(" ")[0])}</span>
         <h1>
-          O que te atrai na <em>CCXP</em>?
+          {t.pesquisa.tituloPre}
+          <em>{t.pesquisa.tituloEm}</em>?
         </h1>
-        <p className="texto-convite">
-          Toque em tudo que combina com você. Usamos isso pra deixar sua experiência (e nossos
-          convites) mais com a sua cara.
-        </p>
-        {erro === "vazio" && <div className="aviso erro">Escolha pelo menos um interesse.</div>}
+        <p className="texto-convite">{t.pesquisa.sub}</p>
+        {erro === "vazio" && <div className="aviso erro">{t.pesquisa.erroVazio}</div>}
         <form action={salvarInteresses}>
           <input type="hidden" name="origem" value={origem ?? "cadastro"} />
-          <ChipsInteresses opcoes={INTERESSES_OPCOES} />
+          <ChipsInteresses
+            opcoes={t.pesquisa.opcoes}
+            rotuloVazio={t.pesquisa.escolhaUm}
+            rotuloContinuar={t.pesquisa.continuar}
+          />
         </form>
       </div>
     </div>

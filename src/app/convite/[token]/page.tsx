@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
-import { TIPO_LABEL, fmtData } from "@/lib/labels";
+import { TIPO_LABEL } from "@/lib/labels";
 import { completarCadastro, entrarNaCarteira, expirarVencidos } from "@/lib/convites";
 import { solicitarOtpConvite, validarOtpConvite, verificado } from "@/lib/otp";
+import { getT } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,10 @@ export default async function PaginaCadastro({
 }) {
   const { token } = await params;
   const { erro, otp, demo, falha } = await searchParams;
+  const { t, L } = await getT();
+  const localeData = L === "pt" ? "pt-BR" : L === "es" ? "es-ES" : "en-US";
+  const fmtDataL = (d: Date) =>
+    d.toLocaleDateString(localeData, { day: "2-digit", month: "2-digit", year: "numeric" });
 
   await expirarVencidos();
 
@@ -30,13 +35,10 @@ export default async function PaginaCadastro({
         <div className="cartao-convite estado-convite">
           <span className="glifo-estado" aria-hidden>?</span>
           <span className="de-quem">CCXP INSIDER · CCXP26</span>
-          <h1>Convite não encontrado</h1>
-          <p className="texto-convite">
-            Esse link não é válido — pode ter sido digitado errado ou substituído por um mais novo.
-          </p>
+          <h1>{t.convite.naoEncTitulo}</h1>
+          <p className="texto-convite">{t.convite.naoEncTexto}</p>
           <div className="proximo-passo">
-            <b>O que fazer:</b> confira a mensagem que você recebeu (o link certo é o mais recente) ou
-            peça um novo link a quem convidou você.
+            <b>{t.convite.oQueFazer}</b> {t.convite.naoEncFazer}
           </div>
         </div>
       </div>
@@ -53,26 +55,18 @@ export default async function PaginaCadastro({
       <div className="pagina cadastro">
         <div className="cartao-convite estado-convite">
           <span className="glifo-estado" aria-hidden>{expirado ? "⌛" : "✕"}</span>
-          <span className="de-quem">
-            Convite de <b>{convite.host.nome}</b> · Omelete Company
-          </span>
-          <h1>{expirado ? "Esse convite venceu" : "Convite cancelado"}</h1>
+          <span className="de-quem">{t.convite.deQuem(convite.host.nome)}</span>
+          <h1>{expirado ? t.convite.expTitulo : t.convite.canTitulo}</h1>
           <p className="texto-convite">
-            {expirado ? (
-              <>
-                {primeiroNome}, o prazo de cadastro terminou em <b>{fmtData(convite.expiraEm)}</b> e os{" "}
-                {totalIngressos} ingresso(s) reservados voltaram pro pool da CCXP26.
-              </>
-            ) : (
-              <>Este convite pra CCXP26 foi cancelado por quem convidou você.</>
-            )}
+            {expirado
+              ? t.convite.expTexto(primeiroNome, fmtDataL(convite.expiraEm), totalIngressos)
+              : t.convite.canTexto}
           </p>
           <div className="proximo-passo">
-            <b>Mas calma — isso tem volta:</b> fale com <b>{convite.host.nome}</b> e peça pra{" "}
-            {expirado ? "reenviar o convite" : "enviar um novo convite"}. Leva um clique do lado de lá
-            e você recebe um link novo{expirado ? " com prazo renovado" : ""}.
+            <b>{t.convite.voltaLabel}</b>{" "}
+            {expirado ? t.convite.voltaExp(convite.host.nome) : t.convite.voltaCan(convite.host.nome)}
           </div>
-          <p className="nota-estado">CCXP26 · 03 a 06 de dezembro de 2026 · São Paulo Expo</p>
+          <p className="nota-estado">CCXP26 · {t.evento.datas} · {t.evento.local}</p>
         </div>
       </div>
     );
@@ -82,11 +76,11 @@ export default async function PaginaCadastro({
     return (
       <div className="pagina cadastro">
         <div className="cartao-convite">
-          <h1>Você já está na lista, {primeiroNome}</h1>
-          <p className="texto-convite">Seu cadastro foi concluído e os códigos estão na sua carteira.</p>
+          <h1>{t.convite.jaTitulo(primeiroNome)}</h1>
+          <p className="texto-convite">{t.convite.jaTexto}</p>
           <form action={entrarNaCarteira} style={{ marginTop: 22 }}>
             <input type="hidden" name="convidadoId" value={convite.convidadoId} />
-            <button className="cta" type="submit">Abrir minha carteira</button>
+            <button className="cta" type="submit">{t.convite.jaBtn}</button>
           </form>
         </div>
       </div>
@@ -106,13 +100,11 @@ export default async function PaginaCadastro({
   return (
     <div className="pagina cadastro">
       <div className="cartao-convite">
-        <span className="de-quem">
-          Convite de <b>{convite.host.nome}</b> · Omelete Company
-        </span>
+        <span className="de-quem">{t.convite.deQuem(convite.host.nome)}</span>
         <h1>
-          {primeiroNome}, você tem {totalIngressos} ingresso(s) pra <em>CCXP26</em>
+          {t.convite.titulo(primeiroNome, totalIngressos)}<em>CCXP26</em>
         </h1>
-        <p className="texto-convite">03 a 06 de dezembro de 2026 · São Paulo Expo</p>
+        <p className="texto-convite">{t.evento.datas} · {t.evento.local}</p>
 
         <div className="resumo-ingressos">
           {convite.parcelas.map((p) => (
@@ -126,36 +118,27 @@ export default async function PaginaCadastro({
 
         {!otpOk ? (
           <div className="form-cadastro otp-bloco">
-            <h3>Confirme que é você</h3>
-            <p className="texto-convite">
-              Por segurança, enviamos um código de 6 dígitos pra <b>{mascarado}</b>.
-            </p>
-            {falha === "limite" && (
-              <div className="aviso erro">
-                Muitos códigos pedidos em sequência. Espere uns 10 minutos e tente de novo.
-              </div>
-            )}
-            {falha && falha !== "limite" && (
-              <div className="aviso erro">O envio falhou; tente reenviar o código.</div>
-            )}
+            <h3>{t.convite.otpTitulo}</h3>
+            <p className="texto-convite">{t.convite.otpSub(mascarado ?? "")}</p>
+            {falha === "limite" && <div className="aviso erro">{t.convite.otpLimite}</div>}
+            {falha && falha !== "limite" && <div className="aviso erro">{t.convite.otpFalha}</div>}
             {demo && (
               <div className="aviso">
-                <b>Modo demo</b> (envio de email ainda não configurado): seu código é{" "}
-                <b className="mono">{demo}</b>.
+                <b>{t.convite.otpDemo}</b> <b className="mono">{demo}</b>.
               </div>
             )}
-            {erro === "codigo" && <p className="alerta">Código incorreto ou vencido; tente de novo.</p>}
+            {erro === "codigo" && <p className="alerta">{t.convite.otpCodigoErrado}</p>}
             {otp !== "enviado" ? (
               <form action={solicitarOtpConvite}>
                 <input type="hidden" name="token" value={token} />
-                <button className="cta enviar-cadastro" type="submit">Receber código por email</button>
+                <button className="cta enviar-cadastro" type="submit">{t.convite.otpReceber}</button>
               </form>
             ) : (
               <>
                 <form action={validarOtpConvite}>
                   <input type="hidden" name="token" value={token} />
                   <div className="campo">
-                    <label htmlFor="codigo">Código de 6 dígitos</label>
+                    <label htmlFor="codigo">{t.convite.otpLabelCodigo}</label>
                     <input
                       id="codigo"
                       name="codigo"
@@ -168,37 +151,35 @@ export default async function PaginaCadastro({
                       required
                     />
                   </div>
-                  <button className="cta enviar-cadastro" type="submit">Confirmar código</button>
+                  <button className="cta enviar-cadastro" type="submit">{t.convite.otpConfirmar}</button>
                 </form>
                 <form action={solicitarOtpConvite} style={{ marginTop: 10, textAlign: "center" }}>
                   <input type="hidden" name="token" value={token} />
-                  <button className="acao" type="submit">Reenviar código</button>
+                  <button className="acao" type="submit">{t.convite.otpReenviar}</button>
                 </form>
               </>
             )}
           </div>
         ) : (
         <form action={cadastrar} className="form-cadastro">
-          <h3>Complete seu cadastro pra receber os códigos</h3>
+          <h3>{t.convite.formTitulo}</h3>
 
-          {erro === "campos" && <p className="alerta">Preencha todos os campos obrigatórios.</p>}
-          {erro === "email_em_uso" && (
-            <p className="alerta">Esse email já está em uso em outra conta; confira o endereço.</p>
-          )}
+          {erro === "campos" && <p className="alerta">{t.convite.erroCampos}</p>}
+          {erro === "email_em_uso" && <p className="alerta">{t.convite.erroEmailUso}</p>}
 
           <div className="campo">
-            <label htmlFor="nascimento">Data de nascimento</label>
+            <label htmlFor="nascimento">{t.convite.labelNasc}</label>
             <input id="nascimento" name="nascimento" type="date" required />
           </div>
 
           {corporativo && (
             <>
               <div className="campo">
-                <label htmlFor="cargo">Cargo</label>
-                <input id="cargo" name="cargo" type="text" placeholder="Seu cargo na empresa" required />
+                <label htmlFor="cargo">{t.convite.labelCargo}</label>
+                <input id="cargo" name="cargo" type="text" placeholder={t.convite.phCargo} required />
               </div>
               <div className="campo">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t.convite.labelEmail}</label>
                 <input
                   id="email"
                   name="email"
@@ -209,9 +190,9 @@ export default async function PaginaCadastro({
                 />
               </div>
               <div className="campo">
-                <label htmlFor="celular">Celular</label>
+                <label htmlFor="celular">{t.convite.labelCelular}</label>
                 <div className="campo-telefone">
-                  <select name="ddi" aria-label="Código do país" defaultValue="+55">
+                  <select name="ddi" aria-label="DDI" defaultValue="+55">
                     {DDIS.map((d) => (
                       <option key={d} value={d}>{d}</option>
                     ))}
@@ -228,11 +209,11 @@ export default async function PaginaCadastro({
               </div>
               <div className="campo-dupla">
                 <div className="campo">
-                  <label htmlFor="instagram">Instagram <span style={{ color: "var(--faint)", fontWeight: 400 }}>(opcional)</span></label>
+                  <label htmlFor="instagram">Instagram <span style={{ color: "var(--faint)", fontWeight: 400 }}>{t.convite.opcional}</span></label>
                   <input id="instagram" name="instagram" type="text" placeholder="@seuuser" />
                 </div>
                 <div className="campo">
-                  <label htmlFor="linkedin">LinkedIn <span style={{ color: "var(--faint)", fontWeight: 400 }}>(opcional)</span></label>
+                  <label htmlFor="linkedin">LinkedIn <span style={{ color: "var(--faint)", fontWeight: 400 }}>{t.convite.opcional}</span></label>
                   <input id="linkedin" name="linkedin" type="text" placeholder="linkedin.com/in/voce" />
                 </div>
               </div>
@@ -242,20 +223,16 @@ export default async function PaginaCadastro({
           <label className="vip-toggle lgpd">
             <input type="checkbox" name="lgpd" required />
             <span className="texto">
-              Li e aceito a política de privacidade
+              {t.convite.lgpdLabel}
               <small>
-                Seus dados são usados só pra entrega dos ingressos e comunicação do evento (LGPD).{" "}
-                <a href="#" style={{ textDecoration: "underline" }}>Política de privacidade</a>
+                {t.convite.lgpdSmall}{" "}
+                <a href="#" style={{ textDecoration: "underline" }}>{t.convite.lgpdLink}</a>
               </small>
             </span>
           </label>
 
-          <button className="cta enviar-cadastro" type="submit">
-            Concluir cadastro e ver meus códigos
-          </button>
-          <p className="dica" style={{ textAlign: "center" }}>
-            Cadastro até {fmtData(convite.expiraEm)}; depois disso o convite expira.
-          </p>
+          <button className="cta enviar-cadastro" type="submit">{t.convite.concluir}</button>
+          <p className="dica" style={{ textAlign: "center" }}>{t.convite.prazo(fmtDataL(convite.expiraEm))}</p>
         </form>
         )}
       </div>

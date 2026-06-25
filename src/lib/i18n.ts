@@ -57,6 +57,90 @@ type Dicionario = {
     aindaDuvida: string;
     contato: string;
   };
+  convite: {
+    naoEncTitulo: string;
+    naoEncTexto: string;
+    oQueFazer: string;
+    naoEncFazer: string;
+    expTitulo: string;
+    canTitulo: string;
+    expTexto: (nome: string, data: string, qtd: number) => string;
+    canTexto: string;
+    voltaLabel: string;
+    voltaExp: (host: string) => string;
+    voltaCan: (host: string) => string;
+    jaTitulo: (nome: string) => string;
+    jaTexto: string;
+    jaBtn: string;
+    deQuem: (host: string) => string;
+    titulo: (nome: string, qtd: number) => string;
+    otpTitulo: string;
+    otpSub: (masc: string) => string;
+    otpLimite: string;
+    otpFalha: string;
+    otpDemo: string;
+    otpCodigoErrado: string;
+    otpReceber: string;
+    otpLabelCodigo: string;
+    otpConfirmar: string;
+    otpReenviar: string;
+    formTitulo: string;
+    erroCampos: string;
+    erroEmailUso: string;
+    labelNasc: string;
+    labelCargo: string;
+    phCargo: string;
+    labelEmail: string;
+    labelCelular: string;
+    opcional: string;
+    lgpdLabel: string;
+    lgpdSmall: string;
+    lgpdLink: string;
+    concluir: string;
+    prazo: (data: string) => string;
+  };
+  carteira: {
+    cadastroOkB: string;
+    cadastroOk: string;
+    interessesOkB: string;
+    interessesOk: string;
+    pesquisaB: string;
+    pesquisaPre: string;
+    pesquisaLink: string;
+    pesquisaPos: string;
+    titulo: (nome: string) => string;
+    lgpd: (data: string) => string;
+    resgateDecl: string;
+    anfitriaoUm: string;
+    anfitriaoVarios: string;
+    ingressos: string;
+    ingressosNota: (n: number) => string;
+    resgatar: string;
+    copiarB: string;
+    copiarTexto: string;
+    mtB: string;
+    mtTexto: string;
+    mtLink: string;
+    mtPos: string;
+    dicaB: string;
+    dicaPre: string;
+    dicaPos: string;
+    semCodigosB: string;
+    semCodigos: string;
+    agenda: string;
+    agendaNota: string;
+  };
+  ticket: { de: (host: string) => string; copiar: string; copiado: string; codigoCopiado: string; disponivel: string };
+  pesquisa: {
+    ultima: (nome: string) => string;
+    tituloPre: string;
+    tituloEm: string;
+    sub: string;
+    erroVazio: string;
+    escolhaUm: string;
+    continuar: (n: number) => string;
+    opcoes: { value: string; label: string }[];
+  };
 };
 
 const PT: Dicionario = {
@@ -150,6 +234,110 @@ const PT: Dicionario = {
     ],
     aindaDuvida: "Ainda com dúvida?",
     contato: "Fale com o anfitrião que te convidou — ele é seu contato direto.",
+  },
+  convite: {
+    naoEncTitulo: "Convite não encontrado",
+    naoEncTexto: "Esse link não é válido — pode ter sido digitado errado ou substituído por um mais novo.",
+    oQueFazer: "O que fazer:",
+    naoEncFazer: "confira a mensagem que você recebeu (o link certo é o mais recente) ou peça um novo link a quem convidou você.",
+    expTitulo: "Esse convite venceu",
+    canTitulo: "Convite cancelado",
+    expTexto: (nome, data, qtd) =>
+      `${nome}, o prazo de cadastro terminou em ${data} e os ${qtd} ingresso(s) reservados voltaram pro pool da CCXP26.`,
+    canTexto: "Este convite pra CCXP26 foi cancelado por quem convidou você.",
+    voltaLabel: "Mas calma — isso tem volta:",
+    voltaExp: (host) =>
+      `fale com ${host} e peça pra reenviar o convite. Leva um clique do lado de lá e você recebe um link novo com prazo renovado.`,
+    voltaCan: (host) =>
+      `fale com ${host} e peça pra enviar um novo convite. Leva um clique do lado de lá e você recebe um link novo.`,
+    jaTitulo: (nome) => `Você já está na lista, ${nome}`,
+    jaTexto: "Seu cadastro foi concluído e os códigos estão na sua carteira.",
+    jaBtn: "Abrir minha carteira",
+    deQuem: (host) => `Convite de ${host} · Omelete Company`,
+    titulo: (nome, qtd) => `${nome}, você tem ${qtd} ingresso(s) pra `,
+    otpTitulo: "Confirme que é você",
+    otpSub: (masc) => `Por segurança, enviamos um código de 6 dígitos pra ${masc}.`,
+    otpLimite: "Muitos códigos pedidos em sequência. Espere uns 10 minutos e tente de novo.",
+    otpFalha: "O envio falhou; tente reenviar o código.",
+    otpDemo: "Modo demo (envio de email ainda não configurado): seu código é",
+    otpCodigoErrado: "Código incorreto ou vencido; tente de novo.",
+    otpReceber: "Receber código por email",
+    otpLabelCodigo: "Código de 6 dígitos",
+    otpConfirmar: "Confirmar código",
+    otpReenviar: "Reenviar código",
+    formTitulo: "Complete seu cadastro pra receber os códigos",
+    erroCampos: "Preencha todos os campos obrigatórios.",
+    erroEmailUso: "Esse email já está em uso em outra conta; confira o endereço.",
+    labelNasc: "Data de nascimento",
+    labelCargo: "Cargo",
+    phCargo: "Seu cargo na empresa",
+    labelEmail: "Email",
+    labelCelular: "Celular",
+    opcional: "(opcional)",
+    lgpdLabel: "Li e aceito a política de privacidade",
+    lgpdSmall: "Seus dados são usados só pra entrega dos ingressos e comunicação do evento (LGPD).",
+    lgpdLink: "Política de privacidade",
+    concluir: "Concluir cadastro e ver meus códigos",
+    prazo: (data) => `Cadastro até ${data}; depois disso o convite expira.`,
+  },
+  carteira: {
+    cadastroOkB: "Cadastro concluído ✓",
+    cadastroOk: "Bem-vindo(a) ao CCXP INSIDER — seus códigos já estão na carteira abaixo.",
+    interessesOkB: "Interesses salvos ✓",
+    interessesOk: "Valeu! Agora a experiência fica com a sua cara.",
+    pesquisaB: "10 segundos:",
+    pesquisaPre: "conta pra gente",
+    pesquisaLink: "o que te atrai na CCXP",
+    pesquisaPos: "— deixa os convites e a programação com a sua cara.",
+    titulo: (nome) => `Sua carteira, ${nome}`,
+    lgpd: (data) => `LGPD ✓ ${data}`,
+    resgateDecl: "Resgate declarado",
+    anfitriaoUm: "Seu anfitrião na Omelete:",
+    anfitriaoVarios: "Seus anfitriões na Omelete:",
+    ingressos: "Seus ingressos",
+    ingressosNota: (n) => `${n} código(s), consolidados de todos os convites`,
+    resgatar: "Resgatar na Mundo Ticket ↗",
+    copiarB: "Toque num código pra copiar",
+    copiarTexto:
+      "e resgate manualmente no site da Mundo Ticket. Os códigos que você já copiou ficam marcados aqui na carteira.",
+    mtB: "Precisa de cadastro na Mundo Ticket",
+    mtTexto: "pra resgatar — se ainda não tem, é só criar na própria página de login. Dúvidas? Veja o",
+    mtLink: "passo a passo do resgate de cortesia",
+    mtPos: "na central de ajuda da CCXP.",
+    dicaB: "Dica:",
+    dicaPre: "na aba",
+    dicaPos: "tem mapa do evento, horários, por onde entrar, como chegar e o que levar.",
+    semCodigosB: "Nenhum código ativo na sua carteira.",
+    semCodigos: "Convites expirados ou cancelados devolvem os códigos ao pool.",
+    agenda: "Agenda do evento",
+    agendaNota: "geral única · perfil corporativo",
+  },
+  ticket: {
+    de: (host) => `Convite de ${host}`,
+    copiar: "Toque pra copiar o código",
+    copiado: "Copiado ✓",
+    codigoCopiado: "Código copiado",
+    disponivel: "Disponível",
+  },
+  pesquisa: {
+    ultima: (nome) => `Última coisa, ${nome} · leva 10 segundos`,
+    tituloPre: "O que te atrai na ",
+    tituloEm: "CCXP",
+    sub: "Toque em tudo que combina com você. Usamos isso pra deixar sua experiência (e nossos convites) mais com a sua cara.",
+    erroVazio: "Escolha pelo menos um interesse.",
+    escolhaUm: "Escolha pelo menos um",
+    continuar: (n) => `Continuar com ${n} interesse(s)`,
+    opcoes: [
+      { value: "Quadrinhos", label: "Quadrinhos" },
+      { value: "Games", label: "Games" },
+      { value: "Terror", label: "Terror" },
+      { value: "Filmes", label: "Filmes" },
+      { value: "Anime", label: "Anime" },
+      { value: "Momento com a família", label: "Momento com a família" },
+      { value: "Negócios", label: "Negócios" },
+      { value: "Networking", label: "Networking" },
+      { value: "Oportunidades de patrocínio", label: "Oportunidades de patrocínio" },
+    ],
   },
 };
 
@@ -245,6 +433,110 @@ const EN: Dicionario = {
     aindaDuvida: "Still have a question?",
     contato: "Talk to the host who invited you — they're your direct contact.",
   },
+  convite: {
+    naoEncTitulo: "Invitation not found",
+    naoEncTexto: "This link isn't valid — it may have been mistyped or replaced by a newer one.",
+    oQueFazer: "What to do:",
+    naoEncFazer: "check the message you received (the right link is the most recent one) or ask whoever invited you for a new link.",
+    expTitulo: "This invitation expired",
+    canTitulo: "Invitation cancelled",
+    expTexto: (nome, data, qtd) =>
+      `${nome}, the registration deadline ended on ${data} and the ${qtd} reserved ticket(s) returned to the CCXP26 pool.`,
+    canTexto: "This CCXP26 invitation was cancelled by whoever invited you.",
+    voltaLabel: "But don't worry — there's a way back:",
+    voltaExp: (host) =>
+      `talk to ${host} and ask for a resend. It's one click on their side and you'll get a new link with a renewed deadline.`,
+    voltaCan: (host) =>
+      `talk to ${host} and ask for a new invitation. It's one click on their side and you'll get a fresh link.`,
+    jaTitulo: (nome) => `You're already on the list, ${nome}`,
+    jaTexto: "Your registration is complete and the codes are in your wallet.",
+    jaBtn: "Open my wallet",
+    deQuem: (host) => `Invitation from ${host} · Omelete Company`,
+    titulo: (nome, qtd) => `${nome}, you have ${qtd} ticket(s) for `,
+    otpTitulo: "Confirm it's you",
+    otpSub: (masc) => `For security, we sent a 6-digit code to ${masc}.`,
+    otpLimite: "Too many codes requested in a row. Wait about 10 minutes and try again.",
+    otpFalha: "Sending failed; try resending the code.",
+    otpDemo: "Demo mode (email sending not set up yet): your code is",
+    otpCodigoErrado: "Wrong or expired code; try again.",
+    otpReceber: "Get code by email",
+    otpLabelCodigo: "6-digit code",
+    otpConfirmar: "Confirm code",
+    otpReenviar: "Resend code",
+    formTitulo: "Finish your registration to get the codes",
+    erroCampos: "Fill in all required fields.",
+    erroEmailUso: "This email is already used on another account; check the address.",
+    labelNasc: "Date of birth",
+    labelCargo: "Job title",
+    phCargo: "Your role at the company",
+    labelEmail: "Email",
+    labelCelular: "Mobile",
+    opcional: "(optional)",
+    lgpdLabel: "I've read and accept the privacy policy",
+    lgpdSmall: "Your data is used only to deliver the tickets and for event communication (LGPD).",
+    lgpdLink: "Privacy policy",
+    concluir: "Finish registration and see my codes",
+    prazo: (data) => `Register by ${data}; after that the invitation expires.`,
+  },
+  carteira: {
+    cadastroOkB: "Registration complete ✓",
+    cadastroOk: "Welcome to CCXP INSIDER — your codes are in the wallet below.",
+    interessesOkB: "Interests saved ✓",
+    interessesOk: "Thanks! Now the experience is more your style.",
+    pesquisaB: "10 seconds:",
+    pesquisaPre: "tell us",
+    pesquisaLink: "what draws you to CCXP",
+    pesquisaPos: "— it makes invitations and programming more your style.",
+    titulo: (nome) => `Your wallet, ${nome}`,
+    lgpd: (data) => `LGPD ✓ ${data}`,
+    resgateDecl: "Redemption declared",
+    anfitriaoUm: "Your host at Omelete:",
+    anfitriaoVarios: "Your hosts at Omelete:",
+    ingressos: "Your tickets",
+    ingressosNota: (n) => `${n} code(s), consolidated from all invitations`,
+    resgatar: "Redeem on Mundo Ticket ↗",
+    copiarB: "Tap a code to copy it",
+    copiarTexto:
+      "and redeem it manually on the Mundo Ticket website. Codes you've already copied are marked here in the wallet.",
+    mtB: "You need a Mundo Ticket account",
+    mtTexto: "to redeem — if you don't have one, just create it on the login page. Questions? See the",
+    mtLink: "step-by-step courtesy redemption guide",
+    mtPos: "in the CCXP help center.",
+    dicaB: "Tip:",
+    dicaPre: "in the",
+    dicaPos: "tab you'll find the event map, schedule, where to enter, how to get there and what to bring.",
+    semCodigosB: "No active codes in your wallet.",
+    semCodigos: "Expired or cancelled invitations return the codes to the pool.",
+    agenda: "Event schedule",
+    agendaNota: "single general agenda · corporate profile",
+  },
+  ticket: {
+    de: (host) => `Invitation from ${host}`,
+    copiar: "Tap to copy the code",
+    copiado: "Copied ✓",
+    codigoCopiado: "Code copied",
+    disponivel: "Available",
+  },
+  pesquisa: {
+    ultima: (nome) => `One last thing, ${nome} · takes 10 seconds`,
+    tituloPre: "What draws you to ",
+    tituloEm: "CCXP",
+    sub: "Tap everything that fits you. We use it to make your experience (and our invitations) more your style.",
+    erroVazio: "Pick at least one interest.",
+    escolhaUm: "Pick at least one",
+    continuar: (n) => `Continue with ${n} interest(s)`,
+    opcoes: [
+      { value: "Quadrinhos", label: "Comics" },
+      { value: "Games", label: "Games" },
+      { value: "Terror", label: "Horror" },
+      { value: "Filmes", label: "Movies" },
+      { value: "Anime", label: "Anime" },
+      { value: "Momento com a família", label: "Family time" },
+      { value: "Negócios", label: "Business" },
+      { value: "Networking", label: "Networking" },
+      { value: "Oportunidades de patrocínio", label: "Sponsorship opportunities" },
+    ],
+  },
 };
 
 const ES: Dicionario = {
@@ -338,6 +630,110 @@ const ES: Dicionario = {
     ],
     aindaDuvida: "¿Sigues con dudas?",
     contato: "Habla con el anfitrión que te invitó — es tu contacto directo.",
+  },
+  convite: {
+    naoEncTitulo: "Invitación no encontrada",
+    naoEncTexto: "Este enlace no es válido — puede haberse escrito mal o haber sido reemplazado por uno más nuevo.",
+    oQueFazer: "Qué hacer:",
+    naoEncFazer: "revisa el mensaje que recibiste (el enlace correcto es el más reciente) o pide uno nuevo a quien te invitó.",
+    expTitulo: "Esta invitación expiró",
+    canTitulo: "Invitación cancelada",
+    expTexto: (nome, data, qtd) =>
+      `${nome}, el plazo de registro terminó el ${data} y las ${qtd} entrada(s) reservadas volvieron al pool de la CCXP26.`,
+    canTexto: "Esta invitación a la CCXP26 fue cancelada por quien te invitó.",
+    voltaLabel: "Pero tranquilo — tiene solución:",
+    voltaExp: (host) =>
+      `habla con ${host} y pide el reenvío. Es un clic de su lado y recibirás un enlace nuevo con plazo renovado.`,
+    voltaCan: (host) =>
+      `habla con ${host} y pide una nueva invitación. Es un clic de su lado y recibirás un enlace nuevo.`,
+    jaTitulo: (nome) => `Ya estás en la lista, ${nome}`,
+    jaTexto: "Tu registro está completo y los códigos están en tu cartera.",
+    jaBtn: "Abrir mi cartera",
+    deQuem: (host) => `Invitación de ${host} · Omelete Company`,
+    titulo: (nome, qtd) => `${nome}, tienes ${qtd} entrada(s) para `,
+    otpTitulo: "Confirma que eres tú",
+    otpSub: (masc) => `Por seguridad, enviamos un código de 6 dígitos a ${masc}.`,
+    otpLimite: "Demasiados códigos seguidos. Espera unos 10 minutos e inténtalo de nuevo.",
+    otpFalha: "El envío falló; intenta reenviar el código.",
+    otpDemo: "Modo demo (envío de email aún no configurado): tu código es",
+    otpCodigoErrado: "Código incorrecto o vencido; inténtalo de nuevo.",
+    otpReceber: "Recibir código por email",
+    otpLabelCodigo: "Código de 6 dígitos",
+    otpConfirmar: "Confirmar código",
+    otpReenviar: "Reenviar código",
+    formTitulo: "Completa tu registro para recibir los códigos",
+    erroCampos: "Completa todos los campos obligatorios.",
+    erroEmailUso: "Este email ya está en uso en otra cuenta; revisa la dirección.",
+    labelNasc: "Fecha de nacimiento",
+    labelCargo: "Cargo",
+    phCargo: "Tu cargo en la empresa",
+    labelEmail: "Email",
+    labelCelular: "Celular",
+    opcional: "(opcional)",
+    lgpdLabel: "He leído y acepto la política de privacidad",
+    lgpdSmall: "Tus datos se usan solo para la entrega de las entradas y la comunicación del evento (LGPD).",
+    lgpdLink: "Política de privacidad",
+    concluir: "Completar registro y ver mis códigos",
+    prazo: (data) => `Regístrate hasta el ${data}; después la invitación expira.`,
+  },
+  carteira: {
+    cadastroOkB: "Registro completo ✓",
+    cadastroOk: "Bienvenido(a) a CCXP INSIDER — tus códigos ya están en la cartera de abajo.",
+    interessesOkB: "Intereses guardados ✓",
+    interessesOk: "¡Gracias! Ahora la experiencia tiene más tu estilo.",
+    pesquisaB: "10 segundos:",
+    pesquisaPre: "cuéntanos",
+    pesquisaLink: "qué te atrae de la CCXP",
+    pesquisaPos: "— hace que las invitaciones y la programación tengan más tu estilo.",
+    titulo: (nome) => `Tu cartera, ${nome}`,
+    lgpd: (data) => `LGPD ✓ ${data}`,
+    resgateDecl: "Canje declarado",
+    anfitriaoUm: "Tu anfitrión en Omelete:",
+    anfitriaoVarios: "Tus anfitriones en Omelete:",
+    ingressos: "Tus entradas",
+    ingressosNota: (n) => `${n} código(s), consolidados de todas las invitaciones`,
+    resgatar: "Canjear en Mundo Ticket ↗",
+    copiarB: "Toca un código para copiarlo",
+    copiarTexto:
+      "y canjéalo manualmente en el sitio de Mundo Ticket. Los códigos que ya copiaste quedan marcados aquí en la cartera.",
+    mtB: "Necesitas una cuenta en Mundo Ticket",
+    mtTexto: "para canjear — si no la tienes, créala en la página de login. ¿Dudas? Mira el",
+    mtLink: "paso a paso del canje de cortesía",
+    mtPos: "en el centro de ayuda de la CCXP.",
+    dicaB: "Tip:",
+    dicaPre: "en la pestaña",
+    dicaPos: "encuentras el mapa del evento, horarios, por dónde entrar, cómo llegar y qué llevar.",
+    semCodigosB: "No hay códigos activos en tu cartera.",
+    semCodigos: "Las invitaciones expiradas o canceladas devuelven los códigos al pool.",
+    agenda: "Agenda del evento",
+    agendaNota: "agenda general única · perfil corporativo",
+  },
+  ticket: {
+    de: (host) => `Invitación de ${host}`,
+    copiar: "Toca para copiar el código",
+    copiado: "Copiado ✓",
+    codigoCopiado: "Código copiado",
+    disponivel: "Disponible",
+  },
+  pesquisa: {
+    ultima: (nome) => `Una última cosa, ${nome} · toma 10 segundos`,
+    tituloPre: "¿Qué te atrae de la ",
+    tituloEm: "CCXP",
+    sub: "Toca todo lo que combina contigo. Lo usamos para que tu experiencia (y nuestras invitaciones) tengan más tu estilo.",
+    erroVazio: "Elige al menos un interés.",
+    escolhaUm: "Elige al menos uno",
+    continuar: (n) => `Continuar con ${n} interés(es)`,
+    opcoes: [
+      { value: "Quadrinhos", label: "Cómics" },
+      { value: "Games", label: "Videojuegos" },
+      { value: "Terror", label: "Terror" },
+      { value: "Filmes", label: "Películas" },
+      { value: "Anime", label: "Anime" },
+      { value: "Momento com a família", label: "Tiempo en familia" },
+      { value: "Negócios", label: "Negocios" },
+      { value: "Networking", label: "Networking" },
+      { value: "Oportunidades de patrocínio", label: "Oportunidades de patrocinio" },
+    ],
   },
 };
 

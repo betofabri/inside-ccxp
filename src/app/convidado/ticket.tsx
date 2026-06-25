@@ -7,7 +7,7 @@ type Props = {
   valor: string;
   tipo: string;
   tipoLabel: string;
-  host: string;
+  labels: { de: string; copiar: string; copiado: string; codigoCopiado: string; disponivel: string };
 };
 
 const CHAVE = "insider-codigos-copiados";
@@ -20,7 +20,7 @@ const lerCopiados = (): number[] => {
   }
 };
 
-export default function Ticket({ codigoId, valor, tipo, tipoLabel, host }: Props) {
+export default function Ticket({ codigoId, valor, tipo, tipoLabel, labels }: Props) {
   const [copiado, setCopiado] = useState(false);
   const [flash, setFlash] = useState(false);
 
@@ -58,19 +58,19 @@ export default function Ticket({ codigoId, valor, tipo, tipoLabel, host }: Props
         type="button"
         className="codigo clicavel"
         onClick={copiar}
-        title="Toque pra copiar o código"
+        title={labels.copiar}
       >
         <span className="valor">{valor}</span>
         <span className="icone-copiar" aria-hidden>
           {flash ? "✓" : "⧉"}
         </span>
       </button>
-      <div className="origem">Convite de {host}</div>
+      <div className="origem">{labels.de}</div>
       <div className="rodape">
         {copiado ? (
-          <span className="badge copiado-badge">{flash ? "Copiado ✓" : "Código copiado"}</span>
+          <span className="badge copiado-badge">{flash ? labels.copiado : labels.codigoCopiado}</span>
         ) : (
-          <span className="badge entregue">Disponível</span>
+          <span className="badge entregue">{labels.disponivel}</span>
         )}
       </div>
     </div>
