@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
-import { TIPO_LABEL } from "@/lib/labels";
 import Ticket from "./ticket";
 import Confetes from "@/components/confetes";
-import { getT } from "@/lib/i18n";
+import { getT, TIPO_LABEL_I18N } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -113,7 +112,7 @@ export default async function PaginaConvidado({
                 codigoId={cod.id}
                 valor={cod.valor}
                 tipo={cod.tipo}
-                tipoLabel={TIPO_LABEL[cod.tipo]}
+                tipoLabel={TIPO_LABEL_I18N[L][cod.tipo]}
                 labels={{
                   de: t.ticket.de(host),
                   copiar: t.ticket.copiar,

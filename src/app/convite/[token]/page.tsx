@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
-import { TIPO_LABEL } from "@/lib/labels";
 import { completarCadastro, entrarNaCarteira, expirarVencidos } from "@/lib/convites";
 import { solicitarOtpConvite, validarOtpConvite, verificado } from "@/lib/otp";
-import { getT } from "@/lib/i18n";
+import { getT, TIPO_LABEL_I18N } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -109,7 +108,7 @@ export default async function PaginaCadastro({
         <div className="resumo-ingressos">
           {convite.parcelas.map((p) => (
             <span className={`saldo-chip t-${p.tipo}`} key={p.id}>
-              <span className="nome-tipo">{TIPO_LABEL[p.tipo]}</span>
+              <span className="nome-tipo">{TIPO_LABEL_I18N[L][p.tipo]}</span>
               <span className="n c">{p.qtd}</span>
               {p.vip && <span className="badge vip">VIP</span>}
             </span>

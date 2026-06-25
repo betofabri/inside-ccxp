@@ -737,6 +737,34 @@ const ES: Dicionario = {
   },
 };
 
+// Tipos de ingresso traduzidos pras telas do convidado (admin usa TIPO_LABEL PT)
+export const TIPO_LABEL_I18N: Record<Locale, Record<string, string>> = {
+  pt: {
+    spoiler_night: "Spoiler Night",
+    quinta: "Quinta",
+    sexta: "Sexta",
+    sabado: "Sábado",
+    domingo: "Domingo",
+    todos_os_dias: "Todos os Dias VIP",
+  },
+  en: {
+    spoiler_night: "Spoiler Night",
+    quinta: "Thursday",
+    sexta: "Friday",
+    sabado: "Saturday",
+    domingo: "Sunday",
+    todos_os_dias: "All Days VIP",
+  },
+  es: {
+    spoiler_night: "Spoiler Night",
+    quinta: "Jueves",
+    sexta: "Viernes",
+    sabado: "Sábado",
+    domingo: "Domingo",
+    todos_os_dias: "Todos los Días VIP",
+  },
+};
+
 export const DICIONARIOS: Record<Locale, Dicionario> = { pt: PT, en: EN, es: ES };
 
 export async function getT(): Promise<{ L: Locale; t: Dicionario }> {
