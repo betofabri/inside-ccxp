@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { assumirPersona } from "@/lib/actions";
 import { resetarDemoConvidado, resetarDemoHost } from "@/lib/demo";
 import { NIVEL_LABEL } from "@/lib/labels";
+import { getT } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function Home({
   }>;
 }) {
   const { reset, qtd, token, erro, resethost, convites, apagados } = await searchParams;
+  const { t } = await getT();
   // só ativos aparecem no hub; admin entra por /backstage (fora da navegação)
   const funcionarios = await db.funcionario.findMany({ where: { ativo: true }, orderBy: { id: "asc" } });
   const convidados = await db.convidado.findMany({
@@ -34,19 +36,18 @@ export default async function Home({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-insider.svg`} alt="CCXP Insider" className="logo-hero" />
         <h1>
-          A plataforma de RSVP e relacionamento para convidados especiais{" "}
-          <em>pré, durante e pós CCXP</em>
+          {t.hub.heroPre} <em>{t.hub.heroEm}</em>
         </h1>
         <div className="evento">
           <span><b>CCXP26</b></span>
-          <span>03 a 06 de dezembro de 2026</span>
-          <span>São Paulo Expo</span>
-          <span>Protótipo navegável · escolha um papel pra entrar</span>
+          <span>{t.evento.datas}</span>
+          <span>{t.evento.local}</span>
+          <span>{t.hub.escolha}</span>
         </div>
         <div className="hero-ctas">
-          <a className="cta" href="#personas">Sou host</a>
+          <a className="cta" href="#personas">{t.hub.souHost}</a>
           <a className="cta fantasma" href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/acesso`}>
-            Sou convidado
+            {t.hub.souConvidado}
           </a>
         </div>
       </section>
@@ -61,11 +62,9 @@ export default async function Home({
       <section className="personas" id="personas">
         <div className="persona-col">
           <header>
-            Colaborador O&CO <span className="num">host</span>
+            {t.hub.colabTitulo} <span className="num">host</span>
           </header>
-          <p className="desc">
-            Convida direto da tela inicial e acompanha os próprios convites. A flag corporativa libera o lote compartilhado.
-          </p>
+          <p className="desc">{t.hub.colabDesc}</p>
           <ul>
             {hosts.map((f) => (
               <li key={f.id}>
@@ -75,7 +74,7 @@ export default async function Home({
                   <button className="persona-btn" type="submit">
                     <span className="nome">{f.nome}</span>
                     <span className="meta">
-                      {NIVEL_LABEL[f.nivel]} · {f.podeCorporativo ? "com flag corp" : "sem flag"}
+                      {NIVEL_LABEL[f.nivel]} · {f.podeCorporativo ? t.hub.comFlag : t.hub.semFlag}
                     </span>
                     <span className="seta">→</span>
                   </button>
@@ -87,11 +86,11 @@ export default async function Home({
 
         <div className="persona-col">
           <header>
-            Convidado <span className="num">vip</span>
+            {t.hub.convTitulo} <span className="num">vip</span>
           </header>
           <p className="desc">
-            Carteira de códigos consolidada, link da Mundo Ticket e agenda do evento (perfil corporativo).
-            Já se cadastrou? <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/acesso`} style={{ textDecoration: "underline" }}>Entre com seu código</a>.
+            {t.hub.convDesc} {t.hub.jaCadastrou}{" "}
+            <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/acesso`} style={{ textDecoration: "underline" }}>{t.hub.entreComCodigo}</a>.
           </p>
           <ul>
             {convidados.map((c) => (
@@ -103,7 +102,7 @@ export default async function Home({
                     <span className="nome">{c.nome}</span>
                     <span className="meta">
                       {c.convites.length > 1
-                        ? `${c.convites.length} convites`
+                        ? t.hub.convitesN(c.convites.length)
                         : c.convites[0]?.status ?? "—"}
                     </span>
                     <span className="seta">→</span>

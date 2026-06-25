@@ -7,6 +7,8 @@ import { NIVEL_LABEL, fmtData } from "@/lib/labels";
 import { db } from "@/lib/db";
 import PerfilTopo from "@/components/perfil-topo";
 import ImportarBotao from "@/app/funcionario/importar-botao";
+import LangToggle from "@/components/lang-toggle";
+import { getT } from "@/lib/i18n";
 
 const display = Marcellus({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const corpo = Archivo({ subsets: ["latin"], variable: "--font-corpo" });
@@ -94,9 +96,10 @@ async function carregarPerfil(role: string, id: number): Promise<Perfil | null> 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const persona = await getPersona();
   const perfil = persona ? await carregarPerfil(persona.role, persona.id) : null;
+  const { L, t } = await getT();
 
   return (
-    <html lang="pt-BR">
+    <html lang={L === "pt" ? "pt-BR" : L}>
       <body className={`${display.variable} ${corpo.variable} ${mono.variable}`}>
         <header className="topbar">
           <Link href="/" aria-label="Início">
@@ -104,15 +107,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ccxp-insider.svg`} alt="CCXP Insider" className="logo" />
           </Link>
           <span className="sistema">
-            <b>CCXP INSIDER.</b> O Backstage do Backstage.
+            <b>CCXP INSIDER.</b> {t.header.tagline}
           </span>
           <nav className="topo-nav">
-            <Link href="/apoio" className="topo-link">Assets</Link>
-            <button className="topo-link breve" type="button" disabled title="Fotos: em breve">
-              Fotos <span className="selo-breve">em breve</span>
+            <Link href="/apoio" className="topo-link">{t.header.assets}</Link>
+            <Link href="/faq" className="topo-link">{t.header.faq}</Link>
+            <button className="topo-link breve" type="button" disabled title={`${t.header.fotos}: ${t.header.breve}`}>
+              {t.header.fotos} <span className="selo-breve">{t.header.breve}</span>
             </button>
           </nav>
           <span className="spacer" />
+          <LangToggle atual={L} />
           {perfil && (
             <PerfilTopo
               nome={perfil.nome}
@@ -130,10 +135,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main>{children}</main>
         <footer className="rodape-app">
           <span className="assinatura">
-            <b>CCXP INSIDER</b> · A plataforma de convites e relacionamento corporativo da CCXP
+            <b>CCXP INSIDER</b> · {t.rodape.assinatura}
           </span>
-          <span>CCXP26 · 03 a 06 dez 2026 · São Paulo Expo</span>
-          <span>Protótipo · envio mockado · dados de exemplo</span>
+          <span>CCXP26 · {t.evento.datas} · {t.evento.local}</span>
+          <span>{t.rodape.proto}</span>
         </footer>
       </body>
     </html>

@@ -2995,3 +2995,92 @@ details.secao[open] > *:not(summary) {
 /* ── Reset demo: dois botões lado a lado ───────────────────────────────────── */
 
 .reset-acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ── Toggle de idioma (header) ─────────────────────────────────────────────── */
+
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-right: 12px;
+}
+
+.lang-toggle form { display: flex; margin: 0; }
+
+.lang-opt {
+  padding: 5px 9px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.lang-opt:hover { color: var(--ink); }
+.lang-opt.ativo { color: var(--ink-on-accent); background: var(--champagne); font-weight: 600; }
+
+@media (max-width: 640px) {
+  .lang-toggle { margin-right: 8px; }
+  .lang-opt { padding: 5px 7px; }
+}
+
+/* ── FAQ ───────────────────────────────────────────────────────────────────── */
+
+.faq-lista { display: grid; gap: 10px; max-width: 760px; }
+
+.faq-item {
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  border-radius: var(--radius-m);
+  padding: 0 18px;
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 0;
+}
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-q { font-size: 15.5px; font-weight: 600; color: var(--ink); }
+
+.faq-mais {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--champagne);
+  transition: transform 0.2s var(--ease);
+}
+
+.faq-item[open] .faq-mais { transform: rotate(45deg); }
+
+.faq-a {
+  margin: 0;
+  padding: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 62ch;
+}
+
+.faq-rodape {
+  margin-top: 22px;
+  padding: 16px 18px;
+  max-width: 760px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--champagne);
+  border-radius: var(--radius-s);
+  color: var(--muted);
+}
+
+.faq-rodape b { color: var(--ink); }

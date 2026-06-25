@@ -21,3 +21,9 @@ export async function sairPersona() {
   (await cookies()).delete("persona");
   redirect("/");
 }
+
+export async function trocarIdioma(formData: FormData) {
+  const lang = String(formData.get("lang") ?? "pt");
+  if (!["pt", "en", "es"].includes(lang)) return;
+  (await cookies()).set("lang", lang, { path: "/", maxAge: 60 * 60 * 24 * 365 });
+}
