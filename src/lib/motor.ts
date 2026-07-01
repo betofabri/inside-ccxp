@@ -41,11 +41,17 @@ export async function processarRegua() {
             include: { convites: { include: { codigos: true, host: true } } },
           })
         : await db.convidado.findMany({
+            // regua: o MESMO convite precisa ser ativo E corporativo (chaves
+            // duplicadas num objeto se sobrescrevem — por isso o some único)
             where: {
-              convites: { some: { status: { in: ["pendente", "cadastrado"] } } },
-              ...(passo.categoria === "regua"
-                ? { convites: { some: { parcelas: { some: { pool: "corporativo" } } } } }
-                : {}),
+              convites: {
+                some: {
+                  status: { in: ["pendente", "cadastrado"] },
+                  ...(passo.categoria === "regua"
+                    ? { parcelas: { some: { pool: "corporativo" } } }
+                    : {}),
+                },
+              },
             },
             include: {
               convites: {
