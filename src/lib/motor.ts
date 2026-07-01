@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { enviarEmail, templateEmail, linkar } from "@/lib/email";
+import { renderizarTemplate } from "@/lib/template";
 
 // F4 — Motor de disparo da régua. Processa as etapas ativas ancoradas no
 // calendário (dataRef vencida), resolve a audiência por categoria, aplica
@@ -96,12 +97,12 @@ export async function processarRegua() {
 
       const convite = c.convites[0];
       const link = convite ? `${URL_HUB}/convite/${convite.magicToken}` : URL_HUB;
-      const corpo = passo.corpo
-        .replaceAll("{{nome}}", c.nome.split(" ")[0])
-        .replaceAll("{{host}}", convite?.host.nome ?? "CCXP INSIDER")
-        .replaceAll("{{qtd}}", String(convite?.codigos.length ?? ""))
-        .replaceAll("{{tipos}}", "")
-        .replaceAll("{{link}}", link);
+      const corpo = renderizarTemplate(passo.corpo, {
+        nome: c.nome.split(" ")[0],
+        host: convite?.host.nome,
+        qtd: convite?.codigos.length ?? "",
+        link,
+      });
 
       let statusEnvio = "enviado";
       if (passo.canal.includes("email") && c.email) {

@@ -17,7 +17,14 @@ function kv(): KVNamespace {
   return env.OTP;
 }
 
-const gerarCodigo = () => String(Math.floor(100000 + Math.random() * 900000));
+// CSPRNG: rejection sampling pra distribuição uniforme em [100000, 999999]
+const gerarCodigo = () => {
+  const buf = new Uint32Array(1);
+  do {
+    crypto.getRandomValues(buf);
+  } while (buf[0] >= 4294000000); // descarta a cauda que enviesaria o módulo
+  return String(100000 + (buf[0] % 900000));
+};
 
 // rate-limit de reenvio: 3 códigos por janela de 10 min por chave
 const LIMITE_ENVIOS = 3;

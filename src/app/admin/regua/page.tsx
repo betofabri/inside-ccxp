@@ -14,6 +14,7 @@ import {
 import { adicionarPreCadastro, importarPreCadastros, dispararSaveTheDate } from "@/lib/savethedate";
 import { processarRegua } from "@/lib/motor";
 import AdminTabs from "../admin-tabs";
+import { renderizarTemplate } from "@/lib/template";
 
 export const dynamic = "force-dynamic";
 
@@ -145,12 +146,13 @@ export default async function PaginaFollowUp({
   const linkTeste = await linkAmostraTeste();
   const linkWhatsTeste = (passo: Passo) => {
     const nome = admin?.nome ?? "Admin";
-    const corpo = passo.corpo
-      .replaceAll("{{nome}}", nome.split(" ")[0])
-      .replaceAll("{{host}}", nome)
-      .replaceAll("{{qtd}}", "2")
-      .replaceAll("{{tipos}}", "2× Sábado")
-      .replaceAll("{{link}}", linkTeste);
+    const corpo = renderizarTemplate(passo.corpo, {
+      nome: nome.split(" ")[0],
+      host: nome,
+      qtd: 2,
+      tipos: "2× Sábado",
+      link: linkTeste,
+    });
     return `https://wa.me/?text=${encodeURIComponent(`*[TESTE] ${passo.assunto}*\n\n${corpo}\n\n_CCXP INSIDER · CCXP26 · 03 a 06/dez · São Paulo Expo_`)}`;
   };
 

@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { getPersona } from "@/lib/persona";
 import { enviarEmail, templateEmail, linkar } from "@/lib/email";
 import { enviarWhatsApp } from "@/lib/whatsapp";
+import { renderizarTemplate } from "@/lib/template";
 
 async function exigirAdmin() {
   const persona = await getPersona();
@@ -132,12 +133,13 @@ export async function enviarTestePasso(formData: FormData) {
 
   // renderiza o template com dados de amostra
   const link = await linkAmostraTeste();
-  const corpo = passo.corpo
-    .replaceAll("{{nome}}", admin.nome.split(" ")[0])
-    .replaceAll("{{host}}", admin.nome)
-    .replaceAll("{{qtd}}", "2")
-    .replaceAll("{{tipos}}", "2× Sábado")
-    .replaceAll("{{link}}", link);
+  const corpo = renderizarTemplate(passo.corpo, {
+    nome: admin.nome.split(" ")[0],
+    host: admin.nome,
+    qtd: 2,
+    tipos: "2× Sábado",
+    link,
+  });
 
   const envio = await enviarEmail({
     para: destino,
@@ -179,12 +181,13 @@ export async function enviarTesteWhatsPasso(formData: FormData) {
   if (!destino) redirect("/admin/regua?erro=sem_whats");
 
   const link = await linkAmostraTeste();
-  const corpo = passo.corpo
-    .replaceAll("{{nome}}", admin.nome.split(" ")[0])
-    .replaceAll("{{host}}", admin.nome)
-    .replaceAll("{{qtd}}", "2")
-    .replaceAll("{{tipos}}", "2× Sábado")
-    .replaceAll("{{link}}", link);
+  const corpo = renderizarTemplate(passo.corpo, {
+    nome: admin.nome.split(" ")[0],
+    host: admin.nome,
+    qtd: 2,
+    tipos: "2× Sábado",
+    link,
+  });
 
   const envio = await enviarWhatsApp({
     para: destino,

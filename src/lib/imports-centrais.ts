@@ -141,7 +141,11 @@ export async function salvarConfigs(formData: FormData) {
   const chaves = ["expiracao_dias", "link_mundo_ticket", "evento_inicio", "evento_fim", "evento_local", "email_teste", "whats_teste"];
   for (const chave of chaves) {
     const valor = String(formData.get(chave) ?? "").trim();
-    if (!valor) continue;
+    if (!valor) {
+      // campo esvaziado de propósito: remove a config (o código tem fallback)
+      await db.config.delete({ where: { chave } }).catch(() => {});
+      continue;
+    }
     await db.config.upsert({ where: { chave }, update: { valor }, create: { chave, valor } });
   }
   await db.auditLog.create({

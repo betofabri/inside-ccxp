@@ -3084,3 +3084,14 @@ details.secao[open] > *:not(summary) {
 }
 
 .faq-rodape b { color: var(--ink); }
+
+/* ── Auditoria Fable 5: P2 fixes ───────────────────────────────────────────── */
+
+/* toggle de idioma: alvo de toque confortável (era 28×24) */
+.lang-opt { padding: 9px 12px; }
+
+/* tabs do admin com scroll no mobile, sem a scrollbar aparente */
+.admin-tabs {
+  scrollbar-width: none;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
